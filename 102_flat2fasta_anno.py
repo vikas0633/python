@@ -75,13 +75,22 @@ def makeFasta(file,seq_col,anno_col):
             if line[0] != '#':
                 if first_line == False:
                     header = '>'
+                    ''' for spider work
                     for i in list(anno_col.split(',')):
                         if (token[1] == '') or (token[1] == 0):
                             header += token[0]+','+token[0]+','
                             break   
                         header += token[int(i)-1]+','
-                    print (header.strip())[:-1]
-                    print token[int(seq_col)-1]
+                        '''
+                    if  len(token) == int(seq_col):   
+						for i in list(anno_col.split(',')): 
+							if (token[1] == '') or (token[1] == '0') or (float(token[2].strip()) == 0):
+								header += token[0]+','+token[-2]+','
+								break
+							header += token[int(i)-1]+','
+
+						print (header.strip())[:-1]
+						print token[int(seq_col)-1]
                 first_line = False       
         
 

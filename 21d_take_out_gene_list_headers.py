@@ -1,37 +1,37 @@
 
 def fasta_len(file):
 	first_line = True
-	length = {}
+	seq = {}
 	for line in open(file,'r'):
 		line = line.strip()
 		if len(line) > 0 :			
 			if line[0] == '>':
 				if first_line == False:
-					length[header] = str_len
-				str_len = ''
-				header = line[1:]
+					seq[header] = sq
+				sq = ''
+				header = line[1:].split(' ')[0]
 			else:
-				str_len += line
+				sq += line
 		first_line = False			
-	length[header] = str_len
+	seq[header] = sq
 	
-	return length
+	return seq
 
-def extract_seq(file,header,length):
+def extract_seq(file,header,seq):
 	for line in open(header,'r'):
 		header = line.strip()	
 		header = header.replace(' ','').replace('>','')
-		if header in length:
+		if header in seq:
 			print '>'+header
-			print length[header]
+			print seq[header]
 		
 	
 if __name__ == "__main__":
     
     # get the file and header
-    file="/Users/vgupta/Desktop/temp/test.fa"
-    header="/Users/vgupta/Desktop/temp/test.header"
+    file="/home/vgupta/spider/03geneAnnotation/01_collapsed_tranctula_transcripts/Palle_assembly.tarantula.39950.200bp.fasta"
+    header="/home/vgupta/spider/03geneAnnotation/01_collapsed_tranctula_transcripts/silk_gene_transcripts.fas.200bp.blastout.scaf"
     
-    length = fasta_len(file)
+    seq = fasta_len(file)
     # get the sequence
-    extract_seq(file,header,length)
+    extract_seq(file,header,seq)

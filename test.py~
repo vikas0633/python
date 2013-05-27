@@ -15,7 +15,6 @@ def options(argv):
 	except getopt.GetoptError:
 		print 'python 21w1_format_fasta.py -i <inputfile>'
 		sys.exit(2)
-
 	for opt, arg in opts:
 		if opt == '-h':
 			print 'python 21w1_format_fasta.py -i <inputfile>'

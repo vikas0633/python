@@ -10,7 +10,6 @@ Created on March 14, 2013
 # python ~/script/python/21ai_modify_gene_names.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 import os,sys,getopt, re
-from C_loadFasta import *
 import A_hash_file
 import E_get_chr_size_gff3
 
