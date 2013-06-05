@@ -10,7 +10,6 @@ Created on Feb 25, 2013
 # python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 import os,sys,getopt, re
-from C_loadFasta import *
 
 
 

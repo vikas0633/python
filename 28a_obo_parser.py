@@ -10,7 +10,6 @@ Created on Feb 25, 2013
 # python ~/script/python/28a_obo_parser.py -i 02_gene_ontology_ext.obo.txt -c name,namespace,def
 
 import os,sys,getopt, re
-from C_loadFasta import *
 
 
 
