@@ -1,7 +1,7 @@
-### load function scripts
-<br > A_hash_file.py - /Users/vikas0633/Desktop/script/python/ - a script that hash the second column using first column as key  <br />
-<br > B_hash_mRNA_IDs.py - /Users/vikas0633/Desktop/script/python/ - returns a uniq mRNA id hash <br />
-<br > C_loadFasta.py - /Users/vikas0633/Desktop/script/python/ - script to load fasta sequences <br />
+### Custom Made Modules
+A_hash_file.py - /Users/vikas0633/Desktop/script/python/ - a script that hash the second column using first column as key  <br />
+B_hash_mRNA_IDs.py - /Users/vikas0633/Desktop/script/python/ - returns a uniq mRNA id hash <br />
+C_loadFasta.py - /Users/vikas0633/Desktop/script/python/ - script to load fasta sequences <br />
 D_longest_fasta_sequence_header.py - /Users/vikas0633/Desktop/script/python/ - script return headers of longest sequence
 E_get_chr_size_gff3.py - script takes a gff3 file and returns max position for each chromosome - /Users/vikas0633/Desktop/script/python/
 
