@@ -7,39 +7,39 @@ E_get_chr_size_gff3.py - script takes a gff3 file and returns max position for e
 
 
 ## smallRNA Clustering Scripts
-4a.py plant_week29 - calculating clusters based on genotype (input IGV file) <br />
-4a1.r plant_week29 - for plotting results from previous step <br />
-4b.py plant_week30 - find clusters regulations and pattern based on size <br /> 
-4c.py plant_week30 - from the clusters, make it to the inter-intra genic analysis <br />
-4d.py plant_week31 - calculating regulated sequences in the cluster <br />
+4a.py - calculating clusters based on genotype (input IGV file) <br />
+4a1.r - for plotting results from previous step <br />
+4b.py - find clusters regulations and pattern based on size <br /> 
+4c.py - from the clusters, make it to the inter-intra genic analysis <br />
+4d.py - calculating regulated sequences in the cluster <br />
 
 
 ## FASTA Handlers
-5.py plant_week30 - make fasta files <br />
-5b.py plant_week30 - take out mapping positions from igv file using fasta file containing sequences <br />
-6.py plant/lotus_mRNA - a script for taking out cDNAs from transcripts file i.e. MG20 file <br />
-7.py plant/2011_week31 - a script for any fasta file which looks for a pattern and returns a count and possibility of being random <br />
+5.py  - make fasta files <br />
+5b.py - take out mapping positions from igv file using fasta file containing sequences <br />
+6.py  - a script for taking out cDNAs from transcripts file i.e. MG20 file <br />
+7.py  - a script for any fasta file which looks for a pattern and returns a count and possibility of being random <br />
 
 
 ## miRNA Mapping
-8a.py plant/2011_week31 - script for replacing 'U' to 'T' <br />
+8a.py - script for replacing 'U' to 'T' <br />
 
 
 ## Genome Gap Filling Simulation
-9.sh 2011_gap_filling/2011_week33/ script for gap filling project <br />
-9a.py 2011_gap_filling/2011_week33/ for taking out rep element <br />
-9b.py 2011_gap_filling/2011_week33/ for replacing genome by N <br />
-9c.py 2011_gap_filling/2011_week33/ for taking out sequence where only one read is mapped <br />
-9d.py 2011_gap_filling/2011_week33/ take out the rep elements and put these in the genomic region <br />
+9.sh - script for gap filling project <br />
+9a.py - for taking out rep element <br />
+9b.py - for replacing genome by N <br />
+9c.py - for taking out sequence where only one read is mapped <br />
+9d.py - take out the rep elements and put these in the genomic region <br />
 
 ## Gap Filling Real Data
 10a.py - take out N-region from the ref_genome <br />
 10b.py - remove any additional N-region which might be present in 10Kb flanking region <br />
 10c.py -  <br />
-10q.py - 2011_gap_filling/2011_week39/20110926 calculating insert_size/distances <br />
-10r.py - 2011_gap_filling/2011_week39/20110927 ### check if you have all elements <br />
-10s.py - 2011_gap_filling/2011_week39/20110927 ### make reverse complement multi-fasta <br />
-10t.py - 2011_gap_filling/2011_week39/20110928 ### make summary output for elements <br />
+10q.py - calculating insert_size/distances <br />
+10r.py - check if you have all elements <br />
+10s.py - make reverse complement multi-fasta <br />
+10t.py - make summary output for elements <br />
 
 ### ShortRan Scripts
 12.sh - /plant/2011_week37/ <br />
