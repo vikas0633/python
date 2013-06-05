@@ -1,91 +1,89 @@
-### Custom Made Modules
+## Custom Made Modules
 A_hash_file.py - /Users/vikas0633/Desktop/script/python/ - a script that hash the second column using first column as key  <br />
 B_hash_mRNA_IDs.py - /Users/vikas0633/Desktop/script/python/ - returns a uniq mRNA id hash <br />
 C_loadFasta.py - /Users/vikas0633/Desktop/script/python/ - script to load fasta sequences <br />
-D_longest_fasta_sequence_header.py - /Users/vikas0633/Desktop/script/python/ - script return headers of longest sequence
-E_get_chr_size_gff3.py - script takes a gff3 file and returns max position for each chromosome - /Users/vikas0633/Desktop/script/python/
-
-3.R Plant_week29 - calculating cluster distribution across the chromosome in R
-
-### cluster scripts
-4a.py plant_week29 - calculating clusters based on genotype (input IGV file)
-4a1.r plant_week29 - for plotting results from previous step
-4b.py plant_week30 - find clusters regulations and pattern based on size 
-4c.py plant_week30 - from the clusters, make it to the inter-intra genic analysis
-4d.py plant_week31 - calculating regulated sequences in the cluster
-
-### taking out DNA and igv
-5.py plant_week30 - make fasta files
-5b.py plant_week30 - take out mapping positions from igv file using fasta file 				 containing sequences 
-
-6.py plant/lotus_mRNA - a script for taking out cDNAs from transcripts file i.e. MG20 file
-
-7.py plant/2011_week31 - a script for any fasta file which looks for a pattern and returns a count and possibility of being random
+D_longest_fasta_sequence_header.py - /Users/vikas0633/Desktop/script/python/ - script return headers of longest sequence <br />
+E_get_chr_size_gff3.py - script takes a gff3 file and returns max position for each chromosome - /Users/vikas0633/Desktop/script/python/ <br />
 
 
-### miRNA Mapping
-8a.py plant/2011_week31 - script for replacing 'U' to 'T'
+## smallRNA Clustering Scripts
+4a.py plant_week29 - calculating clusters based on genotype (input IGV file) <br />
+4a1.r plant_week29 - for plotting results from previous step <br />
+4b.py plant_week30 - find clusters regulations and pattern based on size <br /> 
+4c.py plant_week30 - from the clusters, make it to the inter-intra genic analysis <br />
+4d.py plant_week31 - calculating regulated sequences in the cluster <br />
 
 
-### gap filling simulated
-9.sh 2011_gap_filling/2011_week33/ script for gap filling project
-9a.py 2011_gap_filling/2011_week33/ for taking out rep element
-9b.py 2011_gap_filling/2011_week33/ for replacing genome by N
-9c.py 2011_gap_filling/2011_week33/ for taking out sequence where only one read is mapped
-9d.py 2011_gap_filling/2011_week33/ take out the rep elements and put these in the genomic region
+## FASTA Handlers
+5.py plant_week30 - make fasta files <br />
+5b.py plant_week30 - take out mapping positions from igv file using fasta file containing sequences <br />
+6.py plant/lotus_mRNA - a script for taking out cDNAs from transcripts file i.e. MG20 file <br />
+7.py plant/2011_week31 - a script for any fasta file which looks for a pattern and returns a count and possibility of being random <br />
 
-### gap_filling real data
-10a.py - take out N-region from the ref_genome
-10b.py - remove any additional N-region which might be present in 10Kb flanking region
-10c.py -  
-10q.py - 2011_gap_filling/2011_week39/20110926 calculating insert_size/distances
-10r.py - 2011_gap_filling/2011_week39/20110927 ### check if you have all elements
-10s.py - 2011_gap_filling/2011_week39/20110927 ### make reverse complement multi-fasta
-10t.py - 2011_gap_filling/2011_week39/20110928 ### make summary output for elements
 
-### shell Script for smallRNA pipeline
-12.sh - /plant/2011_week37/
-12a.py - /plant/2011_week40/20111004/
-12b.py - /plant/2011_week37/ for taking out sequences with particular pattern
-12c.py - /plant/2011_week38/20110920/ make fasta file from profile
-12d.py - /plant/2011_week38/20110920/ replace U by T in miRNA database
-12e.py - /plant/2011_week38/20110920/ for counting mismatches
-12f.py - /plant/2011_week38/20110920/ for miRNA mapping from counting
-12g.py - /plant/2011_week38/20110923/ cluster predictions
-12h.py - /plant/2011_week38/20110923/ genome region analysis cluster by cluster or position by position  
-12i.py - /plant/2011_week38/20110924/ for counting regulated sequences in cluster
-12j.py - /plant/2011_week40/20111004/ for counting unique size sequences and plotting the distribution from profile files
-12k.py - /plant/2011_week40/20111004/ for counting unique size sequences and plotting the distribution from cluster files
-12l.py - /plant/2011_week42/20111017 - for making profile from fastq files
-12m.py - /plant/2011_week42/20111017 - remove reads which were mapped on repeats
-12n.py - /plant/2011_week42/20111017 - for normalizing profiles
-12o.py - /plant/2011_week42/20111019 - ### generate a text file with 0's of size total_no_of_libraries*total_no_of_libraries
-12p.py - /plant/2011_week42/20111019 - for plotting expression data between two sets
-12r.py - /plant/2011_week43/scripts -  for making sql batch script
-mysql_batch - /plant/2011_week43/scripts - for saving file into the mysql database
-12s.py - add anotation to the sequences
-12t.py - script for making mySQl-add column batch file
-12u.py - make a script which can make a fasta file with abundance in the header as of format Sequence_xAbundance
-12v.py - script for making igv files for clustering and visualization
-12w.py - script for filtering reads based on score
-12x.py - script for making chromosome length file for miRNA predictions
-12y.py - script for making file compatible for tasiRNA predictions
-12z.py - script for taking out clusters of ta-siRNAs
-12aa.py - script for combining sequences for profile with the mapped genomic sequences which contain genomic annotation
-12ab.py - script for making header for the table with library wise abundances
-12ac.py - script for making table the library wise abundances
-12ad.py - script for plotting abundaces
-12ae.py - python script for reaplcing libraries header
-12af.py - miRNA to MySQL database 
-12ag.py - tasi-RNA to MySQL database
-12ah.py - add length coloumn to the mySQL database
-12ai.py - make a file with unique abundances
-12ai.py - 
-12aj.py - script for spliting the fastq files by size
-12ak.py - make artificial adapters
-12al.py - parse the mirdeep 2 output to the mysql supported output
-12am.py - script to find the miRNA* sequences in profiles - /Users/vgupta/Desktop/script/python
-12an.py - script to add an identifier based non-redundancy - /Users/vgupta/Desktop/script/python
+## miRNA Mapping
+8a.py plant/2011_week31 - script for replacing 'U' to 'T' <br />
+
+
+## Genome Gap Filling Simulation
+9.sh 2011_gap_filling/2011_week33/ script for gap filling project <br />
+9a.py 2011_gap_filling/2011_week33/ for taking out rep element <br />
+9b.py 2011_gap_filling/2011_week33/ for replacing genome by N <br />
+9c.py 2011_gap_filling/2011_week33/ for taking out sequence where only one read is mapped <br />
+9d.py 2011_gap_filling/2011_week33/ take out the rep elements and put these in the genomic region <br />
+
+## Gap Filling Real Data
+10a.py - take out N-region from the ref_genome <br />
+10b.py - remove any additional N-region which might be present in 10Kb flanking region <br />
+10c.py -  <br />
+10q.py - 2011_gap_filling/2011_week39/20110926 calculating insert_size/distances <br />
+10r.py - 2011_gap_filling/2011_week39/20110927 ### check if you have all elements <br />
+10s.py - 2011_gap_filling/2011_week39/20110927 ### make reverse complement multi-fasta <br />
+10t.py - 2011_gap_filling/2011_week39/20110928 ### make summary output for elements <br />
+
+### ShortRan Scripts
+12.sh - /plant/2011_week37/ <br />
+12a.py - /plant/2011_week40/20111004/ <br />
+12b.py - /plant/2011_week37/ for taking out sequences with particular pattern <br />
+12c.py - /plant/2011_week38/20110920/ make fasta file from profile <br />
+12d.py - /plant/2011_week38/20110920/ replace U by T in miRNA database <br />
+12e.py - /plant/2011_week38/20110920/ for counting mismatches <br />
+12f.py - /plant/2011_week38/20110920/ for miRNA mapping from counting <br />
+12g.py - /plant/2011_week38/20110923/ cluster predictions <br />
+12h.py - /plant/2011_week38/20110923/ genome region analysis cluster by cluster or position by position <br />
+12i.py - /plant/2011_week38/20110924/ for counting regulated sequences in cluster <br />
+12j.py - /plant/2011_week40/20111004/ for counting unique size sequences and plotting the distribution from profile files <br />
+12k.py - /plant/2011_week40/20111004/ for counting unique size sequences and plotting the distribution from cluster files <br />
+12l.py - /plant/2011_week42/20111017 - for making profile from fastq files <br />
+12m.py - /plant/2011_week42/20111017 - remove reads which were mapped on repeats <br />
+12n.py - /plant/2011_week42/20111017 - for normalizing profiles <br />
+12o.py - /plant/2011_week42/20111019 - ### generate a text file with 0's of size total_no_of_libraries*total_no_of_libraries <br />
+12p.py - /plant/2011_week42/20111019 - for plotting expression data between two sets <br />
+12r.py - /plant/2011_week43/scripts -  for making sql batch script <br />
+mysql_batch - /plant/2011_week43/scripts - for saving file into the mysql database <br />
+12s.py - add anotation to the sequences <br />
+12t.py - script for making mySQl-add column batch file <br />
+12u.py - make a script which can make a fasta file with abundance in the header as of format Sequence_xAbundance <br />
+12v.py - script for making igv files for clustering and visualization <br />
+12w.py - script for filtering reads based on score <br />
+12x.py - script for making chromosome length file for miRNA predictions <br />
+12y.py - script for making file compatible for tasiRNA predictions <br />
+12z.py - script for taking out clusters of ta-siRNAs <br />
+12aa.py - script for combining sequences for profile with the mapped genomic sequences which contain genomic annotation <br />
+12ab.py - script for making header for the table with library wise abundances <br />
+12ac.py - script for making table the library wise abundances <br />
+12ad.py - script for plotting abundances <br />
+12ae.py - python script for reaplcing libraries header <br />
+12af.py - miRNA to MySQL database <br />
+12ag.py - tasi-RNA to MySQL database <br />
+12ah.py - add length coloumn to the mySQL database <br />
+12ai.py - make a file with unique abundances <br />
+12ai.py - <br />
+12aj.py - script for spliting the fastq files by size <br />
+12ak.py - make artificial adapters <br />
+12al.py - parse the mirdeep 2 output to the mysql supported output <br />
+12am.py - script to find the miRNA* sequences in profiles - /Users/vgupta/Desktop/script/python <br />
+12an.py - script to add an identifier based non-redundancy - /Users/vgupta/Desktop/script/python <br />
 
 
 
