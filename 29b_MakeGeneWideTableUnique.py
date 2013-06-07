@@ -84,9 +84,8 @@ COLNAME="mg004	mg010	mg012	mg019	mg023	mg036	mg049	mg051	mg062	mg072	mg073	mg077
 
 HEADER = '#'+'Lj30_ID'+ '\t'+ 'chr'+ '\t'+ 'start'+ '\t'+ 'end'+ '\t'+ 'old_IDs'
 
-for col in COLNAME:
-    for eff in EFFECTS:
-        HEADER += '\t' + col + '_' + eff
+for eff in EFFECTS:
+        HEADER += '\t' + eff
         
 HEADER += '\t' + 'details'
 

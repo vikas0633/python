@@ -239,6 +239,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 
 ### 29. snpEff data analysis
 29a_MakeGeneWideTable.py - script to put the snpEff data togehter <br />
+29b_MakeGeneWideTableUnique.py - script to summarize snpEff data <br />
 
 ### General Scripts
 100_intersect_columns.py - script to find non-overlapping entries between the two columns <br />
