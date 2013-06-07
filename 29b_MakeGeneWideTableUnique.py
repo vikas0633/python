@@ -100,7 +100,6 @@ def logfile(infile):
     
 
 ### main argument to 
-
 def options(argv):
     directory = ''
     suff= ''
@@ -109,7 +108,7 @@ def options(argv):
         opts, args = getopt.getopt(argv,"hd:s:g:",["dir=","suff=","gene_ID="])
     except getopt.GetoptError:
         print '''
-            python 29a_MakeGeneWideTable.py \
+            python 29b_MakeGeneWideTableUnique.py \
                                             -d <dir> \
                                             -s <suff> \
                                             -g <gene_ID>
@@ -118,7 +117,7 @@ def options(argv):
     for opt, arg in opts:
         if opt == '-h':
             print '''
-            python 29a_MakeGeneWideTable.py \
+            python 29b_MakeGeneWideTableUnique.py \
                                             -d <dir> \
                                             -s <suff> \
                                             -g <gene_ID>
@@ -138,7 +137,6 @@ def options(argv):
     
 ### process file one by one
 def process(f,snp_data):
-    snp_data[f] = {}
     name = COLNAME[files_prefix.index(f.replace(suff,'')[:-1])]
     for line in open(f,'r'):
         if len(line) > 0:
@@ -148,21 +146,24 @@ def process(f,snp_data):
                 transcript_id = token[12].strip()
                 if token[0].strip() == '':
                     chro = 0
+                pos = str(chro)+'_'+token[1]   
                 if effect in EFFECTS:
-                    if not transcript_id in snp_data[f]:
-                        snp_data[f][transcript_id] = {}
+                    if not transcript_id in snp_data:
+                        snp_data[transcript_id] = {}
                     
-                    if effect in snp_data[f][transcript_id]:
-                        snp_data[f][transcript_id][effect] += 1
+                    if effect in snp_data[transcript_id]:
+                        if pos not in snp_data[transcript_id][effect]:
+                            snp_data[transcript_id][effect].append(pos)
                     else:
-                        snp_data[f][transcript_id][effect] = 1
+                        snp_data[transcript_id][effect] = [pos]
                         
                     ### adding details
-                    if "details" in snp_data[f][transcript_id]:
-                        snp_data[f][transcript_id]["details"] += name+'-'+str(chro) +'-'+token[1]+'-'+EFFECTS_ABBREVATIONS[effect]+'-'+token[16]+'-'+token[17]+';' 
+                    if "details" in snp_data[transcript_id]:
+                        snp_data[transcript_id]["details"] += name+'-'+str(chro) +'-'+token[1]+'-'+EFFECTS_ABBREVATIONS[effect]+'-'+token[16]+'-'+token[17]+';' 
                     else:
-                        snp_data[f][transcript_id]["details"] = name +'-'+str(chro) +'-'+token[1]+'-'+EFFECTS_ABBREVATIONS[effect]+'-'+token[16]+'-'+token[17]+';'
+                        snp_data[transcript_id]["details"] = name +'-'+str(chro) +'-'+token[1]+'-'+EFFECTS_ABBREVATIONS[effect]+'-'+token[16]+'-'+token[17]+';'
     return snp_data
+
 ### Loop over the files in a folder
 def LoopFiles(direcotry, suff):
     snf_data = {}
@@ -189,20 +190,18 @@ def print_out(gene_id_hash, snp_data, suff):
         line = ''
         details = ''
         line += transcript_id + '\t'+ gene_id_hash[transcript_id]
-        for f in files_prefix:
-            f = f + "." + suff
-            for effect in EFFECTS:
-                if transcript_id not in snp_data[f]:
+        for effect in EFFECTS:
+            if transcript_id not in snp_data:
+                line += '\t' + str(0)
+            else:
+                if effect not in snp_data[transcript_id]:
                     line += '\t' + str(0)
                 else:
-                    if effect not in snp_data[f][transcript_id]:
-                        line += '\t' + str(0)
-                    else:
-                        line += '\t' + str(snp_data[f][transcript_id][effect])
-        
-            if transcript_id in snp_data[f]:
-                if "details" in snp_data[f][transcript_id]:
-                    details += snp_data[f][transcript_id]["details"] + ','
+                    line += '\t' + str(len(snp_data[transcript_id][effect]))
+    
+        if transcript_id in snp_data:
+            if "details" in snp_data[transcript_id]:
+                details += snp_data[transcript_id]["details"] + ','
         
         print line + '\t' + details
 
