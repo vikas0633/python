@@ -203,6 +203,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ah_count_N_between_genes.py - script to count Ns between the genes <br />
 21ai_modify_gene_names.py - script to modify gene names based on N counts <br />
 21aj_add_mRNA.py - script to add dummy mRNAs if absent <br />
+21ak_remove_redundant.py - script to remove the redundant node gene models
+
 	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -249,6 +251,5 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 103_sort_gff_blocks.py - script to sort GFF3 file blocks <br />
 104_intersect_files_column.py - script to print the desired columns given keys from the files <br />
 105_match_IDs_from_2gff3_files.py - script will take two gff3 files and print out the corresponding mRNA IDs <br />
-
-
+106_filter_out_against_genelist.py - this script will filter out the genes which are in the list <br />
 

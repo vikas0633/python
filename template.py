@@ -23,9 +23,11 @@
 # python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
+### import modules
 import os,sys,getopt, re
 
 
+### global variables
 
 ### make a logfile
 import datetime
