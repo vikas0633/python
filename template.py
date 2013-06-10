@@ -1,13 +1,27 @@
-'''
-Created on Feb 25, 2013
+#-----------------------------------------------------------+
+#                                                           |
+# template.py - template for python scripting               |
+#                                                           |
+#-----------------------------------------------------------+
+#                                                           |
+# AUTHOR: Vikas Gupta                                        |
+# CONTACT: vikas0633@gmail.com                              |
+# STARTED: 09/06/2013                                       |
+# UPDATED: 09/06/2013                                       |
+#                                                           |
+# DESCRIPTION:                                              | 
+# Short script to convert and copy the wheat BACs           |
+# Run this in the parent dir that the HEX* dirs exist       |
+#                                                           |
+# LICENSE:                                                  |
+#  GNU General Public License, Version 3                    |
+#  http://www.gnu.org/licenses/gpl.html                     |  
+#                                                           |
+#-----------------------------------------------------------+
 
-@author: vgupta
-'''
-
-### script was made for formatting the longest ORF to flat file
-
-### check output with 
+# Example:
 # python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+
 
 import os,sys,getopt, re
 
