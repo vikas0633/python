@@ -93,6 +93,7 @@ def list_of_rows(infile):
                 
 def filter_fasta(infile, keys):
     for line in open(infile):
+        line = line.strip()
         if len(line) > 1:
             if line[0] != '#':
                 if line[0] == '>':
@@ -103,8 +104,8 @@ def filter_fasta(infile, keys):
                         else:
                             flag = True
                     
-                    if flag == True:
-                        print line
+                if flag == True:
+                   print line
 
 def get_ID(line):
     match = re.search(r'ID=.+;',line)

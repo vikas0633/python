@@ -22,6 +22,10 @@ It must do following:
 import os,sys, getopt
 from D_longest_fasta_sequence_header import *
 
+### GLOBAL VARIABLEs
+TAU_PATH="/Users/vgupta/Desktop/tools/TAU"
+SCRIPT_DIR="/Users/vgupta/Desktop/script/python"
+
 def file_empty(file):
     count = sum([1 for line in open(file)])
     if count == 0:
@@ -89,25 +93,31 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                 if (chr_id == tokens[0][1:]):
                     ID = 'ID='+mRNA_id+'.'+str(model_no)+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                     frame = 0
-                    if strand == '+':
+                    if cds_strand == '+':
                         #mRNA_st = mRNA_st + exons[1][0]
                         if len(exons)==1:
                             #five_prime_UTR_st =  exons[1][0] + mRNA_st -1
                             five_prime_UTR_st = mRNA_st -1
                             five_prime_UTR_en = start - exons[1][0] + mRNA_st -2
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_st)+'\t'+str(five_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_st)+'\t'+str(five_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             CDS_st = start
                             CDS_en = end
                             ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_st + mRNA_st -1)+'\t'+str(CDS_en + mRNA_st -1)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_st + mRNA_st -1)+'\t'+str(CDS_en + mRNA_st -1)+'\t'+'.'+'\t'+cds_strand+'\t'+str(frame)+'\t'+ID
                             o.write(lin+'\n')
                             cds_len = CDS_en - CDS_st + 1
                             exon_st = exons[1][0]
                             exon_en = exons[1][1]
                             last_cds_len = 0
                             three_prime_UTR_st = CDS_en + mRNA_st
+                            
+                            three_prime_UTR_en = exons[len(exons)][1] + mRNA_st - exons[1][0]
+                            ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
+                            if (three_prime_UTR_en - three_prime_UTR_st > 1):
+                                lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
+                                o.write(lin+'\n')
                         else:
                         
                             exon_length = 0
@@ -165,31 +175,35 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                         three_prime_UTR_st = exon_st+(end - start - last_cds_len) + 3 + mRNA_st
                                         break
         
-                        three_prime_UTR_en = exons[len(exons)][1] + mRNA_st - exons[1][0]
-                        ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                        if (three_prime_UTR_en - three_prime_UTR_st > 1):
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
-                            o.write(lin+'\n')
+                            three_prime_UTR_en = exons[len(exons)][1] + mRNA_st - exons[1][0]
+                            ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
+                            if (three_prime_UTR_en - three_prime_UTR_st > 1):
+                                lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                                o.write(lin+'\n')
                     
-                    if strand == '-':
+                    if cds_strand == '-':
                         #mRNA_st = mRNA_st - exons[1][0]
                            
                         if len(exons)==1:
                             five_prime_UTR_st =  mRNA_en
                             five_prime_UTR_en =  exons[len(exons)][1] - start  + mRNA_st - 1
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
             
                             CDS_st = exons[len(exons)][1] - start -2
                             CDS_en = exons[len(exons)][1] - end -1
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_en+ mRNA_st)+'\t'+str(CDS_st+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_en+ mRNA_st)+'\t'+str(CDS_st+ mRNA_st)+'\t'+'.'+'\t'+cds_strand+'\t'+str(frame)+'\t'+ID
                             o.write(lin+'\n')
                             cds_len = CDS_st - CDS_en + 1
                             frame = 3- (cds_len) % 3
                             last_cds_len = 0
                             three_prime_UTR_st = CDS_en - 1 + mRNA_st
+                            three_prime_UTR_en = mRNA_st - 1
+                            ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
+                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
+                            o.write(lin+'\n')
                         else:
                             exon_length = 0
                             introns = 0
@@ -245,16 +259,16 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                         o.write(lin+'\n')
                                         three_prime_UTR_st = exons[i][1]-(end -start -last_cds_len) - 1 + mRNA_st
                                         break
-                        three_prime_UTR_en = mRNA_st - 1
-                        ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                        lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
-                        o.write(lin+'\n')
+                            three_prime_UTR_en = mRNA_st - 1
+                            ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
+                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                            o.write(lin+'\n')
         
                 
             
 def mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
     file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
-    Longheader = longest_seq(file,strand)
+    Longheader = longest_seq(file)
     print Longheader
     flag = False ### flag for print mRNA co-ordinates
     for line in open(file,'r'):
@@ -279,30 +293,58 @@ def mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
                 mRNA_st = start -1
                 print file, model_no,"flag", lin, "strand",strand
                 ### check if the longest cdna is also in same strand
-                if strand == tokens[4].strip():
+                #if strand == tokens[4].strip():
                 ### call exons from TAU gff file
-                    exons = exon(count,mRNA_id,start,end,strand,model_no,tokens[0][1:],no)
+                exons = exon(count,mRNA_id,start,end,strand,model_no,tokens[0][1:],no)
                 ### call CDS/UTRs
                 call_CDS(count,mRNA_id,gene_model,start,end,strand,model_no,exons,tokens[0][1:],no)
                 
                 print "mRNA",count,mRNA_id,gene_model,start,end,strand,model_no,exons,tokens[0][1:],no
+                
+    return Longheader.split(':')[0]
 
 def process_transcript(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
     ### open cdna file and o.write( as mRNA gene-model
-    mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no)
+    return mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no)
+    
+def write_fasta(ID, infile, outfile, header):
+    flag = False
+    o = open(outfile,'a')
+    for line in open(infile,'r'):
+        if line.startswith('>'):
+            if line.startswith(header):
+                o.write('>'+ID+'\n')
+                flag = True
+            else:
+                if flag == True:
+                    break
+                flag = False
+               
+        elif flag==True:
+            o.write(line)
+    o.close()
     
 
-def save_files(ID,count):
-    ### save the files for cdna, cds and proteins 
-    os.system('echo ">" '+ID+' >> Ljr_cdna.fa')
-    os.system('cat '+'./temp'+str(count)+'/temp'+str(count)+'.cdna.fa | awk "NR>1" >> Ljr_cdna.fa')
-    os.system('echo ">" '+ID+' >> Ljr_cds.fa')
-    os.system('cat '+'./temp'+str(count)+'/temp'+str(count)+'.cds.fa | awk "NR>1" >> Ljr_cds.fa')
-    os.system('echo ">" '+ID+' >> Ljr_cds_protein.fa')
-    os.system('cat '+'./temp'+str(count)+'/temp'+str(count)+'.protein.fa | awk "NR>1" >> Ljr_cds_protein.fa')
-    os.system('echo ">" '+ID+' >> Ljr_introns.fa')
-    os.system('cat '+'./temp'+str(count)+'/temp'+str(count)+'.introns.fa | awk "NR>1" >> Ljr_introns.fa')
-
+def save_files(ID,count,header):
+    
+    ### save the files for cdna, cds and proteins
+    ### make a function to write the output file
+    infile = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
+    outfile = 'TAU_cdna.fa'
+    write_fasta(ID, infile, outfile, header)
+    
+    infile = './temp'+str(count)+'/temp'+str(count)+'.cds.fa'
+    outfile = 'TAU_cds.fa'
+    write_fasta(ID, infile, outfile, header)
+    
+    infile = './temp'+str(count)+'/temp'+str(count)+'.protein.fa'
+    outfile = 'TAU_protein.fa'
+    write_fasta(ID, infile, outfile, header)
+    
+    infile = './temp'+str(count)+'/temp'+str(count)+'.introns.fa'
+    outfile = 'TAU_introns.fa'
+    write_fasta(ID, infile, outfile, header)
+    
 
 def process_gff(gff,infile):
     id = ''
@@ -334,17 +376,17 @@ def process_gff(gff,infile):
                         ### make genome fasta file
                         extract_seq(infile, header, mRNA_st, mRNA_en)
                         ### change the format of the gff3 file
-                        os.system('nice -n 19 python /u/vgupta/script/python/21u_make_gff2.py -i tau_in -o temp.gff')
+                        os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
                         ### run TAU
-                        os.system('nice -n 19 perl /u/vgupta/01_genome_annotation/tools/TAU/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
                         file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
                         
                         
         
                         if sum([1 for line1 in open(file)]) != 0:
                             ### process transcript
-                            process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
-                            save_files(last_gene_id+'.'+str(last_model_no),count)
+                            hedaer=process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
+                            save_files(last_gene_id+'.'+str(last_model_no),count,hedaer)
                             o.write(exon_line)                
                         
                         #sys.exit(0)
@@ -384,18 +426,24 @@ def process_gff(gff,infile):
     ### make genome fasta file
     extract_seq(infile, header, mRNA_st, mRNA_en)
     ### change the format of the gff3 file
-    os.system('nice -n 19 python /u/vgupta/script/python/21u_make_gff2.py -i tau_in -o temp.gff')
+    os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
 
     ### run TAU
-    os.system('nice -n 19 perl /u/vgupta/01_genome_annotation/tools/TAU/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+    
     
     file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
     if sum([1 for line in open(file)]) != 0:
-        save_files(last_gene_model+'.'+str(last_model_no),count)
         ### process transcript
-        process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
+        hedaer=process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
+        save_files(last_gene_model+'.'+str(last_model_no),count,hedaer)
         o.write(exon_line)
                 
+                
+def remove_temp_files():
+    os.system('[ -f temp.gff ] && rm -r TAU_* || echo "No trash in the directory"')
+    os.system('[ -f temp.gff ] && rm -r temp* || echo "No trash in the directory"')
+
 if __name__ == "__main__":
 
     infile,gff = options(sys.argv[1:]) 
@@ -405,6 +453,10 @@ if __name__ == "__main__":
     hash_gff_mRNA = {}
     hash_gff_exon = {}
     mRNA_id = {}
+    
+    ### remove TAU output file if exits
+    remove_temp_files()
+    
     for line in open(gff,'r'):
         line = line.strip()
         token = line.split('\t')
@@ -455,4 +507,4 @@ if __name__ == "__main__":
     ### process gene model file
     process_gff(gff,infile)
     
-    #os.system('rm -r temp*')
+    os.system('rm -r temp*')

@@ -1,6 +1,6 @@
 #D_longest_fasta_sequence_header.py - /Users/vikas0633/Desktop/script/python/ - script return headers of longest sequence
 
-def longest_seq(file,strand):
+def longest_seq(file):
 	first_line = True
 	hash = {}
 	for line in open(file,'r'):
@@ -11,8 +11,7 @@ def longest_seq(file,strand):
 					
 					### hash the length
 					if (first_line == False):
-						if (seq_strand == strand):
-							hash[header] = seq_len
+						hash[header] = seq_len
 					header = line
 					seq_len = 0
 					token = line.split('.')
@@ -24,8 +23,7 @@ def longest_seq(file,strand):
 
 	
 	### for last sequence
-	if seq_strand == strand:
-		hash[header] = seq_len
+	hash[header] = seq_len
 	
 	
 	### find the longest length
