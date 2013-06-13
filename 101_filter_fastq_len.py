@@ -118,7 +118,7 @@ if __name__ == "__main__":
         o.write(str(int((commands.getoutput('wc -l '+file)).split()[0])/4)+'\n')
         
         ### write the length distribution
-        o.write('Size Fractionation')
+        o.write('Size Fractionations\n')
         for key in sorted(read_sizes):
             o.write(str(key)+'\t'+str(read_sizes[key])+'\n')
             
