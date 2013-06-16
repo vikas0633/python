@@ -29,39 +29,26 @@ def options(argv):
 def HASHfasta(inf):
 	return LOADfasta(inf)
 	
-def printFasta(gff3,hash):
+def printFasta(gff3,hash_fasta):
 	uniq = {} ### to write only unique sequences
 	for line in open(gff3,'r'):
 		line = line.strip()
 		token = line.split('\t')
-		if len(line) > 1:
+		if len(line) > 0:
 			if line[0] != '#':
 				if token[2] == "mRNA":
-					if token[1]=="CUFFLINKS":
-						match = re.search(r'ID=.+;',line)
-						match = match.group().split(';')[0].replace('ID=','')
-						if match not in uniq:
-							if match in hash:
-								uniq[match] = ''
-								print '>'+match
-								print hash[match]
-					else:
-						match = re.search(r'ID=.*',line)
-						match = match.group().split(';')[0].replace('ID=','')
-						#match = match.group().split(';')[0].replace('Parent=','')
-						if match not in uniq:
-							if match in hash:
-								uniq[match] = ''
-								print '>'+match
-								print hash[match]
-							
-		
-
+					match = re.search(r'ID=.+',line)
+					match = match.group().split(';')[0].replace('ID=','')
+					if match in hash_fasta:
+						print '>'+match
+						print hash_fasta[match]
+						
+	print 'XXX ', len(uniq)
 if __name__ == "__main__":
     
 	inf,gff3 = options(sys.argv[1:])
 	
-	hash = HASHfasta(inf)
+	hash_fasta = HASHfasta(inf)
 	
 	### print duplicate removed fasta
-	printFasta(gff3,hash)
+	printFasta(gff3,hash_fasta)

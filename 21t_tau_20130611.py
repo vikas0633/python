@@ -23,11 +23,11 @@ import os,sys, getopt
 from D_longest_fasta_sequence_header import *
 
 ### GLOBAL VARIABLEs
-#TAU_PATH="/users/vgupta/Desktop/tools/TAU"
-#SCRIPT_DIR="/users/vgupta/Desktop/script/python"
+TAU_PATH="/users/vgupta/Desktop/tools/TAU"
+SCRIPT_DIR="/users/vgupta/Desktop/script/python"
 
-TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
-SCRIPT_DIR="/u/vgupta/script/python"
+#TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
+#SCRIPT_DIR="/u/vgupta/script/python"
 
 def file_empty(file):
     count = sum([1 for line in open(file)])
@@ -312,7 +312,8 @@ def mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
                 ### call CDS/UTRs
                 cds_strand = call_CDS(count,mRNA_id,gene_model,start,end,strand,model_no,exons,tokens[0][1:],no)
                 
-                print Longheader.split(':')[0], cds_strand 
+                print Longheader.split(':')[0], cds_strand
+                
     return Longheader.split(':')[0], cds_strand
 
 def process_transcript(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
@@ -353,7 +354,6 @@ def write_fasta(ID, infile, outfile, header, cds_strand):
 def save_files(ID, count, header, cds_strand):
     ### save the files for cdna, cds and proteins
     ### make a function to write the output file
-    
     infile = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
     outfile = 'TAU_cdna.fa'
     write_fasta(ID, infile, outfile, header, cds_strand)
@@ -461,7 +461,7 @@ def process_gff(gff,infile):
     if sum([1 for line in open(file)]) != 0:
         ### process transcript
         hedaer, cds_strand = process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
-        save_files(last_gene_model+'.'+str(last_model_no), count, hedaer, cds_strand)
+        save_files(last_gene_id+'.'+str(last_model_no), count, hedaer, cds_strand)
         o.write(exon_line)
                 
                 

@@ -8,13 +8,13 @@ def LOADfasta(file):
 		if len(line) > 0 :			
 			if line[0] == '>':
 				if first_line == False:
-					if str != '': 
-						seq[header] = str
-				str = ''
+					if string != '': 
+						seq[header] = string
+				string = ''
 				header = line[1:].strip().lstrip()
 			else:
-				str += line
+				string += line
 		first_line = False			
-	if str != '': 
-		seq[header] = str
+	if string != '': 
+		seq[header] = string
 	return seq
