@@ -203,7 +203,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ah_count_N_between_genes.py - script to count Ns between the genes <br />
 21ai_modify_gene_names.py - script to modify gene names based on N counts <br />
 21aj_add_mRNA.py - script to add dummy mRNAs if absent <br />
-21ak_remove_redundant.py - script to remove the redundant node gene models
+21ak_remove_redundant.py - script to remove the redundant node gene models <br />
+21al_correct_strand.py - this script takes strand from CDS and assigns the same to mRNA, exons and UTRs, GFF3 files <br />
 
 	
 ### Transcripts Handlers

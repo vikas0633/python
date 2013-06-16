@@ -54,7 +54,8 @@ def make_gff():
 	import datetime
 	now = datetime.datetime.now()
 	
-	o = open(str(now.strftime("%Y-%m-%d_%H%M_"))+'gene.gff','w')
+	#o = open(str(now.strftime("%Y-%m-%d_%H%M_"))+'gene.gff','w')
+	o = open(str(now.strftime("CUFF."))+'gene.gff','w')
 	for line in open(gff,'r'):
 		if line[0] != '#':
 			line = line.strip()
@@ -78,7 +79,9 @@ def make_fasta():
 	### make database for ref seq
 	os.system('formatdb -i '+ref+' -p F -o T')
 	
-	file = str(now.strftime("%Y-%m-%d_%H%M_"))+'gene.fa'
+	#file = str(now.strftime("%Y-%m-%d_%H%M_"))+'gene.fa'
+	file = str(now.strftime("CUFF."))+'gene.fa'
+	
 	o = open(file,'w')
 	
 	o.close()
