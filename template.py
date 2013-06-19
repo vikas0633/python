@@ -54,13 +54,13 @@ def options(argv):
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
         print '''
-            python 100b_fasta2flat.py -i <inputfile>
+            python 100b_fasta2flat.py -i <ifile>
             '''
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print '''
-                python 100b_fasta2flat.py -i <inputfile>
+                python 100b_fasta2flat.py -i <ifile>
                 '''
             sys.exit()
         elif opt in ("-i", "--ifile"):

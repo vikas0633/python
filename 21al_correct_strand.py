@@ -145,7 +145,8 @@ def process_objs(lst,strand):
 def parse(file):
     first_block = True
     new_block = False
-    
+    flag = True
+    gene = ''
     for line in open(file):
         obj = GFF3(line)
         if obj.types() != "gene":
@@ -153,7 +154,7 @@ def parse(file):
                 if first_block == True:
                     first_block = False
                 else:
-                    print gene
+                    print last_gene
                     process_objs(lst, strand)
                 lst = []
             if obj.types() == "CDS":
@@ -162,6 +163,7 @@ def parse(file):
             lst.append(obj)
             
         else:
+            last_gene = gene
             gene = line.strip()
     
     ### for last block
