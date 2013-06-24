@@ -255,3 +255,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 105_match_IDs_from_2gff3_files.py - script will take two gff3 files and print out the corresponding mRNA IDs <br />
 106_filter_out_against_genelist.py - this script will filter out the genes which are in the list <br />
 107_ParameterGFF3.py - Script to calculate Gene, mRNA, exon, CDS count, Total length and average length <br />
+108_filterExactOverlapGFF3.py - Script to filter out exact overalpping gene models <br />

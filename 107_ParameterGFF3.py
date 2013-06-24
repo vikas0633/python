@@ -156,7 +156,7 @@ class GenomicParameters:
            
 def process_gff3(infile):
     
-    print 'FeatureType'+'\t'+'TotalLength'+'\t'+'AverageLength'+'\t'+'MaxLength'+'\t'+'MinLength'
+    print 'FeatureType'+'\t'+'Count'+'\t'+'TotalLength'+'\t'+'AverageLength'+'\t'+'MaxLength'+'\t'+'MinLength'
     gene_ids = {}
     features = {}
     elements = {'gene':[]}
@@ -167,10 +167,11 @@ def process_gff3(infile):
             features[obj.types()]=''
             if obj.types() == "gene":
                 g_id = str(obj)
-                gene_id = g_id.split('.')[0]+'.'+g_id.split('.')[1]
+                token = g_id.split('.')
+                gene_id = '.'.join(token[:-1])
                 if gene_id not in gene_ids:
                     gene_ids[gene_id] = ''
-                    elements[obj.types()].append(int(obj.ends()) - int(obj.starts()))
+                elements[obj.types()].append(int(obj.ends()) - int(obj.starts()))
             else:
                 ### get the mRNA length
                 if obj.types() == 'mRNA':
@@ -199,6 +200,8 @@ def process_gff3(infile):
             str(stats.avg_length()) + '\t' + \
             str(stats.max_length()) + '\t' + \
             str(stats.min_length())
+            gene_length = stats.total_length()
+        
         
         elif features == 'mRNA':
             print str(stats) + '\t' + \
@@ -208,13 +211,28 @@ def process_gff3(infile):
             str(max(mRNA.values())) + '\t' + \
             str(min(mRNA.values()))
         
+        elif features == 'exon':
+            print str(stats) + '\t' + \
+            str(stats.counts()) + '\t' + \
+            str(stats.total_length()) + '\t' + \
+            str(stats.avg_length()) + '\t' + \
+            str(stats.max_length()) + '\t' + \
+            str(stats.min_length())
+            
+            print str('Intron') + '\t' + \
+            str(stats.counts()-len(mRNA.values())) + '\t' + \
+            str(gene_length - stats.total_length()) + '\t' + \
+            str((gene_length - stats.total_length())/(stats.counts()-len(mRNA.values())))
+        
         else:
             print str(stats) + '\t' + \
             str(stats.counts()) + '\t' + \
             str(stats.total_length()) + '\t' + \
             str(stats.avg_length()) + '\t' + \
             str(stats.max_length()) + '\t' + \
-            str(stats.min_length())                    
+            str(stats.min_length())
+            
+    
         
 
 if __name__ == "__main__":

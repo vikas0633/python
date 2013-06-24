@@ -20,9 +20,12 @@ now = datetime.datetime.now()
 
 ### Global variable
 #key is the second column in the GFF3/GTF file
-COVERAGE_KEY = "cufflinks"  ### key for the file that contains the RNA-seq pileup in GTF
-AUGUSTUS = "AUGUSTUS"
-
+COVERAGE = "cufflinks"  ### key for the file that contains the RNA-seq pileup in GTF
+AUGUSTUS = "Augustus"
+GlimmerHMM = "GlimmerHMM"
+CUFFLINKS = "CUFFLINKS"
+GENEMARK = "GeneMark.hmm"
+Key_454 = "454Scaffolds"
 
 #o = open(str(now.strftime("%Y-%m-%d_%H%M_"))+'gene.gff','w')
 
@@ -42,11 +45,11 @@ def parse(file,chr,hash,key,print_gene_models,gene_id):
 					for i in range(int(token[3]),int(token[4])+1):
 						hash[i]=''
 					if print_gene_models == True:
-						if (token[1] == "CUFFLINKS") or  (token[1] == "GlimmerHMM") or (token[1] == "Augustus") or (token[1] == "GeneMark.hmm"):
+						if (token[1] == CUFFLINKS) or  (token[1] == GlimmerHMM) or (token[1] == AUGUSTUS) or (token[1] == GENEMARK):
 							ID=(line.split('=')[1]).split(';')[0]
 							gene_id[ID]=''
 							print line
-						elif (token[1] == "Ljchr0-6_pseudomol_20120830.chlo.mito.fa"):
+						elif (token[1] == Key_454):
 							ID=(line.split('=')[1]).split(';')[0]
 							gene_id[ID]=''
 							mRNA_id = ID.replace('path','mrna')
@@ -91,12 +94,12 @@ def find_overlap(file,chr,hash_cov,hash_aug,key,print_gene_models,gene_id):
 					temp[i]=''
 				temp_set = set(temp)
 				if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set)))  or (len(temp_set.intersection(hash_aug_set)) > 0.8*(len(temp_set))):
-					if (token[1] == "CUFFLINKS") or  (token[1] == "GlimmerHMM") or (token[1] == "Augustus") or (token[1] == "GeneMark.hmm"):
+					if (token[1] == CUFFLINKS) or  (token[1] == GlimmerHMM) or (token[1] == AUGUSTUS) or (token[1] == GENEMARK):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
 						print line
 					
-					elif (token[1] == "Ljchr0-6_pseudomol_20120830.chlo.mito.fa"):
+					elif (token[1] == Key_454):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
 						mRNA_id = ID.replace('path','mrna')
@@ -127,11 +130,11 @@ def find_overlap_denovo(file,chr,hash_cov,hash_TC,key,print_gene_models,gene_id)
 					temp[i]=''
 				temp_set = set(temp)
 				if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set)))  or (len(temp_set.intersection(hash_TC_set)) > 10):
-					if (token[1] == "CUFFLINKS") or  (token[1] == "GlimmerHMM") or (token[1] == "Augustus") or (token[1] == "GeneMark.hmm"):
+					if (token[1] == CUFFLINKS) or  (token[1] == GlimmerHMM) or (token[1] == AUGUSTUS) or (token[1] == GENEMARK):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
 						print line
-					elif (token[1] == "Ljchr0-6_pseudomol_20120830.chlo.mito.fa"):
+					elif (token[1] == Key_454):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
 						mRNA_id = ID.replace('path','mrna')
@@ -211,32 +214,26 @@ def gene_stru(gene_id,infile):
 		if len(line) > 0:
 			if (line[0] != '#'):
 				if (token[2] != 'gene'):
-					if (token[1] == "CUFFLINKS"):
+					if (token[1] == CUFFLINKS):
 						keys = (line.split('=')[-1]).split('.')
 						key = keys[0]+'.'+keys[1]
 						if key in gene_id:
 							print line
-					if (token[1] == 'Ljchr0-6_pseudomol_20120830.chlo.mito.fa'):
-						keys = ((line.split('=')[3])).split(';')[0].split('.')
-						key = keys[0]+'.'+keys[1]+'.'+keys[2]
+					if (token[1] == Key_454):
+						key = (line.split('=')[1]).split(';')[0]
 						if key in gene_id:
 							print line
-					if (token[1] == 'Lotus_TC'):
-						keys = (line.split('=')[3]).split('.')
-						key = keys[0]
-						if key in gene_id:
-							print line
-					if (token[1] == "Augustus"):
+					if (token[1] == AUGUSTUS):
 						keys = (line.split('=')[-1]).split('.')
 						key = 'gene.'+keys[1]+'.'+keys[2].strip()
 						if key in gene_id:
 							print line
-					if (token[1] == "GlimmerHMM"):
+					if (token[1] == GlimmerHMM):
 						keys = (line.split('=')[-1]).split('.')
 						key = 'gene.'+keys[1]+'.'+keys[2]+'.'+keys[3].strip()
 						if key in gene_id:
 							print line
-					if (token[1] == "GeneMark.hmm"):
+					if (token[1] == GENEMARK):
 						key = (line.split('=')[-1]).replace('t','g')
 						if key in gene_id:
 							print line
@@ -253,7 +250,7 @@ def call_gff(file):
 		### hash coverage file
 		hash={}
 		print_gene_models = False
-		key = COVERAGE_KEY
+		key = COVERAGE
 		hash_cov,gene_id = parse(file,chr,hash,key,print_gene_models,gene_id)
 		
 		### hash Augustus
@@ -263,35 +260,26 @@ def call_gff(file):
 		hash_aug,gene_id = parse(file,chr,hash,key,print_gene_models,gene_id)	
 		
 
-		### hash TC
+		### hash 454
 		hash={}
 		print_gene_models = False
-		key = 'Lotus_TC'
+		key = Key_454
 		hash_TC,gene_id = parse(file,chr,hash,key,print_gene_models,gene_id)
 		
 		
 		### hash the cufflinks gff co-ordinates
 		hash={}
-		key = 'CUFFLINKS'
+		key = CUFFLINKS
 		print_gene_models = True
 		hash,gene_id = parse(file,chr,hash,key,print_gene_models,gene_id) 
 		filter_out(chr,hash,file)		
 		
-		### hash the velvet co-ordinates and find overlap against coverage file and Augustus
-		print_gene_models = True
-		file = 'temp'
-		key = 'Ljchr0-6_pseudomol_20120830.chlo.mito.fa'
-		hash = {}
-		hash,gene_id = find_overlap(file,chr,hash_cov,hash_aug,key,print_gene_models,gene_id)
-		os.system('cp temp temp2')
-		file = 'temp2'
-		filter_out(chr,hash,file)
 		
 		### de-novo
 		### hash the Augustus co-ordinates and find overlap against coverage file and TC
 		print_gene_models = True
 		file = 'temp'
-		key = 'Augustus'
+		key = AUGUSTUS
 		hash = {}
 		hash,gene_id = find_overlap_denovo(file,chr,hash_cov,hash_TC,key,print_gene_models,gene_id)
 		os.system('cp temp temp2')
@@ -302,7 +290,7 @@ def call_gff(file):
 		### hash the GeneMark co-ordinates and find overlap against coverage file and TC
 		print_gene_models = True
 		file = 'temp'
-		key = 'GeneMark.hmm'
+		key = GENEMARK
 		hash = {}
 		hash,gene_id = find_overlap_denovo(file,chr,hash_cov,hash_TC,key,print_gene_models,gene_id)
 		os.system('cp temp temp2')
@@ -313,7 +301,7 @@ def call_gff(file):
 		### hash the GlimmerHMM co-ordinates and find overlap against coverage file and TC
 		print_gene_models = True
 		file = 'temp'
-		key = 'GlimmerHMM'
+		key = GlimmerHMM
 		hash = {}
 		hash,gene_id = find_overlap_denovo(file,chr,hash_cov,hash_TC,key,print_gene_models,gene_id)
 		os.system('cp temp temp2')
@@ -321,53 +309,49 @@ def call_gff(file):
 		filter_out(chr,hash,file)
 		
 		
-		### hash the TC co-ordinates and find overlap against coverage file and Augustus
+		### Homology based
+		#os.system('touch protein_match.gff3')
 		print_gene_models = True
 		file = 'temp'
-		key = 'Lotus_TC'
+		key = AUGUSTUS
+		hash = {}
+		hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
+		os.system('cp temp temp2')
+		file = 'temp2'
+		filter_out(chr,hash,file)
+		
+		
+		### Homology based
+		#os.system('touch protein_match.gff3')
+		print_gene_models = True
+		file = 'temp'
+		key = GENEMARK
+		hash = {}
+		hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
+		os.system('cp temp temp2')
+		file = 'temp2'
+		filter_out(chr,hash,file)
+		
+		### Homology based
+		#os.system('touch protein_match.gff3')
+		print_gene_models = True
+		file = 'temp'
+		key = GlimmerHMM
+		hash = {}
+		hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
+		os.system('cp temp temp2')
+		file = 'temp2'
+		filter_out(chr,hash,file)
+		
+		### hash the 454 co-ordinates and find overlap against coverage file and Augustus
+		print_gene_models = True
+		file = 'temp'
+		key = Key_454
 		hash = {}
 		hash,gene_id = find_overlap(file,chr,hash_cov,hash_aug,key,print_gene_models,gene_id)
 		os.system('cp temp temp2')
 		file = 'temp2'
 		filter_out(chr,hash,file)
-		
-		
-		### Homology based
-		#os.system('touch protein_match.gff3')
-		print_gene_models = True
-		file = 'temp'
-		key = 'Augustus'
-		hash = {}
-		hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
-		os.system('cp temp temp2')
-		file = 'temp2'
-		filter_out(chr,hash,file)
-		
-		'''
-		
-		### Homology based
-		#os.system('touch protein_match.gff3')
-		print_gene_models = True
-		file = 'temp'
-		key = 'GeneMark.hmm'
-		hash = {}
-		hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
-		os.system('cp temp temp2')
-		file = 'temp2'
-		filter_out(chr,hash,file)
-		
-		### Homology based
-		#os.system('touch protein_match.gff3')
-		print_gene_models = True
-		file = 'temp'
-		key = 'GlimmerHMM'
-		hash = {}
-		hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
-		os.system('cp temp temp2')
-		file = 'temp2'
-		filter_out(chr,hash,file)
-		
-		'''
 		
 		### print gene structure
 		gene_stru(gene_id,infile)
@@ -396,11 +380,11 @@ if __name__ == "__main__":
 	
 	file = options(sys.argv[1:])[0] 
 	
-	database = 'arabi_Brassi_lotus_medicago_protein.fasta'
-	ref_seq = 'Ljchr0-6_pseudomol_20120830.chlo.mito.fa.refined'
+	database = '../refseq.aa.fa'
+	ref_seq = '../454Scaffolds.fna'
 	
-	#os.system('makeblastdb -in '+database +' >blast.temp')
-	#os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
+	os.system('makeblastdb -in '+database +' >blast.temp')
+	os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
 	
 	### get the end point for each chromosome
 	size = get_size(file)
