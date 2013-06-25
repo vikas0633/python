@@ -308,7 +308,7 @@ def call_gff(file,size):
 		file = 'temp2'
 		filter_out(chr,hash,file)
 		
-		
+		'''
 		### Homology based
 		#os.system('touch protein_match.gff3')
 		print_gene_models = True
@@ -342,6 +342,7 @@ def call_gff(file,size):
 		os.system('cp temp temp2')
 		file = 'temp2'
 		filter_out(chr,hash,file)
+		'''
 		
 		### hash the 454 co-ordinates and find overlap against coverage file and Augustus
 		print_gene_models = True
@@ -380,11 +381,11 @@ if __name__ == "__main__":
 	
 	file = options(sys.argv[1:])[0] 
 	
-	database = 'refseq.aa.fa'
-	ref_seq = '454Scaffolds.fna'
+	database = '../refseq.aa.fa'
+	ref_seq = '../454Scaffolds.fna'
 	
-	os.system('makeblastdb -in '+database +' >blast.temp')
-	os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
+	#os.system('makeblastdb -in '+database +' >blast.temp')
+	#os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
 	
 	### get the end point for each chromosome
 	size = get_size(file)
