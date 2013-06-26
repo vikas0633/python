@@ -1,16 +1,17 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 108_filterExactOverlapGFF3.py - GFF3 filtering GMAP       |
+# 108_AddPhaseGFF3 - Adds the GFF3 phase                    |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
 # AUTHOR: Vikas Gupta                                       |
 # CONTACT: vikas0633@gmail.com                              |
-# STARTED: 09/06/2013                                       |
-# UPDATED: 09/06/2013                                       |
+# STARTED: 26/06/2013                                       |
+# UPDATED: 26/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# Script to filter out exact overalpping gene models        |
+# Given CDS sequences in the GFF3 file this scripts adds the|
+# phase based on the exon co-ordinates                      |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -19,7 +20,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/1108_AddPhaseGFF3 -i GFF3
 
 
 ### import modules
@@ -27,7 +28,9 @@ import os,sys,getopt, re
 
 
 ### global variables
-FILTER_RANGE = 50 ### remove genemodels overlapping +/- N genes
+CDS = {}
+mRNA_id = ''
+CDS_strand = ''
 
 ### make a logfile
 import datetime
@@ -39,7 +42,7 @@ o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 ### write logfile
 
 def logfile(infile):
-    o.write("Program used: \t\t%s" % "108_filterExactOverlapGFF3.py"+'\n')
+    o.write("Program used: \t\t%s" % "100b_fasta2flat.py"+'\n')
     o.write("Program was run at: \t%s" % str(now.strftime("%Y-%m-%d_%H%M"))+'\n')
     o.write("Infile used: \t\t%s" % infile+'\n')
             
@@ -54,13 +57,13 @@ def options(argv):
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
         print '''
-            python 108_filterExactOverlapGFF3.py -i <ifile>
+            python 108_AddPhaseGFF3-i <ifile>
             '''
         sys.exit(2)
     for opt, arg in opts:
         if opt == '-h':
             print '''
-                python 108_filterExactOverlapGFF3.py -i <ifile>
+                108_AddPhaseGFF3 -i <ifile>
                 '''
             sys.exit()
         elif opt in ("-i", "--ifile"):
@@ -76,6 +79,7 @@ def split_line(line):
 
 ### get ID
 def get_ID(line):
+    line = line.strip()
     match = re.search(r'ID=.+;',line)
     if match:
         return match.group().split(';')[0].replace('ID=','')
@@ -129,42 +133,89 @@ class GFF3:
     def attributes(self):
         return self.attribute
 
-def process_objs(lst,strand):
-    for obj in lst:
-        print obj.seqids() + '\t' + \
-        obj.sources() + '\t' + \
-        obj.types() + '\t' + \
-        obj.starts() + '\t' + \
-        obj.ends() + '\t' + \
-        obj.scores() + '\t' + \
-        strand + '\t' + \
-        obj.phases() + '\t' + \
-        obj.attributes()
+def process_objs(obj,phase, attributes):
+    print obj.seqids() + '\t' + \
+    obj.sources() + '\t' + \
+    obj.types() + '\t' + \
+    obj.starts() + '\t' + \
+    obj.ends() + '\t' + \
+    obj.scores() + '\t' + \
+    obj.strands() + '\t' + \
+    str(phase) + '\t' + \
+    attributes
 
-def process_file(infile):
-    flag = True
-    gene_coords = {}
-    for line in open(infile, 'r'):
-        if (len(line) > 5) or (not line.startswith('#')):
+def getPhase(obj):
+    global CDS
+    CDS[int(obj.starts())] = obj
+
+### returns a list containing phase values
+def calcPhase(CDS):
+    phase = []
+    for start in sorted(CDS.keys()):
+        end = CDS[start].ends()
+        if len(phase) == 0:
+            phase.append(0)
+            last_phase = phase[-1]
+            phase.append( ( 3 -  ((int(end) - int(start) + 1 )%3) + last_phase )%3)
+            last_phase = phase[-1]
+        else:
+            phase.append( ( 3 -  ((int(end) - int(start) + 1 )%3) + last_phase )%3)
+            last_phase = phase[-1]
+    print phase
+    return phase
+
+def process_CDS(count):
+    
+    phase = calcPhase(CDS)
+    i = 0
+    start_count = count
+    for start in CDS:
+        if start_count == 0:
+            count += 1
+        else:
+            count -= 1
+        
+        attributes =  re.sub(r'ID.+?;','ID='+mRNA_id+'.CDS.'+str(count)+';',CDS[start].attributes())
+        process_objs(CDS[start], phase[i], attributes)    
+        i += 1   
+            
+def printCDS():
+    if CDS_strand == '+':
+        count = 0
+        process_CDS(count)
+    else:
+        count = len(CDS)
+        process_CDS(count)
+
+def parseGFF3(gff3):
+    global CDS, mRNA_id, CDS_strand
+    CDS_flag = False
+    for line in open(gff3,'r'):
+        if (len(line)>2) & (not line.startswith('#')): 
             obj = GFF3(line)
-            key = obj.seqids(), int(obj.starts()), int(obj.ends())
-            if obj.types() == "gene":
-                if key not in gene_coords:
-                    for i in range( int(obj.starts())-FILTER_RANGE, int(obj.starts())+FILTER_RANGE):
-                        for j in range( int(obj.ends())-FILTER_RANGE, int(obj.ends())+FILTER_RANGE):
-                            key = obj.seqids(), i, j
-                            gene_coords[key] = ''
-                    flag = True
-                else:
-                    flag = False
-            if flag == True:
-                print line
+            
+            if obj.types() == 'mRNA':
+                mRNA_id = str(obj)
+            if obj.types() != 'CDS':
+                if CDS_flag == True:
+                    printCDS()
+                    CDS = {}
+                    CDS_flag = False
+                print line.strip()
+            else:
+                CDS_flag = True
+                CDS_strand = obj.strands()
+                getPhase(obj)
+        first_line = False
+    
+    printCDS()
+        
 
 if __name__ == "__main__":
     
-    infile = options(sys.argv[1:])
+    file = options(sys.argv[1:])
     
-    process_file(infile)
+    parseGFF3(file)
     
     ### close the logfile
     o.close()

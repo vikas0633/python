@@ -23,11 +23,11 @@ import os,sys, getopt
 from D_longest_fasta_sequence_header import *
 
 ### GLOBAL VARIABLEs
-TAU_PATH="/users/vgupta/Desktop/tools/TAU"
-SCRIPT_DIR="/users/vgupta/Desktop/script/python"
+#TAU_PATH="/users/vgupta/Desktop/tools/TAU"
+#SCRIPT_DIR="/users/vgupta/Desktop/script/python"
 
-#TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
-#SCRIPT_DIR="/u/vgupta/script/python"
+TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
+SCRIPT_DIR="/u/vgupta/script/python"
 
 def file_empty(file):
     count = sum([1 for line in open(file)])
@@ -81,6 +81,7 @@ def exon(count,mRNA_id,mRNA_st,mRNA_en,strand,model_no,chr_id,no):
 def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, chr_id,no):
     file = './temp'+str(count)+'/temp'+str(count)+'.cds.fa'
     CDS = False
+    mRNA_strand = strand
     cds_strand = strand
     for line in open(file,'r'):
         if line.startswith('>'):
@@ -122,8 +123,8 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             if (three_prime_UTR_en - three_prime_UTR_st > 1):
                                 lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                                 o.write(lin+'\n')
-                        else:
-                        
+                                
+                        elif (cds_strand == mRNA_strand):
                             exon_length = 0
                             introns = 0
                             for i in range(1,len(exons)+1):
@@ -212,7 +213,8 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
-                        else:
+                            
+                        elif (cds_strand == mRNA_strand):
                             exon_length = 0
                             introns = 0
                             for i in range(len(exons),0,-1):
