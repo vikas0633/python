@@ -59,17 +59,18 @@ def remove_genes(file):
     ''' file -> (NULL)
     this function removes unnecessary gene names assigned by cuyfflinks 
     '''   
-    last_gene_ID = ''
+    gene_ID_hash = {}
     for line in open(file,'r'):
         line = line.strip()
-        if len(line) > 1:
+        if len(line) > 2:
             if line[0] != '#':
                 token = line.split('\t')
                 if token[2] == "gene":
                     gene = line
                     gene_ID = re.search(r'ID=.+',line)
                     gene_ID = gene_ID.group().split(';')[0].replace('ID=','') 
-                    if gene_ID != last_gene_ID:
+                    print gene_ID, last_gene_ID
+                    if gene_ID not in last_gene_ID:
                         print line
                         last_gene_ID = gene_ID
                     

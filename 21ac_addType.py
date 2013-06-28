@@ -50,7 +50,9 @@ def HASH(type):
 def load_elements(inf,hash):
 	elements = {}
 	for line in open(inf,'r'):
-		line = line.strip()
+		line = line.strip('Type=')[0]
+		### check if line already has a type
+		line=line.split()
 		### find parent name
 		token = line.split('\t')
 		if len(token) > 3:

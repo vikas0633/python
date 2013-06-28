@@ -508,14 +508,14 @@ if __name__ == "__main__":
         if len(line)>1:
             if line[0] != '#':
                 if token[2] == "gene":
-                    if token[1] == "CUFFLINKS":
-                        id = line.split('%')[-1][2:]
+                    if (token[1]== "CUFFLINKS") or (token[1]=="Cufflinks"):
+                        id = line.split('Name=')[1].split(';')[0]
                         hash_gff_gene[id]=line
                     else:
                         id = line.split('ID=')[1].split(';')[0]
                         hash_gff_gene[id]=line
                 if token[2] == "mRNA":
-                        if token[1] == "CUFFLINKS":
+                        if (token[1]== "CUFFLINKS") or (token[1]=="Cufflinks"):
                             id = line.split('ID=')[1].split(';')[0]
                             hash_gff_mRNA[id] = line
                             mRNA_id[id] = id 

@@ -13,7 +13,7 @@ Ljchr1_pseudomol_20120830	GlimmerHMM	CDS	2953	3108	.	-	0	ID=Ljchr1_pseudomol_201
 Ljchr1_pseudomol_20120830	GlimmerHMM	CDS	3198	3278	.	-	0	ID=Ljchr1_pseudomol_20120830.cds1.3;Parent=Ljchr1_pseudomol_20120830.path1.gene1;Name=Ljchr1_pseudom
 '''
 
-import sys,os, commands
+import sys,os, commands, re
 import datetime
 now = datetime.datetime.now()
 
@@ -23,7 +23,7 @@ now = datetime.datetime.now()
 COVERAGE = "cufflinks"  ### key for the file that contains the RNA-seq pileup in GTF
 AUGUSTUS = "Augustus"
 GlimmerHMM = "GlimmerHMM"
-CUFFLINKS = "CUFFLINKS"
+CUFFLINKS = "Cufflinks"
 GENEMARK = "GeneMark.hmm"
 Key_454 = "454Scaffolds"
 
@@ -41,7 +41,7 @@ def parse(file,chr,hash,key,print_gene_models,gene_id):
 		token = line.split('\t')
 		if len(line) > 0:		
 			if line[0] != '#': 
-				if (token[1] == key) & (token[0] == chr) & ((token[2] == "gene") or (token[2] == "exon")):
+				if (token[1] == key) & (token[0] == chr) & ((token[2] == "gene") or ((token[2] == "exon") & (token[1]==COVERAGE))):
 					for i in range(int(token[3]),int(token[4])+1):
 						hash[i]=''
 					if print_gene_models == True:
@@ -203,7 +203,12 @@ def homology_evidence(file,chr,hash,print_gene_models,gene_id,key):
 	
 	return hash,gene_id
 	
-	
+### get parent_ID
+def parent_ID(line):
+	line = line.strip()
+	match = re.search(r'Parent=.+',line)
+	if match:
+		return match.group().split(';')[0].replace('Parent=','')
 
 def gene_stru(gene_id,infile):
 	
@@ -215,26 +220,23 @@ def gene_stru(gene_id,infile):
 			if (line[0] != '#'):
 				if (token[2] != 'gene'):
 					if (token[1] == CUFFLINKS):
-						keys = (line.split('=')[-1]).split('.')
-						key = keys[0]+'.'+keys[1]
+						key = parent_ID(line).split('.')[0]+parent_ID(line).split('.')[1]
 						if key in gene_id:
 							print line
 					if (token[1] == Key_454):
-						key = (line.split('=')[1]).split(';')[0]
+						key = parent_ID(line).replace('mrna','path')
 						if key in gene_id:
 							print line
 					if (token[1] == AUGUSTUS):
-						keys = (line.split('=')[-1]).split('.')
-						key = 'gene.'+keys[1]+'.'+keys[2].strip()
+						key = parent_ID(line).replace('model','gene')
 						if key in gene_id:
 							print line
 					if (token[1] == GlimmerHMM):
-						keys = (line.split('=')[-1]).split('.')
-						key = 'gene.'+keys[1]+'.'+keys[2]+'.'+keys[3].strip()
+						key = parent_ID(line).replace('model','gene')
 						if key in gene_id:
 							print line
 					if (token[1] == GENEMARK):
-						key = (line.split('=')[-1]).replace('t','g')
+						key = parent_ID(line).replace('_t', '_g')
 						if key in gene_id:
 							print line
 				
@@ -381,11 +383,11 @@ if __name__ == "__main__":
 	
 	file = options(sys.argv[1:])[0] 
 	
-	database = '../refseq.aa.fa'
-	ref_seq = '../454Scaffolds.fna'
+	database = '/u/vgupta/09_blueberry/11_CombineGFF3/refseq.aa.fa'
+	ref_seq = '/u/vgupta/09_blueberry/01_genome/454Scaffolds.fna'
 	
-	#os.system('makeblastdb -in '+database +' >blast.temp')
-	#os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
+	os.system('makeblastdb -in '+database +' >blast.temp')
+	os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
 	
 	### get the end point for each chromosome
 	size = get_size(file)

@@ -79,8 +79,8 @@ def modifyGeneNames(gff3,hash,chr):
                         gene = line
                         gene_ID = re.search(r'ID=.+',line)
                         gene_ID = gene_ID.group().split(';')[0].replace('ID=','') 
-                        gene_type = re.search(r'Type=.+',line)
-                        gene_type = gene_type.group().split(';')[0].replace('Type=','')
+                        #gene_type = re.search(r'Type=.+',line)
+                        #gene_type = gene_type.group().split(';')[0].replace('Type=','')
                         if gene_ID != last_gene_ID:
                             count += 10
                             flag = True
@@ -115,14 +115,14 @@ def modifyGeneNames(gff3,hash,chr):
                         if flag == True:
                             ### print gene 
                             lin = '\t'.join(gene.split('\t')[0:len(gene.split('\t'))-1]) ### all information except ID
-                            lin += '\t'+"ID="+chr_name[token[0]]+ str(count).zfill(7)+';Name='+(gene_ID)+';Type='+gene_type+';'
+                            lin += '\t'+"ID="+chr_name[token[0]]+ str(count).zfill(7)+';Name='+(gene_ID)+';'
                             #lin += '\t'+"ID="+chr_name[token[0]]+ str(count).zfill(7)+';Type='+gene_type+';'
                             print lin
                             
                         ### print mRNA
                         mRNA_ID = chr_name[token[0]]+ str(count).zfill(7)+'.'+variant_no_mRNA
                         lin = '\t'.join(line.split('\t')[0:len(line.split('\t'))-1]) ### all information except ID
-                        lin += '\t'+"ID="+mRNA_ID+';Parent='+chr_name[token[0]]+str(count).zfill(7)+";Name="+mRNA_ID+';Type='+gene_type+';'
+                        lin += '\t'+"ID="+mRNA_ID+';Parent='+chr_name[token[0]]+str(count).zfill(7)+";Name="+mRNA_ID+';'
                         print lin
                     
                     else:
@@ -131,7 +131,7 @@ def modifyGeneNames(gff3,hash,chr):
                         match = match.group().split(';')[0].replace('ID=','')       
                         variant_no = match.split('.')[-1].replace('exon','')                           ### Get the mRNA variant number
                         lin = '\t'.join(line.split('\t')[0:len(line.split('\t'))-1]) ### all information except ID
-                        lin += '\t'+"ID="+mRNA_ID+'.'+token[2]+'.'+variant_no+';Parent='+mRNA_ID+';Type='+gene_type+';'
+                        lin += '\t'+"ID="+mRNA_ID+'.'+token[2]+'.'+variant_no+';Parent='+mRNA_ID+';'
                         print lin
                     
 

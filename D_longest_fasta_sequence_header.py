@@ -3,6 +3,7 @@
 def longest_seq(file):
 	first_line = True
 	hash = {}
+	string = ''
 	for line in open(file,'r'):
 		line = line.strip()
 		if len(line) > 0: 
@@ -11,19 +12,23 @@ def longest_seq(file):
 					
 					### hash the length
 					if (first_line == False):
-						hash[header] = seq_len
+						if string.startswith('ATG'):
+							hash[header] = seq_len
+						string = ''
 					header = line
 					seq_len = 0
 					token = line.split('.')
 					tokens = line.split(':')
-					seq_strand = tokens[4].strip()
+					seq_strand = tokens[2].strip()
 					first_line = False
 				else:
-					seq_len += len(line)
+					string += line
+					seq_len += len(string)
 
 	
 	### for last sequence
-	hash[header] = seq_len
+	if string.startswith('ATG'):
+		hash[header] = seq_len
 	
 	
 	### find the longest length
