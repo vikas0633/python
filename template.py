@@ -44,6 +44,11 @@ def logfile(infile):
     o.write("Infile used: \t\t%s" % infile+'\n')
             
     
+def help():
+    print '''
+            python 100b_fasta2flat.py -i <ifile>
+            '''
+    sys.exit(2)
 
 ### main argument to 
 
@@ -53,16 +58,10 @@ def options(argv):
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
-        print '''
-            python 100b_fasta2flat.py -i <ifile>
-            '''
-        sys.exit(2)
+        help()
     for opt, arg in opts:
         if opt == '-h':
-            print '''
-                python 100b_fasta2flat.py -i <ifile>
-                '''
-            sys.exit()
+            help()
         elif opt in ("-i", "--ifile"):
             infile = arg
             

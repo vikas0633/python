@@ -216,11 +216,11 @@ def gene_stru(gene_id,infile):
 	for line in open(infile,'r'):
 		line = line.strip()
 		token = line.split('\t')
-		if len(line) > 0:
+		if len(line) > 2:
 			if (line[0] != '#'):
 				if (token[2] != 'gene'):
 					if (token[1] == CUFFLINKS):
-						key = parent_ID(line).split('.')[0]+parent_ID(line).split('.')[1]
+						key = parent_ID(line).split('.')[0]+'.'+parent_ID(line).split('.')[1]
 						if key in gene_id:
 							print line
 					if (token[1] == Key_454):
@@ -386,8 +386,8 @@ if __name__ == "__main__":
 	database = '/u/vgupta/09_blueberry/11_CombineGFF3/refseq.aa.fa'
 	ref_seq = '/u/vgupta/09_blueberry/01_genome/454Scaffolds.fna'
 	
-	os.system('makeblastdb -in '+database +' >blast.temp')
-	os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
+	#os.system('makeblastdb -in '+database +' >blast.temp')
+	#os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
 	
 	### get the end point for each chromosome
 	size = get_size(file)

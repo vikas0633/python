@@ -502,6 +502,9 @@ if __name__ == "__main__":
     ### remove TAU output file if exits
     remove_temp_files()
     
+    ### format ref database
+    #os.system('formatdb -i '+infile+' -p F -o T')
+    
     for line in open(gff,'r'):
         line = line.strip()
         token = line.split('\t')
