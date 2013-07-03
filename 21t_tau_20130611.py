@@ -23,11 +23,11 @@ import os,sys, getopt
 from D_longest_fasta_sequence_header import *
 
 ### GLOBAL VARIABLEs
-#TAU_PATH="/users/vgupta/Desktop/tools/TAU"
-#SCRIPT_DIR="/users/vgupta/Desktop/script/python"
+TAU_PATH="/users/vgupta/Desktop/tools/TAU"
+SCRIPT_DIR="/users/vgupta/Desktop/script/python"
 
-TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
-SCRIPT_DIR="/u/vgupta/script/python"
+#TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
+#SCRIPT_DIR="/u/vgupta/script/python"
 
 def file_empty(file):
     count = sum([1 for line in open(file)])
@@ -245,7 +245,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
-                            ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
+                            ID = 'ID='+mRNA_id+'.'+str('CDS.')+str(i)+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             
                                 
                             CDS_st = exons[len(exons)][1] - start - introns -2
@@ -279,8 +279,10 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                     exon_en = exons[i][1] -1
                                     last_cds_len = cds_len
                                     cds_len += (exon_en - exon_st) + 1
-                                    ID = 'ID='+mRNA_id+'.'+str('CDS.')+str(i)+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                                    if (start <= exon_st) & (end-start > cds_len):
+                                    #ID = 'ID='+mRNA_id+'.'+str('CDS.')+str(i)+';'+'Parent='+mRNA_id+'.'+str(no)+';'
+                                    #print start, exon_st, exon_en,end-start, cds_len
+                                    #if (start <= exon_st) & (end-start > cds_len): 20130702
+                                    if (end-start > cds_len):
                                         frame = (cds_len) % 3
                                         if frame == 3:
                                             frame = 0
@@ -423,7 +425,7 @@ def process_gff(gff,infile):
                         ### change the format of the gff3 file
                         os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
                         ### run TAU
-                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -L 20 -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
                         file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
                         
                         
@@ -474,7 +476,7 @@ def process_gff(gff,infile):
     os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
 
     ### run TAU
-    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -L 20 -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
     
     
     file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'

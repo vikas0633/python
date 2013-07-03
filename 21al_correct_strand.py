@@ -148,23 +148,27 @@ def parse(file):
     flag = True
     gene = ''
     for line in open(file):
-        obj = GFF3(line)
-        if obj.types() != "gene":
-            if obj.types() == "mRNA":
-                if first_block == True:
-                    first_block = False
-                else:
-                    print last_gene
-                    process_objs(lst, strand)
-                lst = []
-            if obj.types() == "CDS":
-                strand = obj.strands()
+        line = line.strip()
+        if (len(line) > 5) & (not line.startswith('#')):
+            obj = GFF3(line)
+            if obj.types() != "gene":
+                if obj.types() == "mRNA":
+                    if first_block == True:
+                        first_block = False
+                    else:
+                        print last_gene
+                        process_objs(lst, strand)
+                    
+                    lst = []
+                    strand = obj.strands()
+                if obj.types() == "CDS":
+                    strand = obj.strands()
+                    
+                lst.append(obj)
                 
-            lst.append(obj)
-            
-        else:
-            last_gene = gene
-            gene = line.strip()
+            else:
+                last_gene = gene
+                gene = line.strip()
     
     ### for last block
     print gene

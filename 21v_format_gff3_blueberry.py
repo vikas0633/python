@@ -61,7 +61,8 @@ def write_elements(inf,elements):
 		if len(token) > 3:
 			if token[2] == "gene":
 				if (token[1]=="CUFFLINKS" or token[1]=="Cufflinks"):
-					match = line.split('%')[-1].replace(';','')[2:]
+					match = re.search(r'Name=.+',line)
+					match = match.group().split(';')[0].replace('Name=','')
 					if match in elements:
 						print line
 						print elements[match]

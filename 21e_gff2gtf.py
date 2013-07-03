@@ -12,17 +12,20 @@ for line in inFile:
     ID = ''
 
     #if the feature is a gene 
-    if data[2] == "gene":
+    if data[2] == "mRNA":
       #get the id
-      ID = data[-1].split('ID=')[-1].split(';')[0]
+      t_ID = data[-1].split('ID=')[-1].split(';')[0]
+      g_ID = data[-1].split('Parent=')[-1].split(';')[0]
 
-    #if the feature is anything else
-    else:
-      # get the parent as the ID
-      ID = data[-1].split('Parent=')[-1].split(';')[0]
-    
-    #modify the last column
-    data[-1] = 'gene_id "' + ID + '"; transcript_id "' + ID +'";'
+        
+    ### write mRNA as transcript
+    if data[2] == 'mRNA':
+      data[2] = 'transcript'
+      
 
     #print out this new GTF line
-    print '\t'.join(data)
+    if data[2] != 'gene':
+      #modify the last column
+      data[-1] = 'gene_id "' + g_ID + '"; transcript_id "' + t_ID +'";'
+
+      print '\t'.join(data)

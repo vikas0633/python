@@ -43,7 +43,6 @@ def printFasta(gff3,hash_fasta):
 						print '>'+match
 						print hash_fasta[match]
 						
-	print 'XXX ', len(uniq)
 if __name__ == "__main__":
     
 	inf,gff3 = options(sys.argv[1:])

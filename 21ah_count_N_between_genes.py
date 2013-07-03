@@ -67,7 +67,8 @@ def countN(genome,chr):
     for line in open(genome,'r'):
         line = line.strip()
         if line[0] == '>':
-            if line[1:] == chr:
+            if line[1:].split()[0] == chr:
+                print line
                 flag = True                 ### raise a flag if correct chromosome is found
                 pos = 0
                 hash = {}
@@ -123,7 +124,6 @@ if __name__ == "__main__":
     ### get chromosomes names and sizes
     chr_size = E_get_chr_size_gff3.get_size(gff3)
     
-        
     for chr in sorted(chr_size):        ### Process file chromosomes
         hash = countN(genome,chr)       ### hash Ns in the genome by chromosomes
         processGFF3(gff3,hash,chr)

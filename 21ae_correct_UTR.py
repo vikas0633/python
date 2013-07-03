@@ -133,7 +133,7 @@ def parse(file):
                     print line
                 if token[2] == "mRNA":
                     print line
-                    if token[1]=="CUFFLINKS":
+                    if token[1]=="CUFFLINKS" or token[1]=="Cufflinks":
                         match = re.search(r'ID=.+;',line)
                         if match:
                             match = match.group().split(';')[0].replace('ID=','')
