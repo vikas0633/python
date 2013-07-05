@@ -57,7 +57,7 @@ def options(argv):
     
 ### modify gene names
 def modifyGeneNames(gff3,chr):
-    last_gene_ID = ''
+    gene_ID_hash = {}
     count = 0
     for line in open(gff3,'r'):
         line = line.strip()
@@ -71,12 +71,15 @@ def modifyGeneNames(gff3,chr):
                         gene_ID = gene_ID.group().split(';')[0].replace('ID=','') 
                         #gene_type = re.search(r'Type=.+',line)
                         #gene_type = gene_type.group().split(';')[0].replace('Type=','')
-                        if gene_ID != last_gene_ID:
+                        if gene_ID not in gene_ID_hash:
                             count += 10
+                            gene_ID_hash[gene_ID] = count
+                            ### new variable for the keeping the AS cufflinks geneID
+                            Count = count
                             flag = True
                         else:
                             flag = False                                            ### flag for new gene
-                        last_gene_ID = gene_ID                  
+                            Count = gene_ID_hash[gene_ID]                 
                     elif token[2] == "mRNA":
                         match = re.search(r'ID=.+',line)                            ### Get the mRNA ID
                         match = match.group().split(';')[0].replace('ID=','')       
@@ -86,14 +89,14 @@ def modifyGeneNames(gff3,chr):
                         if flag == True:
                             ### print gene 
                             lin = '\t'.join(gene.split('\t')[0:len(gene.split('\t'))-1]) ### all information except ID
-                            lin += '\t'+"ID="+token[0].replace('scaffold','Vc')+'g'+ str(count).zfill(5)+';Name='+(gene_ID)+';'
+                            lin += '\t'+"ID="+token[0].replace('scaffold','Vc')+'g'+ str(Count).zfill(5)+';Name='+(gene_ID)+';'
                             #lin += '\t'+"ID="+chr_name[token[0]]+ str(count).zfill(7)+';Type='+gene_type+';'
                             print lin
                             
                         ### print mRNA
-                        mRNA_ID = token[0].replace('scaffold','Vc')+'g'+ str(count).zfill(5)+'.'+variant_no_mRNA
+                        mRNA_ID = token[0].replace('scaffold','Vc')+'g'+ str(Count).zfill(5)+'.'+variant_no_mRNA
                         lin = '\t'.join(line.split('\t')[0:len(line.split('\t'))-1]) ### all information except ID
-                        lin += '\t'+"ID="+mRNA_ID+';Parent='+token[0].replace('scaffold','Vc')+'g'+str(count).zfill(5)+";Name="+mRNA_ID+';'
+                        lin += '\t'+"ID="+mRNA_ID+';Parent='+token[0].replace('scaffold','Vc')+'g'+str(Count).zfill(5)+";Name="+gene_ID+'.'+variant_no_mRNA+';'
                         print lin
                     
                     else:

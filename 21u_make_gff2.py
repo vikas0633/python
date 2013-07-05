@@ -31,14 +31,14 @@ def options(argv):
 
 
 def process_file():
-    o = open('temp.gff','w')
-    for line in open(infile,'r'):
-        line = line.strip()
-        token = line.split('\t')
-        if (token[2] == "exon"):
-			lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+token[3]+'\t'+token[4]+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+line.split('=')[2].split(';')[0]
-			o.write(lin+'\n')
-    o.close()
+	o = open('temp.gff','w')
+	for line in open(infile,'r'):
+	        line = line.strip()
+		token = line.split('\t')
+		if (token[2] == "exon"):
+		        lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+token[3]+'\t'+token[4]+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+line.split('=')[2].split(';')[0]
+		        o.write(lin+'\n')
+	o.close()
 if __name__ == "__main__":
 
 	infile, outfile = options(sys.argv[1:]) 

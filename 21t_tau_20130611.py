@@ -23,11 +23,11 @@ import os,sys, getopt
 from D_longest_fasta_sequence_header import *
 
 ### GLOBAL VARIABLEs
-TAU_PATH="/users/vgupta/Desktop/tools/TAU"
-SCRIPT_DIR="/users/vgupta/Desktop/script/python"
+#TAU_PATH="/users/vgupta/Desktop/tools/TAU"
+#SCRIPT_DIR="/users/vgupta/Desktop/script/python"
 
-#TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
-#SCRIPT_DIR="/u/vgupta/script/python"
+TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
+SCRIPT_DIR="/u/vgupta/script/python"
 
 def file_empty(file):
     count = sum([1 for line in open(file)])
@@ -275,8 +275,8 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             three_prime_UTR_st = CDS_en + mRNA_st -1
                             if flag_end == False:
                                 for i in range(j-1,0,-1):
-                                    exon_st = exons[i][0] -1 
-                                    exon_en = exons[i][1] -1
+                                    exon_st = exons[i][0] - 1 
+                                    exon_en = exons[i][1] - 1
                                     last_cds_len = cds_len
                                     cds_len += (exon_en - exon_st) + 1
                                     #ID = 'ID='+mRNA_id+'.'+str('CDS.')+str(i)+';'+'Parent='+mRNA_id+'.'+str(no)+';'
@@ -318,7 +318,7 @@ def mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
             mRNA_id = gene_id+'.'+str(model_no)
             #strand = tokens[4].strip()                                                 # Do not take strand from cdna file
             #lin = token[0][1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(start)+'\t'+str(end)+'\t'+'.'+'\t'+tokens[4].strip()+'\t'+'.'+'\t'+ID
-            lin = token[0][1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(mRNA_st)+'\t'+str(mRNA_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+            lin = token[0][1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(mRNA_st )+'\t'+str(mRNA_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
             cds_strand = strand
             if flag == False:
                 o.write(lin+'\n')
@@ -425,7 +425,7 @@ def process_gff(gff,infile):
                         ### change the format of the gff3 file
                         os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
                         ### run TAU
-                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -L 20 -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -L 1 -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
                         file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
                         
                         
@@ -439,11 +439,11 @@ def process_gff(gff,infile):
                         #sys.exit(0)
                     new_transcript = True
                     header = token[0]
-                    mRNA_st = int(token[3]) 
+                    mRNA_st = int(token[3])
                     mRNA_en = int(token[4]) 
                     strand = token[6]
-                    start = int(token[3]) - mRNA_st
-                    end = int(token[4]) - mRNA_st
+                    start = int(token[3]) - mRNA_st 
+                    end = int(token[4]) - mRNA_st 
                     lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+str(start)+'\t'+str(end)+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+token[8]
                     tau_in = open('tau_in','w')
                     id = line.split('ID=')[1].split(';')[0]
@@ -457,8 +457,8 @@ def process_gff(gff,infile):
                     
                 if (token[2] == 'exon'):
                     if line.split('Parent=')[1].split(';')[0] == id:
-                        start = int(token[3]) - mRNA_st
-                        end = int(token[4]) - mRNA_st
+                        start = int(token[3]) - mRNA_st 
+                        end = int(token[4]) - mRNA_st 
                         lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+str(start)+'\t'+str(end)+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+token[8]
                         tau_in.write(lin+'\n')
                         exon_line += line+'\n'
@@ -476,7 +476,7 @@ def process_gff(gff,infile):
     os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
 
     ### run TAU
-    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -L 20 -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -L 1 -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
     
     
     file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
