@@ -30,6 +30,7 @@ import os,sys,getopt, re
 ### global variables
 
 FASTA_FLAG = False
+HITS = 5
 
 ### make a logfile
 import datetime
@@ -51,17 +52,18 @@ def help():
             python 111_blastoutput_parser.py 
                                 -i <ifile>   ### blast output in the standard text -m6 format 
                                 -f <fasta>   ### fasta file for blast database
+                                -n <n_hits>    ### Max hits to be printed each line
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    global FASTA_FLAG
+    global FASTA_FLAG, HITS
     infile = ''
     fasta = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:f:",["ifile=","fasta="])
+        opts, args = getopt.getopt(argv,"hi:f:n:",["ifile=","fasta=","n_hits"])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -72,10 +74,12 @@ def options(argv):
         elif opt in ("-f", "--fasta"):
             fasta = arg
             FASTA_FLAG = True
+        elif opt in ("-n", "--n_hits"):
+            HITS = int(arg)
             
     logfile(infile)
             
-    return infile, fasta
+    return infile, fasta, HITS
 
 def split_line(line, by):
     return line.split(by)
@@ -85,7 +89,9 @@ def get_species(line):
     if match:
         species = match.group().replace('[','').replace(']','').split(' ')
         return ' '.join(species[0:2])
-
+    else:
+        return 'NA'
+    
 def get_desc(line):
     return line.split('|')[4].split('[')[0]
 
@@ -195,7 +201,7 @@ def hash_blast(fasta):
             obj = process_fasta_header(line.strip())
             
             ### hash the data against gi
-            blast_hash[obj.GIs()] = [obj.descs(), obj.spes()]
+            blast_hash[obj.GIs()] = obj.descs() + '\t' + obj.spes()
     return blast_hash
 
 
@@ -219,6 +225,8 @@ def print_out(obj):
 ### function to print out blast result
 def print_blast_out(infile, blast_hash):
     
+    query_count = {}
+    
     for line in open(infile,'r'):
         
         ### parse blast result
@@ -226,12 +234,20 @@ def print_blast_out(infile, blast_hash):
         
         ### get the blast results
         out_line = print_out(obj)
-        print out_line + '\t' + blast_hash[obj.SUBJECT().split('|')[1]]
         
+        ### counts the queries
+        if obj.QUERY() in query_count:
+            query_count[obj.QUERY()] += 1
+        else:
+            query_count[obj.QUERY()] = 1
+        
+        ### print the output
+        if query_count[obj.QUERY()] <= HITS:
+                print out_line + '\t' + str(blast_hash[obj.SUBJECT().split('|')[1]])
 
 if __name__ == "__main__":
     
-    infile, fasta = options(sys.argv[1:])
+    infile, fasta, HITS = options(sys.argv[1:])
     
     ### hash the blast database
     blast_hash = hash_blast(fasta)

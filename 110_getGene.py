@@ -154,7 +154,7 @@ def printGFF(gff3, gene_IDs):
     print_flag = False
     for line in open(gff3, 'r'):
         line = line.strip()
-        if ((len(line) > 5) and (not line.startswith('#'))):
+        if ((len(line) > 1) and (not line.startswith('#'))):
             obj = GFF3(line)
             if obj.types() == "gene":
                 if str(obj) in gene_IDs:

@@ -259,3 +259,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 109_AddPhaseGFF3.py - script to add Phase <br />
 110_getGene.py - script take a list of genes and extracts the genemodels from the GFF3 file <br />
 111_blastoutput_parser.py - script to parse blast output and return a table <br />
+112_iprscanout_parser.py - script to parse blast output and return a table <br />

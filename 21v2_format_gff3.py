@@ -82,7 +82,7 @@ def hashFasta(file):
 				if first_line == False:
 					seqs[header] = seq
 				seq = ''
-				header = line[1:]
+				header = line[1:].split(' ')[0]
 				token = header.split('.')
 			else:
 				seq += line

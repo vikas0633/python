@@ -68,7 +68,6 @@ def countN(genome,chr):
         line = line.strip()
         if line[0] == '>':
             if line[1:].split()[0] == chr:
-                print line
                 flag = True                 ### raise a flag if correct chromosome is found
                 pos = 0
                 hash = {}
