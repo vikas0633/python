@@ -1,6 +1,7 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 110_getGene.py - take out the genes given a list          |
+# 21ak_update_GFF3_IDsOnly.py this script take a two column |
+# id and replaces these in the GFF3 file                    |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -10,8 +11,8 @@
 # UPDATED: 09/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# This script hash the gene_ID and take out all the mathing |
-# genes from a gFF3 file                                    |
+# Short script to convert and copy the wheat BACs           |
+# Run this in the parent dir that the HEX* dirs exist       |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -20,7 +21,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/110_getGene.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -39,13 +40,14 @@ o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 ### write logfile
 
 def logfile(infile):
-    o.write("Program used: \t\t%s" % "110_getGene.py"+'\n')
+    o.write("Program used: \t\t%s" % "100b_fasta2flat.py"+'\n')
     o.write("Program was run at: \t%s" % str(now.strftime("%Y-%m-%d_%H%M"))+'\n')
     o.write("Infile used: \t\t%s" % infile+'\n')
             
+    
 def help():
     print '''
-            python 110_getGene.py  -g <GFF3> -l <gene_list>
+            python 100b_fasta2flat.py -i <ifile> -l <gene_list>
             '''
     sys.exit(2)
 
@@ -55,38 +57,49 @@ def options(argv):
     infile = ''
     gff3 = ''
     try:
-        opts, args = getopt.getopt(argv,"hg:l:",["GFF3=", "gene_list="])
+        opts, args = getopt.getopt(argv,"hi:l:",["ifile=","list="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h':
             help()
-        elif opt in ("-g", "--GFF3"):
-            gff3 = arg
-        elif opt in ("-l", "--gene_list"):
-            gene_list = arg
+        elif opt in ("-i", "--ifile"):
+            infile = arg
+        elif opt in ("-l", "--list"):
+            list_file = arg
+        
+    logfile(infile)
             
-    logfile(gff3)
-            
-    return gff3, gene_list
+    return infile, list_file
+    
+def hash_file(infile):
+    hash_ID = {}
+    for line in open(infile,'r'):
+        line = line.strip()
+        token = line.split('\t')
+        hash_ID[token[0]] = token[1] ### hash trasctipt ID
+        g_id = '.'.join(token[0].split('.')[:-1])
+        g_id_new = '.'.join(token[1].split('.')[:-1])
+        hash_ID[g_id] = g_id_new ### hash gene_ID
+    return hash_ID
 
 ### split line
 def split_line(line):
     return line.strip().split('\t')
 
 ### get ID
+def get_NAME(line):
+    line = line.strip()
+    match = re.search(r'Name=.+',line)
+    if match:
+        return match.group().split(';')[0].replace('Name=','')
+    
+### get Name
 def get_ID(line):
     line = line.strip()
     match = re.search(r'ID=.+;',line)
     if match:
         return match.group().split(';')[0].replace('ID=','')
-    
-### get ID
-def get_PARENT(line):
-    line = line.strip()
-    match = re.search(r'Parent=.+;',line)
-    if match:
-        return match.group().split(';')[0].replace('Parent=','')
     
 ### http://www.sequenceontology.org/gff3.shtml
 ### make a class that returns columns of a GFF3 row
@@ -147,47 +160,32 @@ def process_objs(obj,phase, attributes):
     obj.strands() + '\t' + \
     str(phase) + '\t' + \
     attributes
-    
-def hash_file(infile):
-    hashFile = {}
-    for line in open(infile,'r'):
-        line = line.strip()
-        hashFile[line] = ''
-        
-        ### add an exception
-        hashFile['gi|197209811|dbj|AB433810.1|.path1'] = ''
-    
-    return hashFile
 
-def printGFF(gff3, gene_IDs):
-    gene_ID = {}
-    print_flag = False
+
+def update_GFF3(gff3, hash_ID):
+    
     for line in open(gff3, 'r'):
         line = line.strip()
         if ((len(line) > 1) and (not line.startswith('#'))):
             obj = GFF3(line)
-            if obj.types() == "gene":
-                if str(obj) in gene_IDs:
-                    print line
             
-            elif obj.types() == "mRNA":
-                g_id = '.'.join(get_ID(line).split('.')[:-1])
-                if g_id in gene_IDs:
-                    print line
-            else :
-                g_id = '.'.join(get_PARENT(line).split('.')[:-1])
-                if g_id in gene_IDs:
-                    print line
-
-
+            if obj.types() == 'gene':
+                name = get_NAME(line)
+                g_id = get_ID(line)
+            
+            if name.startswith('gi|'):    
+                if name in hash_ID:    
+                    print line.replace(g_id, hash_ID[name])
+                
 if __name__ == "__main__":
     
-    gff3, gene_list = options(sys.argv[1:])
+    gff3, list_file = options(sys.argv[1:])
     
-    gene_IDs = hash_file(gene_list)
+    ### hash file
+    hash_ID = hash_file(list_file)
     
-    ### print GFF
-    printGFF(gff3, gene_IDs)
+    ### update GFF3
+    update_GFF3(gff3, hash_ID)
     
     ### close the logfile
     o.close()

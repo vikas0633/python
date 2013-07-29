@@ -197,9 +197,10 @@ def parse(infile, file_format, ids):
         for line in open(infile,'r'):
             line = line.strip()
             if line.startswith('>'):
-                if line in ids:
+                header = line.split(',')[0]
+                if header in ids:
                     print line
-                    print ids[line].strip()
+                    print ids[header].strip()
                     flag = False
                 else:
                     flag = True

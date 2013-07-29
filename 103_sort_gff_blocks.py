@@ -17,7 +17,8 @@ import datetime
 now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 
-
+global count
+count = 0
 
 ### write logfile
 
@@ -53,8 +54,39 @@ def options(argv):
             
     return infile
 
+### split line
+def split_line(line):
+    return line.strip().split('\t')
+
+### get ID
+def get_ID(line):
+    line = line.strip()
+    match = re.search(r'ID=.+;',line)
+    if match:
+        return match.group().split(';')[0].replace('ID=','')
+    else:
+        print 'Error at line'
+        print line
+        sys.exit('ID is missing in the attributes')
+    
+### get PARENT ID
+def get_PARENT(line):
+    line = line.strip()
+    match = re.search(r'Parent=.+;',line)
+    if match:
+        return match.group().split(';')[0].replace('Parent=','')
+    else:
+        print 'Error at line'
+        print line
+        sys.exit('ID is missing in the attributes')
+    
 def sortGFF3(file,chr):
     hash = {}
+    gene_names = {} ### store  gene names
+    gene_starts = {} ### store gene start
+    gene = {} ### store gene line
+    mRNA_names = {}
+    global count
     for line in open(file,'r'):
         line = line.strip()
         if len(line)>1:
@@ -62,20 +94,32 @@ def sortGFF3(file,chr):
                 token = line.split('\t')
                 if token[0] == chr:
                     if token[2] == 'gene':                  ### get the gene name and use it start position as key
-                        match = re.search(r'Name=.+',line)
-                        if match:
-                            match = match.group().split(';')[0].replace('Name=','')
-                        else:
-                            match = re.search(r'ID=.+',line)
-                            match = match.group().split(';')[0].replace('ID=','')
-                        match += token[3]
-                        key = (int(token[3]),match)
-                        hash[key] = line + '\n'
+                        match = get_ID(line)
+                        gene_starts[int(token[3]), match] = match
+                        gene[match] = line
+                        gene_names[match] = ''
+                        
+                    elif token[2] == 'mRNA':
+                        match = get_ID(line)
+                        if match not in mRNA_names:
+                            p_ID = get_PARENT(line)
+                            if p_ID in hash:
+                                hash[p_ID] += line + '\n'
+                                
+                            else:
+                                hash[p_ID] = line + '\n'
+                        
+                        mRNA_names[match] = ''
+                            
                     else:
-                        hash[key] += line+'\n'
-    for key in sorted(hash):
-        print hash[key]
-
+                        hash[p_ID] += line + '\n'
+                        
+    
+    for key in sorted(gene_starts):
+        g_ID =  gene_starts[key]
+        print gene[g_ID]
+        print hash[g_ID]
+    
 if __name__ == "__main__":
     
     file = options(sys.argv[1:])

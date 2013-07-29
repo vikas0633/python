@@ -27,6 +27,18 @@ def options(argv):
 	return inputfile, type
 
 
+### get ID
+def get_ID(line):
+    match = re.search(r'ID=.+;',line)
+    if match:
+        return match.group().split(';')[0].replace('ID=','')
+
+### get ID
+def parent_ID(line):
+    match = re.search(r'Parent=.+;',line)
+    if match:
+        return match.group().split(';')[0].replace('Parent=','')
+
 ### hash the type
 def HASH(type):
 	hash = {}
@@ -35,10 +47,15 @@ def HASH(type):
 			if len(line) > 2:
 				line = line.strip()
 				token = line.split('\t')
+				
+				''' old method
 				if (token[0][0:4] != "CUFF") & (token[0][0:2]!='gi'): ### cufflinks gene models have .1 .2 for each gene while other methods only use .1, .2 for various mRNAs
 					key = ".".join(token[0].split(".")[0:len(token[0].split("."))-1])
 				else:
 					key = token[0]
+				'''
+				key = token[0]
+				
 				key = key.replace('mrna','path') ### replace the gmap models so that match the gene name
 				if len(token)==1:
 					hash[key] = ' '
@@ -50,42 +67,39 @@ def HASH(type):
 def load_elements(inf,hash):
 	elements = {}
 	for line in open(inf,'r'):
-		line = line.strip('Type=')[0]
-		### check if line already has a type
-		line=line.split()
+		line = line.strip()
+		line = line.split('Type=')[0] ## remove type if present
+		
 		### find parent name
 		token = line.split('\t')
 		if len(token) > 3:
 			if line[-1]==';':
 				line = line[0:len(line)-1]
+			if token[2] == "gene":
+				g_id = get_ID(line)
 			if token[2] == "mRNA":
 				if token[1]=="CUFFLINKS":
-					match = re.search(r'ID=.+;',line)
-					if match:
-						match = match.group().split(';')[0].replace('ID=','')
-						mRNA = match
-						match = match.replace('mrna','path')
-						if match in elements:
-							elements[match] += line + '; Type="'+hash[match]+'"\n'
-						else:
-							elements[match] = line + '; Type="'+hash[match]+'"\n'
+					match = get_ID(line)
+					match = match.replace('mrna','path')
+					if g_id in elements:
+						elements[g_id] += line + ';Type="'+hash[match]+'"\n'
+					else:
+						elements[g_id] = line + ';Type="'+hash[match]+'"\n'
 				else:
-					match = re.search(r'Parent=.*',line)
-					if match:
-						match = match.group().split(';')[0].replace('Parent=','')
-						mRNA = match
-						match = match.replace('mrna','path')
-						
-						### add the protein coding type for conserved proteins
-						if match.startswith('gi'):
-							hash[match] = 'protein_coding'
-						
-						if match in elements:
-							elements[match] += line +'; Type="'+hash[match]+'"\n'
-						else:
-							elements[match] = line +'; Type="'+hash[match]+'"\n'
+					match = get_ID(line)
+					match = match.replace('mrna','path')
+					
+					### add the protein coding type for conserved proteins
+					if g_id.startswith('gi'):
+						hash[match] = 'protein_coding'
+					
+					if g_id in elements:
+						elements[g_id] += line +';Type="'+hash[match]+'"\n'
+					else:
+						elements[g_id] = line +';Type="'+hash[match]+'"\n'
+				hash[g_id] = hash[match]
 			if (token[2] != "gene") & (token[2] != "mRNA"):
-				elements[mRNA] += line +'; Type="'+hash[match]+'"\n'
+				elements[g_id] += line +';Type="'+hash[match]+'"\n'
 	return elements
 	
 def write_elements(inf,elements):
@@ -95,18 +109,13 @@ def write_elements(inf,elements):
 		token = line.split('\t')
 		if len(token) > 3:
 			if token[2] == "gene":
-				if token[1]=="CUFFLINKS":
-					match = line.split('%')[-1].replace(';','')[2:]
-					if match in elements:
-						print line + '; Type="'+hash[match]+'"'
-						print elements[match]
-				else:
-					match = re.search(r'ID=.+;',line)
-					if match:
-						match = match.group().replace(';','').replace('ID=','') 
-						if match in elements:
-							print line + '; Type="'+hash[match]+'"'
-							print elements[match]
+				g_id = get_ID(line)
+				if g_id in elements:
+					if line[-1] != ';':
+						print line + ';Type="'+hash[g_id]+'"'
+					else:
+						print line + 'Type="'+hash[g_id]+'"'
+					print elements[g_id]
 
 if __name__ == "__main__":
     

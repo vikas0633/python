@@ -206,7 +206,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ak_remove_redundant.py - script to remove the redundant node gene models <br />
 21al_correct_strand.py - this script takes strand from CDS and assigns the same to mRNA, exons and UTRs, GFF3 files <br />
 21am_update_GFF3_fasta.py - this script updates GFF3 and fasta given a different file <br />
-
+21an_hash_MySQLid.py - this script makes a 2 column table one with Id and another with yes/no <br />
+21ak_update_GFF3_IDsOnly.py this script take a two column id and replaces these in the GFF3 file <br />
 	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
