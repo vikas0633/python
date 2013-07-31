@@ -280,43 +280,43 @@ def get_statistics(infile):
         stats = GenomicParameters(element)
         
         if features == 'gene':
-            print str(stats) + '\t' + \
-            str(stats.counts()) + '\t' + \
-            str(stats.total_length()) + '\t' + \
-            str(stats.avg_length()) + '\t' + \
-            str(stats.max_length()) + '\t' + \
-            str(stats.min_length())
+            print '%10s %10s %10s %10s %10s %10s' % (str(stats) , \
+            str(stats.counts()) , \
+            str(stats.total_length()) , \
+            str(stats.avg_length()) , \
+            str(stats.max_length()) , \
+            str(stats.min_length()))
             gene_length = stats.total_length()
         
         
         elif features == 'mRNA':
-            print str(stats) + '\t' + \
-            str(len(mRNA.values())) + '\t' + \
-            str(sum(mRNA.values())) + '\t' + \
-            str(round(numpy.mean(mRNA.values()),2)) + '\t' + \
-            str(max(mRNA.values())) + '\t' + \
-            str(min(mRNA.values()))
+            print '%10s %10s %10s %10s %10s %10s' % (str(stats) , \
+            str(len(mRNA.values())) , \
+            str(sum(mRNA.values())) , \
+            str(round(numpy.mean(mRNA.values()),2)) , \
+            str(max(mRNA.values())) , \
+            str(min(mRNA.values())))
         
         elif features == 'exon':
-            print str(stats) + '\t' + \
-            str(stats.counts()) + '\t' + \
-            str(stats.total_length()) + '\t' + \
-            str(stats.avg_length()) + '\t' + \
-            str(stats.max_length()) + '\t' + \
-            str(stats.min_length())
+            print '%10s %10s %10s %10s %10s %10s' %  (str(stats) , \
+            str(stats.counts()) , \
+            str(stats.total_length()) , \
+            str(stats.avg_length()) , \
+            str(stats.max_length()) , \
+            str(stats.min_length()))
             
-            print str('Intron') + '\t' + \
-            str(stats.counts()-len(mRNA.values())) + '\t' + \
-            str(gene_length - stats.total_length()) + '\t' + \
-            str((gene_length - stats.total_length())/(stats.counts()-len(mRNA.values())))
+            print '%10s %10s %10s %10s' % (str('Intron') , \
+            str(stats.counts()-len(mRNA.values())) , \
+            str(gene_length - stats.total_length()) , \
+            str((gene_length - stats.total_length())/(stats.counts()-len(mRNA.values()))))
         
         else:
-            print str(stats) + '\t' + \
-            str(stats.counts()) + '\t' + \
-            str(stats.total_length()) + '\t' + \
-            str(stats.avg_length()) + '\t' + \
-            str(stats.max_length()) + '\t' + \
-            str(stats.min_length())
+            print '%10s %10s %10s %10s %10s %10s' %  (str(stats) , \
+            str(stats.counts()) , \
+            str(stats.total_length()) , \
+            str(stats.avg_length()) , \
+            str(stats.max_length()) , \
+            str(stats.min_length()))
 
 if __name__ == "__main__":
     

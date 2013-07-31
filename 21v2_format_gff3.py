@@ -36,6 +36,7 @@ def options(argv):
     ljrep_blast = ''
     gene_densFile = ''
     iprScan_file = ''
+    oMCLfile = ''
     try:
        opts, args = getopt.getopt(argv,"hi:g:c:p:b:r:o:f:s:j:d:a:", ["ifile=","gfile=","cfile=","pfile=", "bfile=","rfile=","orthoMCL=","oMCLfamily=","blast_search=","ljr_repeat=", "gene_density=", "iprScan="])
     except getopt.GetoptError:
@@ -75,6 +76,8 @@ def options(argv):
 def hashFasta(file):
 	first_line = True
 	seqs = {}
+	seq=''
+	header = ''
 	for line in open(file,'r'):
 		line = line.strip()
 		if len(line) > 0 :			
@@ -87,7 +90,8 @@ def hashFasta(file):
 			else:
 				seq += line
 		first_line = False			
-	seqs[header] = seq
+	if header != '':
+	    seqs[header] = seq
 
 	return seqs
 		
@@ -104,7 +108,8 @@ def exonRepeat(exon_repeat):
 	
 def hashHomology(hfile):
 	homology = {}
-	for line in open(hfile,'r'):
+	if hfile != '':
+	    for line in open(hfile,'r'):
 		line = line.strip()
 		token = line.split('\t')
 		
@@ -120,7 +125,8 @@ def hashHomology(hfile):
 
 def hashOrthoMCL(oMCLfile):
 	orthoMCL = {}
-	for line in open(oMCLfile,'r'):
+	if oMCLfile != '':
+	    for line in open(oMCLfile,'r'):
 		line = line.strip()
 		token = line.split('\t')
 		orthoMCL[token[0]] = token[1]
@@ -129,7 +135,8 @@ def hashOrthoMCL(oMCLfile):
 	
 def hashOrthofamily(oMCLfamily):
 	orthofamily = {}
-	for line in open(oMCLfamily,'r'):
+	if oMCLfamily != '':
+	    for line in open(oMCLfamily,'r'):
 		line = line.strip()
 		token = line.split('\t')
 		orthofamily[token[0]] = token[1] +'\t' +token[2] +'\t' +token[3] +'\t' +token[4] +'\t' +token[5] +'\t' +token[6] +'\t' + token[7] 
@@ -137,7 +144,8 @@ def hashOrthofamily(oMCLfamily):
 
 def hashblast(blastfile):
 	blast = {}
-	for line in open(blastfile,'r'):
+	if blastfile != '':
+	    for line in open(blastfile,'r'):
 		line = line.strip()
 		token = line.split('\t')
 		blast[token[0]] = token[1] +'\t'+ token[2] +'\t'+ token[3]
@@ -146,7 +154,8 @@ def hashblast(blastfile):
 def hashljrblast(file):
 	''' This function is for hashing the blast output of Lj repeat '''
 	blast = {}
-	for line in open(file,'r'):
+	if file != '':
+	    for line in open(file,'r'):
 		line = line.strip()
 		token = line.split('\t')
 		blast[token[0]] = token[1] +'\t'+ token[2] +'\t'+ token[10]
@@ -155,7 +164,8 @@ def hashljrblast(file):
 def hash_denseGene(file):
 	''' this function for making a dictionary to store dense genome co-ordinates'''
 	dense = {}
-	for line in open(file,'r'):
+	if file != '':
+	    for line in open(file,'r'):
 		line = line.strip()
 		token = line.split(' ')
 		for i in range(int(token[1]), int(token[2])+1,1):
@@ -165,7 +175,8 @@ def hash_denseGene(file):
 
 def IPRSCAN(file):
 	hash = {}
-	for line in open(file,'r'):
+	if file != '':
+	    for line in open(file,'r'):
 		line = line.strip()
 		token = line.split('\t')
 		hash[token[0]] = token[1]
@@ -197,6 +208,8 @@ def format(inf, cDNA, cds, protein, homology, exons, orthoMCL, orthofamily, blas
 					source =  "Experimentally validated [NCBI]"
 				elif token[1] == "Lotus_TC":
 					source =  "Lotus_TC"
+				else:
+					source = token[1]
 					
 				### get the mRNA ID
 				match = re.search(r'ID=.+;',line)

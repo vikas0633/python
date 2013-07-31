@@ -3,6 +3,7 @@
 def LOADfasta(file):
 	first_line = True
 	seq = {}
+	string = ''
 	for line in open(file,'r'):
 		line = line.strip()
 		if len(line) > 0 :			
@@ -11,7 +12,7 @@ def LOADfasta(file):
 					if string != '': 
 						seq[header] = string
 				string = ''
-				header = line[1:].strip().lstrip()
+				header = line[1:].strip().split()[0]
 			else:
 				string += line
 		first_line = False			

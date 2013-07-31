@@ -261,3 +261,5 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 110_getGene.py - script take a list of genes and extracts the genemodels from the GFF3 file <br />
 111_blastoutput_parser.py - script to parse blast output and return a table <br />
 112_iprscanout_parser.py - script to parse blast output and return a table <br />
+113_validate_GFF3.py - GFF3 validation script <br />
+114_validate_Fasta.py - Fasta validation script <br />
