@@ -332,7 +332,6 @@ if __name__ == "__main__":
     ### parse GFF3 file
     parse(gff3)
     
-    
     ### get the statistics
     get_statistics(gff3)
     

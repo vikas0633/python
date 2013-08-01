@@ -73,12 +73,24 @@ def duplicate(infile):
     headers = {}
     for line in open(infile):
         if line.startswith('>'):
-            header = line[1:].strip().split()[0]
+            header = line[1:].strip().split(',')[0]
             if header in headers:
                 print 'Error at line'
                 print line
                 sys.exit('Duplicate fasta header. Header is the first part of the line stariting with ">" ')
-                
+            headers[header] = ''
+
+def findStops(file):
+
+    for line in open(file,'r'):
+        line = line.strip()
+        if len(line) > 1:
+            if not line.startswith('>'):
+                if re.search('.',line):
+                    print 'Error at line'
+                    print line
+                    sys.exit('Stop codon found')
+
 
 if __name__ == "__main__":
     
@@ -87,6 +99,9 @@ if __name__ == "__main__":
     ### fasta file
     #check the duplicacy in the fasta file
     duplicate(infile)
+
+    ### check if there is a stop in the sequence
+    stops(infile)
     
     ### close the logfile
     o.close()
