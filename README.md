@@ -208,7 +208,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21am_update_GFF3_fasta.py - this script updates GFF3 and fasta given a different file <br />
 21an_hash_MySQLid.py - this script makes a 2 column table one with Id and another with yes/no <br />
 21ak_update_GFF3_IDsOnly.py this script take a two column id and replaces these in the GFF3 file <br />
-21ao_keep_fasta_ifGFF3.py - script to throw out excessive sequences in fasta file <br /> 
+21ao_keep_fasta_ifGFF3.py - script to throw out excessive sequences in fasta file <br />
+21ap_TranscriptSummary.py - Summerizes GFF3 transcript wise <br />
 	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -264,3 +265,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 112_iprscanout_parser.py - script to parse blast output and return a table <br />
 113_validate_GFF3.py - GFF3 validation script <br />
 114_validate_Fasta.py - Fasta validation script <br />
+115_MapFastq.py - Script to Map Fastq files <br />
