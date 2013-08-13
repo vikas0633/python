@@ -210,6 +210,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ak_update_GFF3_IDsOnly.py this script take a two column id and replaces these in the GFF3 file <br />
 21ao_keep_fasta_ifGFF3.py - script to throw out excessive sequences in fasta file <br />
 21ap_TranscriptSummary.py - Summerizes GFF3 transcript wise <br />
+21aq_addGeneStrand.py - Adds the strand to the gene based on the mRNAs strands <br />
 	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -244,9 +245,13 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 28c_gff3_validator.py - Script to validate a gff3 file <br />
 
 
+
 ### 29. snpEff data analysis
 29a_MakeGeneWideTable.py - script to put the snpEff data togehter <br />
 29b_MakeGeneWideTableUnique.py - script to summarize snpEff data <br />
+
+### 30. Degradome data analysis
+30a_count_5prime_stacks.py - script for counting 5' degradome mappings from BAM file <br /> 
 
 ### General Scripts
 100_intersect_columns.py - script to find non-overlapping entries between the two columns <br />
@@ -266,3 +271,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 113_validate_GFF3.py - GFF3 validation script <br />
 114_validate_Fasta.py - Fasta validation script <br />
 115_MapFastq.py - Script to Map Fastq files <br />
+116_runGATK.py - script to run GATK analysis <br />

@@ -1,6 +1,7 @@
 #-----------------------------------------------------------+
 #                                                           |
-# RemoveStopsProteins.py - Removes the proteins with stops  |
+# 21aq_addGeneStrand.py - Adds the strand to the gene based |
+# on the mRNAs strands                                      |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -18,7 +19,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/21aq_addGeneStrand.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -37,41 +38,51 @@ o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 ### write logfile
 
 def logfile(infile):
-    o.write("Program used: \t\t%s" % "100b_fasta2flat.py"+'\n')
+    o.write("Program used: \t\t%s" % "21aq_addGeneStrand.py"+'\n')
     o.write("Program was run at: \t%s" % str(now.strftime("%Y-%m-%d_%H%M"))+'\n')
     o.write("Infile used: \t\t%s" % infile+'\n')
             
     
 def help():
     print '''
-            python 100b_fasta2flat.py -i <ifile>
+            python 21aq_addGeneStrand.py -i <ifile>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
+    infile = ''
     gff3 = ''
-    cds=''
-    protein = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:c:p:",["ifile=","CDS=","proteins="])
+        opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h':
             help()
         elif opt in ("-i", "--ifile"):
-            gff3 = arg
-        elif opt in ("-c", "--CDS"):
-            cds = arg
-        elif opt in ("-p", "--proteins"):
-            proteins = arg
+            infile = arg
             
-    logfile(gff3)
+    logfile(infile)
             
-    return gff3, cds, proteins
+    return infile
+    
+def empty_file(infile):
+    if os.stat(infile).st_size==0:
+        sys.exit('File is empty')
+    
 
+def count_cols(infile):
+    for line in open(infile,'r'):
+        if len(line)>1:
+            if not (line.startswith('#')):
+                if len(line.split('\t')) != COLS:
+                    print 'Error at line'
+                    print line
+                    sys.exit('Each row must have '+str(COLS)+' columns')
+                    
+                    
 ### split line
 def split_line(line):
     return line.strip().split('\t')
@@ -147,112 +158,81 @@ class GFF3:
     def attributes(self):
         return self.attribute
 
-def process_objs(obj, source):
+def process_objs(obj, strand ):
     return obj.seqids() + '\t' + \
-    source + '\t' + \
+    obj.sources() + '\t' + \
     obj.types() + '\t' + \
     obj.starts() + '\t' + \
     obj.ends() + '\t' + \
     obj.scores() + '\t' + \
-    obj.strands() + '\t' + \
+    strand + '\t' + \
     obj.phases() + '\t' + \
-    obj.attributes()
-   
-def findStops(proteins):
-    no_stops = {}
-    no_stops_genes = {}
-    stops = {}
-    stops_genes = {}
-    for line in open(proteins,'r'):
-        line = line.strip()
-        if len(line) > 1:
-            if line.startswith('>'):
-                header = line.split(',')[0][1:]
-            else:
-                if re.search('\.',line[:-2]):
-                    stops[header] = ''
-                    stops_genes[header[:-2]] = ''
-                else:
-                    no_stops[header] = ''
-                    no_stops_genes[header[:-2]] = ''
-            
-    return stops, stops_genes, no_stops, no_stops_genes
-
-def fixCDS(file, stops):
-    o = open(file+'.updated','w')
-    flag = True
-    for line in open(file,'r'):
-        line = line.strip()
-        if line.startswith('>'):
-            header = line.split(',')[0][1:]
-            if header in stops:
-                flag = False
-            else:
-                flag = True
-        if flag == True:
-            if line.startswith('>'):
-                o.write(line+'\n')
-            else:
-                o.write(line.split('.')[0]+'\n')
-            
-    o.close()
-
-
-def fixGFF3(file, stops, stops_genes, no_stops, no_stops_genes):
-    o = open(file+'.updated','w')
-    for line in open(file, 'r'):
-        if len(line) > 1:
-            line = line.strip()
-            obj = GFF3(line)
-            
-            if obj.sources() == 'lj_r30.fa':
-                if (source != 'tRNA') or (source != 'rRNA'):
-                    source = "protein_coding"
-            else:
-                source = obj.sources()
-            
-            if obj.types() == 'gene':
-                if str(obj) in stops_genes:
-                    source = 'processed_transcript'
-                elif str(obj) in no_stops_genes:
-                    source = "protein_coding"
-                
-                elif str(obj) not in no_stops_genes:
-                    if (source != 'tRNA') and (source != 'rRNA'):
-                        source = 'processed_transcript'
-                    
-            elif obj.types() == 'mRNA':
-                if str(obj) in stops:
-                    source = 'processed_transcript'
-                elif str(obj) in no_stops:
-                    source = "protein_coding"
-                
-                elif str(obj) not in no_stops_genes:
-                    if (source != 'tRNA') and (source != 'rRNA'):
-                        source = 'processed_transcript'
-                
-            else:
-                if get_PARENT(line) in stops:
-                    source = 'processed_transcript'
-                
-            o.write(process_objs(obj,source)+'\n')
-    o.close()
+    obj.attributes()                        
+        
+class Gene:
     
+    def __init__(self, obj):
+        self.obj = obj
+        self.features = ''
+        self.strand = '.'
+        
+    def __str__(self):
+        return str(self.obj)
+    
+    def add_mRNA(self, obj, line):
+        if self.features == '':
+            self.features = line + '\n'
+        else:
+            self.features += line + '\n'
+        
+        ### check if the strand is correct
+        if self.strand != '.':
+            if self.strand != obj.strands():
+                pass   
+                '''
+                print 'Error at line'
+                print line
+                sys.exit('mRNAs have different headers')
+                '''
+        else:
+            self.strand = obj.strands()
+            
+    def add_feature(self, obj, line):
+        self.features += line + '\n'
+
+def check_strand(file):
+    
+    genes = []
+    for line in open(file, 'r'):
+        line = line.strip()
+        obj = GFF3(line)
+        
+        if obj.types()=="gene":
+            obj_gene = Gene(obj)
+            genes.append(obj_gene)
+            
+        elif obj.types()=="mRNA":
+            obj_gene.add_mRNA(obj, line)
+        
+        else:
+            obj_gene.add_feature(obj, line)
+        
+    return genes
+        
+def print_out(genes):
+    for gene in genes:
+        print process_objs(gene.obj, gene.strand)
+        print gene.features
+
 if __name__ == "__main__":
     
-    gff3, cds, proteins = options(sys.argv[1:])
+    file = options(sys.argv[1:])
     
-    ### find proteins with stops
-    stops, stops_genes, no_stops, no_stops_genes = findStops(proteins)
+    ### test the strand consistancy
+    genes = check_strand(file)
     
-    ### fix CDS file
-    fixCDS(cds, stops)
-    
-    ### fix protein file
-    fixCDS(proteins, stops)
-    
-    ### fix GFF3 file
-    fixGFF3(gff3, stops, stops_genes, no_stops, no_stops_genes)
+    ### print out
+    print_out(genes)
     
     ### close the logfile
     o.close()

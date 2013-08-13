@@ -22,10 +22,11 @@
 
 
 ### import modules
-import os,sys,getopt, re
+import os, sys, getopt, re, glob
 
 
 ### global variables
+global ref, folder, extension, fastqc, mapper, threads, seed_length, mismatches, single, index, compress_extension, uncompress
 
 ### make a logfile
 import datetime
@@ -57,35 +58,136 @@ def help():
                                     -i <index> [Option to create index for Reference Sequence]
                                     -u <uncompress> [default extention: bz2]
                                     
-                                    
+            Fastq pair must be specified with "*_R1_*" and "*_R2_*"  
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    infile = ''
-    gff3 = ''
+    global ref, folder, extension, fastqc, mapper, threads, seed_length, mismatches, single, index, compress_extension, uncompress
+    ref = ''
+    folder = ''
+    extension = 'fastq'
+    fastqc = False
+    mapper='bwa'
+    threads = 6
+    seed_length = 28
+    mismatches = 2
+    single = False
+    index = False
+    compress_extension = 'bz2'
+    uncompress = False
+    
     try:
-        opts, args = getopt.getopt(argv,"hi:",["ifile="])
+        opts, args = getopt.getopt(argv,"hr:f:x:qp:t:l:m:s:iu:",["ref=","folder=","extension=","fastqc=","mapper=","threads=","seed_length=","mismatches=","single=","index=","uncompress="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h':
             help()
-        elif opt in ("-i", "--ifile"):
-            infile = arg
-            
-    logfile(infile)
-            
-    return infile
+        elif opt in ("-r", "--ref"):
+            ref = arg
+        elif opt in ("-f", "--folder"):
+            folder = arg
+        elif opt in ("-x", "--extension"):
+            extension = arg
+        elif opt in ("-q", "--fastqc"):
+            fastqc = True
+        elif opt in ("-p", "--mapper"):
+            mapper = arg
+        elif opt in ("-t", "--threads"):
+            threads = arg
+        elif opt in ("-l", "--seed_length"):
+            seed_length = arg
+        elif opt in ("-m", "--mismatches"):
+            mismatches = arg
+        elif opt in ("-s", "--single"):
+            single = True
+        elif opt in ("-i", "--index"):
+            index = True
+        elif opt in ("-u", "--uncompress"):
+            uncompress = True
+            compress_extension = arg
     
+    logfile(ref)
+            
+    return  
+    
+def Uncompress(file):
+    
+    if compress_extension == 'bz2':
+        os.system('bzip2 -d --keep --verbose ' + file)
+    
+def files():
+    print 'Files to processed'
+    file_list = []
+    for f in folder.split(','):
+        f = f.strip()
+        if uncompress == True:
+            for file in glob.glob(os.path.join(f, '*'+compress_extension)):
+                Uncompress(file) 
+                file_list.append('.'.join(file.split('.')[:-1]))
+        else:
+            for file in glob.glob(os.path.join(f, '*'+extension)):
+                file_list.append(file)
+                
+        print file
         
+    return file_list
+
+def FastQC(file_list):
+    if fastqc == True:
+        for file in file_list:
+            os.system('Running FastQC for '+file)
+            os.system('fastqc '+file)
+
+def Index():
+    if index == True:
+        os.system('nice -n 19 samtools faidx '+ ref)
+        os.system('nice -n 19 bwa index -a bwtsw '+ ref)
+    if not os.path.isfile(ref + '.fai'):
+        os.system('nice -n 19 samtools faidx '+ ref)
+        
+        
+def AlignReads(file_list):
+    for file in file_list:
+        if mapper == 'bwa':
+            if not os.path.isfile(file+'.sai'):
+                os.system('nice -n 19 bwa aln -t '+ str(threads) +' -l ' +str(seed_length)+ ' ' + ref + ' ' + file + ' > ' + file+'.sai')
+    
+def MapReads(file_list):
+    for file in file_list:
+        if mapper == 'bwa':
+            if single == False:
+                if re.search('_R1_', file):
+                    read1 = file
+                    read2 = file.replace('_R1_','_R2_')
+                    rg = file.strip().split('/')[-1].strip()[:6]
+                    print rg
+                    os.system('nice -n 19 bwa sampe -P '+ ' -r ' + '@RG\tID:'+rg+'\tSM:'+rg+'\tPL:illumina\tLB:lib1\tPU:unit1 '+ ref +' '+ read1+".sai " + read2+".sai " +\
+                              read1 +' '+read2 +' | nice -n 19 samtools view -bt '+ ref+'.fai -| nice -n 19 samtools sort - '+ \
+                              read1+'_sorted')
 
 if __name__ == "__main__":
     
-    file = options(sys.argv[1:])
+    options(sys.argv[1:])
     
+    
+    ### print the files to be process and return the file path as list
+    file_list = files()
+    
+    ### fastqc
+    FastQC(file_list)
+    
+    ### index reference
+    Index()
+    
+    ### align the reads
+    AlignReads(file_list)
+    
+    ### map the files
+    MapReads(file_list)
     
     ### close the logfile
     o.close()

@@ -167,6 +167,7 @@ class mRNA:
         self.exon_length = 0
         self.cds_count = 0
         self.cds_length = 0
+        self.type = line.split('\t')[1]
     
     def __str__(self):
         return self.id
@@ -185,7 +186,7 @@ class mRNA:
     
     def results(self):
         
-        return self.exon_count, self.exon_length
+        return self.exon_count, self.exon_length, self.type
 
 def process_objs(obj,phase, attributes):
     print obj.seqids() + '\t' + \
@@ -216,11 +217,11 @@ def parse(gff3):
                 obj_mRNA.add_cds(line)
         
     ### print header
-    print ID +'\t'+ 'exon_count' +'\t'+ 'exon_length'
+    print 'ID' +'\t'+ 'exon_count' +'\t'+ 'exon_length' + '\t' + 'type'
     for obj in mRNA_objs:
-        exon_count, exon_length = obj.results()
+        exon_count, exon_length, source = obj.results()
         
-        print str(obj) +'\t'+ str(exon_count) +'\t'+ str(exon_length)
+        print str(obj) +'\t'+ str(exon_count) +'\t'+ str(exon_length)+ '\t' + str(source)
         
 
 if __name__ == "__main__":
