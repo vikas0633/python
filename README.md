@@ -211,6 +211,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ao_keep_fasta_ifGFF3.py - script to throw out excessive sequences in fasta file <br />
 21ap_TranscriptSummary.py - Summerizes GFF3 transcript wise <br />
 21aq_addGeneStrand.py - Adds the strand to the gene based on the mRNAs strands <br />
+21ar_findLongestIsoform_GFF3.py - Find the longest isoform for each gene in a gff3 file <br />
+21as_calc5primeCdnaDistance.py - calculate 5' distances of insersions <br />
 	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
