@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 114_validate_Fasta.py - Fasta validation script           |
+# 119c_vcfParser.py - report callable loci                  |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -10,7 +10,8 @@
 # UPDATED: 09/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# Short script to test fasta file                           |
+# Short script to convert and copy the wheat BACs           |
+# Run this in the parent dir that the HEX* dirs exist       |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -19,14 +20,15 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/114_validate_Fasta.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/Desktop/script/python/119_vcfParser.py -i snp.90.PhredQual_5000.vcf
 
 
 ### import modules
-import os,sys,getopt, re
+import os,sys,getopt, re, classVCF
 
 
 ### global variables
+global ifile, HEADER
 
 ### make a logfile
 import datetime
@@ -45,15 +47,15 @@ def logfile(infile):
     
 def help():
     print '''
-            python 114_validate_Fasta.py -i <ifile>
+            python 100b_fasta2flat.py -i <ifile>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    infile = ''
-    gff3 = ''
+    global ifile
+    ifile = ''
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
@@ -62,46 +64,40 @@ def options(argv):
         if opt == '-h':
             help()
         elif opt in ("-i", "--ifile"):
-            infile = arg
+            ifile = arg
             
-    logfile(infile)
+    logfile(ifile)
             
-    return infile
-    
-                            
-def duplicate(infile):
-    headers = {}
-    for line in open(infile):
-        if line.startswith('>'):
-            header = line[1:].strip().split(',')[0]
-            if header in headers:
-                print 'Error at line'
-                print line
-                sys.exit('Duplicate fasta header. Header is the first part of the line stariting with ">" ')
-            headers[header] = ''
-
-def findStops(file):
-
-    for line in open(file,'r'):
-        line = line.strip()
-        if len(line) > 1:
-            if not line.startswith('>'):
-                if re.search('.',line):
-                    print 'Error at line'
-                    print line
-                    sys.exit('Stop codon found')
-
-
+### check if file empty
+def empty_file(infile):
+    if os.stat(infile).st_size==0:
+        sys.exit('File is empty')
+                                
+        
+def parseFile(ifile):
+    o = open(ifile+'MoreThanMG20coverage','w')
+    global HEADER
+    count = 0
+    for line in open(ifile,'r'):
+        if len(line) > 1 and not line.startswith('#'):
+            line = line.strip('\n')
+            obj = classVCF.VCF(line)
+            genotypes = obj.genotypes()
+            ### check if the MG20 is 0/0 reference Homozygous
+            if int(obj.genotypeDepthSUM()) > int(obj.genotypeDepth(2)):  ### check if its not only MG20 coverage
+                if obj.genotype(2) == '0/0':
+                    o.write(line+'\n')
+                    count += 1
+    print 'Total positions printed:', count
+    o.close()
+ 
 if __name__ == "__main__":
     
-    infile = options(sys.argv[1:])
+    options(sys.argv[1:])
+    empty_file(ifile)
     
-    ### fasta file
-    #check the duplicacy in the fasta file
-    duplicate(infile)
-
-    ### check if there is a stop in the sequence
-    findStops(infile)
+    parseFile(ifile)
+    
     
     ### close the logfile
     o.close()

@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 114_validate_Fasta.py - Fasta validation script           |
+# 124_removeFastaDups.py - Script to remove the duplicates from the fasta file       |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -10,7 +10,8 @@
 # UPDATED: 09/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# Short script to test fasta file                           |
+# Short script to convert and copy the wheat BACs           |
+# Run this in the parent dir that the HEX* dirs exist       |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -19,7 +20,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/114_validate_Fasta.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -27,6 +28,7 @@ import os,sys,getopt, re
 
 
 ### global variables
+global ifile
 
 ### make a logfile
 import datetime
@@ -45,15 +47,15 @@ def logfile(infile):
     
 def help():
     print '''
-            python 114_validate_Fasta.py -i <ifile>
+            python 124_removeFastaDups.py  -i <ifile>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    infile = ''
-    gff3 = ''
+    global ifile
+    ifile = ''
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
@@ -62,46 +64,36 @@ def options(argv):
         if opt == '-h':
             help()
         elif opt in ("-i", "--ifile"):
-            infile = arg
+            ifile = arg
             
-    logfile(infile)
+    logfile(ifile)
             
-    return infile
-    
-                            
-def duplicate(infile):
-    headers = {}
-    for line in open(infile):
-        if line.startswith('>'):
-            header = line[1:].strip().split(',')[0]
-            if header in headers:
-                print 'Error at line'
-                print line
-                sys.exit('Duplicate fasta header. Header is the first part of the line stariting with ">" ')
-            headers[header] = ''
-
-def findStops(file):
-
-    for line in open(file,'r'):
+def parseFasta():
+    print_flag = False
+    hash_header = {}
+    o = open(ifile+'.noDups','w')
+    for line in open(ifile,'r'):
         line = line.strip()
-        if len(line) > 1:
-            if not line.startswith('>'):
-                if re.search('.',line):
-                    print 'Error at line'
-                    print line
-                    sys.exit('Stop codon found')
-
+        if len(line) > 0 and not line.startswith('#'):
+            if line.startswith('>'):
+                header = line
+                if header in hash_header:
+                    print_flag = False
+                    print 'Duplicate header is removed: ', header[1:]
+                else:
+                    hash_header[header]=''
+                    print_flag = True
+                    o.write(header+'\n')
+            elif print_flag == True:
+                o.write(line+'\n')
+                
+    o.close()
 
 if __name__ == "__main__":
     
-    infile = options(sys.argv[1:])
+    options(sys.argv[1:])
     
-    ### fasta file
-    #check the duplicacy in the fasta file
-    duplicate(infile)
-
-    ### check if there is a stop in the sequence
-    findStops(infile)
+    parseFasta()
     
     ### close the logfile
     o.close()

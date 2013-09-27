@@ -120,6 +120,8 @@ mysql_batch - for saving file into the mysql database <br />
 
 ### Svend's Data 
 16.py <br />
+16b_blast_reciprocal.py <br/>
+16c_make_hit_table.py <br/>
 
 ### SpearmanRank
 spr.py open file and calculate spearman co-efficient between all columns <br />
@@ -213,6 +215,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21aq_addGeneStrand.py - Adds the strand to the gene based on the mRNAs strands <br />
 21ar_findLongestIsoform_GFF3.py - Find the longest isoform for each gene in a gff3 file <br />
 21as_calc5primeCdnaDistance.py - calculate 5' distances of insersions <br />
+21at_FindLongestProtein.py - Finds Longest Protein <br />
+21au_trim3primeCDS.py - script to trim 3' end of cds sequences <br />
 	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -274,3 +278,11 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 114_validate_Fasta.py - Fasta validation script <br />
 115_MapFastq.py - Script to Map Fastq files <br />
 116_runGATK.py - script to run GATK analysis <br />
+117_addReadGroup.py - script to add readgroup in sam or bam file <br />
+118_flankingRegion.py - script to extract flanking region given set of co-ordinates and range <br />
+119_vcfParser.py - script to parse vcf format file <br />
+120_takeOutPos.py - script to take out matching coords <br />
+121_SlidingWindow.py - plot data with sliding window on multiple chromosome <br />
+122_split_DNA_protein_fasta.py - script to split fasta file between DNA and protein sequences <br />
+123_longestORF.py - script to find longest opening reading frame from a DNA sequence <br />
+124_removeFastaDups.py - Script to remove the duplicates from the fasta file <br />

@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 119_vcfParser.py - script to parse vcf format file       |
+# classCigar.py - process cigar string                      |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -19,63 +19,51 @@
 #                                                           |
 #-----------------------------------------------------------+
 
-# Example:
-# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
-### import modules
-import os,sys,getopt, re
-
-
-### global variables
-global ifile
-
-### make a logfile
-import datetime
-now = datetime.datetime.now()
-o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
-
-
-
-### write logfile
-
-def logfile(infile):
-    o.write("Program used: \t\t%s" % "100b_fasta2flat.py"+'\n')
-    o.write("Program was run at: \t%s" % str(now.strftime("%Y-%m-%d_%H%M"))+'\n')
-    o.write("Infile used: \t\t%s" % infile+'\n')
+def process(string):
+    count = ''
+    read_length = 0
+    matches = 0
+    insertions = 0
+    deletions = 0
+    
+    for letter in string:
+        if letter in 'MIDNSHPX=':
             
-    
-def help():
-    print '''
-            python 100b_fasta2flat.py -i <ifile>
-            '''
-    sys.exit(2)
-
-### main argument to 
-
-def options(argv):
-    global ifile
-    ifile = ''
-    try:
-        opts, args = getopt.getopt(argv,"hi:",["ifile="])
-    except getopt.GetoptError:
-        help()
-    for opt, arg in opts:
-        if opt == '-h':
-            help()
-        elif opt in ("-i", "--ifile"):
-            ifile = arg
+            ### count matches/mismatches
+            if letter == 'M':
+                matches += int(count) 
+            ### count insertions
+            if letter == 'I':
+                insertions += int(count)
+            ### count deletions
+            if letter == 'D':
+                deletions += int(count)   
+            read_length += int(count)
+            count = ''
             
-    logfile(ifile)
-            
-    
-                            
-        
+        else:
+            count += letter
+    return read_length, matches, insertions, deletions
 
-if __name__ == "__main__":
+class Cigar:
     
-    options(sys.argv[1:])
+    def __init__(self, string):
+        self.string = string
+        self.rl, self.m, self.i, self.d =  process(string)  
     
+    def __str__(self):
+        return self.string
     
-    ### close the logfile
-    o.close()
+    def read_length(self):
+        return self.rl
+    
+    def matches(self):
+        return self.m
+    
+    def insertions(self):
+        return self.i
+    
+    def deletions(self):
+        return self.d 

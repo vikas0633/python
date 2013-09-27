@@ -163,12 +163,13 @@ def MapReads(file_list):
                 if re.search('_R1_', file):
                     read1 = file
                     read2 = file.replace('_R1_','_R2_')
-                    rg = file.strip().split('/')[-1].strip()[:6]
-                    print rg
-                    os.system('nice -n 19 bwa sampe -P '+ ' -r ' + '@RG\tID:'+rg+'\tSM:'+rg+'\tPL:illumina\tLB:lib1\tPU:unit1 '+ ref +' '+ read1+".sai " + read2+".sai " +\
+                    rg = file.strip().split('/')[-1].strip()[:6].strip()
+                    rg = '"@RG\tID:'+rg+'\tSM:'+rg+'\tPL:illumina\tLB:lib1\tPU:unit"'
+                    
+                    os.system('nice -n 19 bwa sampe -P '+ ' -r ' + rg +' '+ ref +' '+ read1+".sai " + read2+".sai " +\
                               read1 +' '+read2 +' | nice -n 19 samtools view -bt '+ ref+'.fai -| nice -n 19 samtools sort - '+ \
                               read1+'_sorted')
-
+                    
 if __name__ == "__main__":
     
     options(sys.argv[1:])

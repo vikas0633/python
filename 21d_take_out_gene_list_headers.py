@@ -17,20 +17,26 @@ def fasta_len(file):
 	
 	return seq
 
-def extract_seq(file,header,seq):
-	for line in open(header,'r'):
-		header = line.strip()	
-		header = header.replace(' ','').replace('>','')
-		if header in seq:
-			print '>'+header
-			print seq[header]
+def extract_seq(file,header_file,seq):
+	o=open(header_file+'.fa','w')
+	for line in open(header_file,'r'):
+		line = line.strip()
+		if len(line) > 0 and not line.startswith('#'):
+			header = line.strip()	
+			header = header.replace(' ','').replace('>','')
+			if header in seq:
+				o.write('>'+header+'\n')
+				o.write(seq[header]+'\n')
+				
+			else:
+				print 'Warning: Sequence not found for: ', header
 		
 	
 if __name__ == "__main__":
     
     # get the file and header
-    file="/home/vgupta/spider/03geneAnnotation/01_collapsed_tranctula_transcripts/Palle_assembly.tarantula.39950.200bp.fasta"
-    header="/home/vgupta/spider/03geneAnnotation/01_collapsed_tranctula_transcripts/silk_gene_transcripts.fas.200bp.blastout.scaf"
+    file="/Users/vgupta/Desktop/03_Lotus_annotation/svend/Lj2.5_proteins.faa"
+    header="/Users/vgupta/Desktop/03_Lotus_annotation/svend/7.lotus"
     
     seq = fasta_len(file)
     # get the sequence

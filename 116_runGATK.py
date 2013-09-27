@@ -26,7 +26,7 @@ import os,sys,getopt, re
 
 
 ### global variables
-global bams, ref, picard, gatk, threads, variant, sort_bams
+global bams, ref, picard, gatk, threads, variant, sort_bams, tmp_dir
 
 ### make a logfile
 import datetime
@@ -60,15 +60,16 @@ def help():
 
 def options(argv):
     
-    global bams, ref, picard, gatk, threads, variant, sort_bams
+    global bams, ref, picard, gatk, threads, variant, sort_bams, tmp_dir
     
     bams = ''
     ref = ''
     picard = ''
     gatk = ''
-    threads = 1
+    threads = str(1)
     variant = ''
     sort_bams = False
+    tmp_dir="/home/vgupta/temp" 
     
     try:
         opts, args = getopt.getopt(argv,"hb:r:p:g:t:v:s",["bams=","ref=","picard=","gatk=","threads=","variant=", "sort_bams="])
@@ -112,23 +113,23 @@ def sortBams(file_list):
     if sort_bams == True:
         file_list_bams = []
         for file in file_list:
-            os.system('samtools view -bt ' + ref +'.fai ' + file +' | samtools sort - ' + file + '_sorted')
+            os.system('samtools sort '+file+' '+file+'_sorted')
             file_list_bams.append(file+'_sorted.bam')
-            
         return file_list_bams
+        
     return file_list
     
 def MarkDuplicates(file_list):
     for file in file_list:
         print 'Marking duplicates for', file
-        os.system('java -jar '+picard+'/MarkDuplicates.jar ' +' INPUT='+ file + ' OUTPUT=' + file+'.dedup.bam' +' METRICS_FILE='+ file +'.dups')
+        os.system('java -Xmx50g -jar '+picard+'/MarkDuplicates.jar VALIDATION_STRINGENCY=LENIENT TMP_DIR='+tmp_dir +' INPUT='+ file + ' OUTPUT=' + file+'.dedup.bam' +' METRICS_FILE='+ file +'.dups')
         
     
 def ReAlign(file_list):
     for file in file_list:
         print 'Realigning', file
-        os.system('java -jar '+gatk+'/GenomeAnalysisTK.jar -U -T RealignerTargetCreator '+' -I ' + file+'.dedup.bam' +' -nt '+ threads +' -R ' + ref +' -o '+ file+'.intervals')
-        os.system('java -jar '+gatk+'/GenomeAnalysisTK.jar -U -T IndelRealigner ' + ' -targetIntervals ' + file+'.intervals '+ ' -I ' + file+'.dedup.bam' +' -R ' + ref \
+        os.system('java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar --fix_misencoded_quality_scores -fixMisencodedQuals -U -T RealignerTargetCreator '+' -I ' + file+'.dedup.bam' +' -nt '+ threads +' -R ' + ref +' -o '+ file+'.intervals')
+        os.system('java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar --fix_misencoded_quality_scores -fixMisencodedQuals -U -T IndelRealigner ' + ' -targetIntervals ' + file+'.intervals '+ ' -I ' + file+'.dedup.bam' +' -R ' + ref \
                   + ' -o ' + file+'.realigned.bam')
     
         
@@ -137,47 +138,63 @@ def UnifiedGenotyper(file_list):
         in_string = ''
         ### make input string
         for file in file_list:
+            os.system('samtools index '+file)
             in_string += ' -I '+file
         print 'Running UnifiedGenotyper'
+        '''
+        ### for sample
         os.system(' java -jar '+gatk+'/GenomeAnalysisTK.jar '\
         + ' -R ' + ref \
         + ' -T  UnifiedGenotyper '\
         + in_string \
         + ' -nt ' + threads \
         + ' -o snps.90.raw.vcf ' \
+        + '-stand_call_conf 20 ' \
+        + '-stand_emit_conf 10.0 '\
+        + '-dcov 2 ')
+        
+        '''
+        os.system(' java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar '\
+        + ' -R ' + ref \
+        + ' -T  UnifiedGenotyper -glm BOTH '\
+        + in_string \
+        + ' -nt ' + threads \
+        + ' -o '+ file +'.90.vcf ' \
         + '-stand_call_conf 90 ' \
         + '-stand_emit_conf 10.0 '\
         + '-dcov 200 ')
         
+        
 def recal(file_list):
     global variant
     if variant == '':
-        variant = 'snps.raw.90.vcf'
+        variant = file_list[-1] +'.90.vcf'
     for file in file_list:
         print 'Running BaseRecalibrator for ', file
-        os.system('java -jar '+gatk+'/GenomeAnalysisTK.jar -U -T BaseRecalibrator ' + ' -knownSites ' +variant + ' -I ' + file+'.realigned.bam '+ ' -R ' + ref \
-              + ' -o ' + file+'.recal.bam')
+        os.system('java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar -U -T BaseRecalibrator -rf BadCigar ' + ' -knownSites ' +variant + ' -I ' + file+'.realigned.bam '+ ' -R ' + ref \
+              + ' -o ' + file+'.recal.table')
+        os.system('java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar -T PrintReads -R '+ref +' -I '+ file+'.realigned.bam  -L 20 '+ ' -BQSR '+file+'.recal.table' +' -o '+ file+ '.recal_reads.bam' )
 
 def ReduceReads(file_list):
     for file in file_list:
         print 'Running ReduceReads for ', file
-        os.system('java -jar '+gatk+'/GenomeAnalysisTK.jar -U -T ReduceReads -I ' + file+'.realigned.bam '+ ' -R ' + ref \
+        os.system('java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar -U -T ReduceReads -rf BadCigar -I ' + file+ '.recal_reads.bam'+ ' -R ' + ref \
               + ' -o ' + file+'.reduced.bam')
         
 def ReUnifiedGenotyper(file_list):
     print 'Running ReUnifiedGenotyper'
-    if variant == '':
-        in_string = ''
-        ### make input string
-        for file in file_list:
-            in_string += ' -I '+file
+    in_string = ''
+    ### make input string
+    for file in file_list:
+        os.system('samtools index '+ file+'.reduced.bam')
+        in_string += ' -I '+file+'.reduced.bam'
         
-        os.system(' java -jar '+gatk+'/GenomeAnalysisTK.jar '\
-        + ' -R ' + ref \
-        + ' -T  UnifiedGenotyper '\
-        + in_string \
-        + ' -nt ' + threads \
-        + ' -o snps.raw.vcf ')
+    os.system(' java -jar -Djava.io.tmpdir='+tmp_dir+' '+gatk+'/GenomeAnalysisTK.jar '\
+    + ' -R ' + ref \
+    + ' -T  UnifiedGenotyper -glm BOTH'\
+    + in_string \
+    + ' -nt ' + threads \
+    + ' -o snps.raw.vcf ')
 
 def BuildErrorModelWithVQSR(file , var):
     os.system('java -jar '+gatk+'/GenomeAnalysisTK.jar '\

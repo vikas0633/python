@@ -84,7 +84,7 @@ def makeFasta(file,seq_col,anno_col):
                         '''
                     if  len(token) == int(seq_col):
 			for i in list(anno_col.split(',')): 
-				if (token[1] == '') or (token[1] == '0') or (float(token[2].strip()) == 0):
+				if (token[1] == '') or (token[1] == '0'):
 					header += token[0]+','+token[-2]+','
 					break
 				header += token[int(i)-1]+','

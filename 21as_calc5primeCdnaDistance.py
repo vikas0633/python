@@ -139,6 +139,8 @@ def get_5prime_dist(points, coords_dis, chr, coords_mRNA_len):
             if token[0] == chr:
                 if int(token[1]) in coords_dis:
                     print line, coords_dis[int(token[1])], coords_mRNA_len[int(token[1])]
+                else:
+                    print line, 'NA', 'NA'
 
 
 if __name__ == "__main__":

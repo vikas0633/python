@@ -88,7 +88,8 @@ def PARSE(file2,c2,sep,first_line,hash):
 					key = ''
 					for i in lis:
 						key += '-'+token[int(i)-1] 
-					if key not in hash:
+					#if key not in hash:
+					if key in hash:
 						print line
 				first_line = False
 

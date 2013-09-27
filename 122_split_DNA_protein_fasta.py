@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 114_validate_Fasta.py - Fasta validation script           |
+# 122_split_DNA_protein_fasta.py - script to split fasta file between DNA and protein sequences|
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -10,7 +10,8 @@
 # UPDATED: 09/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# Short script to test fasta file                           |
+# Short script to convert and copy the wheat BACs           |
+# Run this in the parent dir that the HEX* dirs exist       |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -19,7 +20,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/114_validate_Fasta.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/122_split_DNA_protein_fasta.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -27,6 +28,7 @@ import os,sys,getopt, re
 
 
 ### global variables
+global ifile
 
 ### make a logfile
 import datetime
@@ -45,15 +47,15 @@ def logfile(infile):
     
 def help():
     print '''
-            python 114_validate_Fasta.py -i <ifile>
+            python 122_split_DNA_protein_fasta.py -i <ifile>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    infile = ''
-    gff3 = ''
+    global ifile
+    ifile = ''
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
@@ -62,46 +64,54 @@ def options(argv):
         if opt == '-h':
             help()
         elif opt in ("-i", "--ifile"):
-            infile = arg
+            ifile = arg
             
-    logfile(infile)
+    logfile(ifile)
             
-    return infile
-    
-                            
-def duplicate(infile):
-    headers = {}
-    for line in open(infile):
-        if line.startswith('>'):
-            header = line[1:].strip().split(',')[0]
-            if header in headers:
-                print 'Error at line'
-                print line
-                sys.exit('Duplicate fasta header. Header is the first part of the line stariting with ">" ')
-            headers[header] = ''
 
-def findStops(file):
-
-    for line in open(file,'r'):
+def parse_fasta():
+    dna_char = 'ATGCNXatgcnx'
+    first_line = True
+    protein = False
+    d = open(ifile+'.dna','w')
+    p = open(ifile+'.prot','w')
+    for line in open(ifile,'r'):
         line = line.strip()
-        if len(line) > 1:
-            if not line.startswith('>'):
-                if re.search('.',line):
-                    print 'Error at line'
-                    print line
-                    sys.exit('Stop codon found')
-
+        if len(line) > 0 and not line.startswith('#'):
+            if line.startswith('>'):
+                if first_line == False:
+                    if protein == True:
+                        p.write(header+'\n')
+                        p.write(seq+'\n')
+                    else:
+                        d.write(header+'\n')
+                        d.write(seq+'\n')
+                protein = False
+                header = line
+                seq = ''
+                first_line = False
+            else:
+                seq += line
+                for char in line:
+                    if char not in dna_char:
+                        protein = True
+    
+    if protein == True:
+        p.write(header+'\n')
+        p.write(seq+'\n')
+    else:
+        d.write(header+'\n')
+        d.write(seq+'\n')
+    
+    d.close()
+    p.close()
 
 if __name__ == "__main__":
     
-    infile = options(sys.argv[1:])
+    options(sys.argv[1:])
     
-    ### fasta file
-    #check the duplicacy in the fasta file
-    duplicate(infile)
-
-    ### check if there is a stop in the sequence
-    findStops(infile)
+    ### load fasta file
+    parse_fasta()
     
     ### close the logfile
     o.close()

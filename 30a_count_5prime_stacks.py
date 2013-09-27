@@ -24,6 +24,7 @@
 
 ### import modules
 import os,sys,getopt, re
+import classCigar
 
 
 ### global variables
@@ -64,7 +65,7 @@ def options(argv):
     global BAMs, ref, MinTotatCov, MinStackCov, StackFraction, Genone_coverage
     BAMs = ''
     ref = ''
-    MinTotatCov = 10
+    MinTotatCov = 5
     MinStackCov = 5
     StackFraction = 0.5
     Genone_coverage = False
@@ -97,6 +98,7 @@ class SAM():
         self.flag = tokens[1]
         self.st_chr = tokens[2]
         self.st_pos = tokens[3]
+        self.cigar = tokens[5]
         self.read = tokens[9]
             
     
@@ -117,6 +119,9 @@ class SAM():
     
     def reads(self):
         return self.read
+    
+    def cigars(self):
+        return self.cigar
             
 def files():
     files = []
@@ -151,7 +156,11 @@ def CountPos():
     for line in open('reverse.temp.sam','r'):
         line = line.strip()
         obj = SAM(line)
-        key = obj.st_chrs() , str(int(obj.st_poss()) + len(obj.reads()) - 1)
+        cigar = classCigar.Cigar(obj.cigars())
+        ins = int(cigar.insertions())
+        dele = int(cigar.deletions())
+        
+        key = obj.st_chrs() , str(int(obj.st_poss()) + len(obj.reads()) - 1 + dele - ins)
         if key not in hash_pos_rv:
             hash_pos_rv[ key ] = 1
         else:

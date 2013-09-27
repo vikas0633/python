@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 114_validate_Fasta.py - Fasta validation script           |
+# 21at_FindLongestProtein.py - Finds Longest Protein        |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -10,7 +10,8 @@
 # UPDATED: 09/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# Short script to test fasta file                           |
+# Short script to convert and copy the wheat BACs           |
+# Run this in the parent dir that the HEX* dirs exist       |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -19,7 +20,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/114_validate_Fasta.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/21at_FindLongestProtein.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -38,14 +39,14 @@ o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 ### write logfile
 
 def logfile(infile):
-    o.write("Program used: \t\t%s" % "100b_fasta2flat.py"+'\n')
+    o.write("Program used: \t\t%s" % "21at_FindLongestProtein.py"+'\n')
     o.write("Program was run at: \t%s" % str(now.strftime("%Y-%m-%d_%H%M"))+'\n')
     o.write("Infile used: \t\t%s" % infile+'\n')
             
     
 def help():
     print '''
-            python 114_validate_Fasta.py -i <ifile>
+            python 100b_fasta2flat.py -i <ifile>
             '''
     sys.exit(2)
 
@@ -68,40 +69,48 @@ def options(argv):
             
     return infile
     
-                            
-def duplicate(infile):
-    headers = {}
-    for line in open(infile):
-        if line.startswith('>'):
-            header = line[1:].strip().split(',')[0]
-            if header in headers:
-                print 'Error at line'
-                print line
-                sys.exit('Duplicate fasta header. Header is the first part of the line stariting with ">" ')
-            headers[header] = ''
-
-def findStops(file):
-
-    for line in open(file,'r'):
+                                
+def longestIsoform(file):
+    
+    seqs = {}
+    seqs_length = {}
+    comp_header = {}
+    for line in open(file):
         line = line.strip()
-        if len(line) > 1:
-            if not line.startswith('>'):
-                if re.search('.',line):
-                    print 'Error at line'
-                    print line
-                    sys.exit('Stop codon found')
-
-
+        
+        if line.startswith('>'):
+            header = line.split('.')[0]
+            header_line = line
+            
+            
+        else:
+            if header in seqs_length:
+                if seqs_length[header] < len(line):
+                    seqs[header] = line
+                    seqs_length[header] = len(line)
+                    comp_header[header] = header_line
+            else:
+                seqs[header] = line
+                seqs_length[header] = len(line)
+                comp_header[header] = header_line
+            
+    for header in seqs:
+        #print comp_header[header]
+        Lj_id = comp_header[header].split(',')[0]
+        try:
+            Anno = ' '.join(comp_header[header].split('|')[2].split(' ')[1:]) + ' ' +comp_header[header].split('|')[0].split(',')[-1]+'|' +comp_header[header].split('|')[1]+'|'+comp_header[header].split('|')[2].split(' ')[0]
+            print Lj_id +' '+ Anno
+            print seqs[header]
+        except:
+            print comp_header[header].replace(',', ' ')
+            print seqs[header]
+        
+            
 if __name__ == "__main__":
     
-    infile = options(sys.argv[1:])
+    file = options(sys.argv[1:])
     
-    ### fasta file
-    #check the duplicacy in the fasta file
-    duplicate(infile)
-
-    ### check if there is a stop in the sequence
-    findStops(infile)
+    longestIsoform(file)
     
     ### close the logfile
     o.close()
