@@ -1,3 +1,8 @@
+### classes
+classMAF.py - script to parse maf format file 
+
+
+
 ## Custom Made Modules
 A_hash_file.py - a script that hash the second column using first column as key  <br />
 B_hash_mRNA_IDs.py - returns a uniq mRNA id hash <br />
@@ -217,7 +222,13 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21as_calc5primeCdnaDistance.py - calculate 5' distances of insersions <br />
 21at_FindLongestProtein.py - Finds Longest Protein <br />
 21au_trim3primeCDS.py - script to trim 3' end of cds sequences <br />
-	
+12av_removeMAFoverlaps.py - script to take longest alignment from the overlapping alignments <br />
+21aw_CallFractionexon.py - script to calculate the callable fraction by transcripts in exonic regions <br />
+21ax_LongestProteinCodingIsoform - script to find longest protein coding isoform <br />
+21ay_countFixDifference.py - script to calculate the ancestral alleles and fix differneces <br />
+21az_addNRanno.py - script to add nr annotation to GFF3 file <br />
+21ba_getGeneBasedAlign.py - script to extract gene specific information from MAF file <br />
+
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
 22b.py - normalize transcript profile table <br />
@@ -286,3 +297,5 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 122_split_DNA_protein_fasta.py - script to split fasta file between DNA and protein sequences <br />
 123_longestORF.py - script to find longest opening reading frame from a DNA sequence <br />
 124_removeFastaDups.py - Script to remove the duplicates from the fasta file <br />
+125_pileup2bed.py - Script to convert from Pileup to Bed format <br />
+126_maf2bed.py - Script to convert from MAF to Bed format <br />

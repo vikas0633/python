@@ -72,22 +72,22 @@ def options(argv):
             
 def hash_blast():
     blasthash = {}
-    list_sample=['01','04','05','07']
+    list_sample=['01','04','05','06']
     for line in open(blast,'r'):
         line = line.strip()
         tokens = line.split('\t')
         query, hit = tokens[0], tokens[1]
         if query[:2] in list_sample and hit[:2] in list_sample:
-            if len(query) > 20:
-                query = query[0:20]
+            if len(query) > 25:
+                query = query[0:25]
             
             if query not in blasthash:
                 blasthash[query] = [query[:2],hit[:2]]
             else:
                 blasthash[query].append(hit[:2])
             
-            if len(hit) > 20:
-                hit = hit[0:20]
+            if len(hit) > 25:
+                hit = hit[0:25]
             if hit not in blasthash:
                 blasthash[hit] = [query[:2],hit[:2]]
             else:
@@ -98,16 +98,18 @@ def parse_proteins(blasthash):
     HEADER='Accessions\tSymbiosome\tSoybeanNodule\tMedicagoNodule\tLotusRoots'
     print HEADER
     hash_data={}
-    list_sample=['01','04','05','07']
+    hash_data_sample = {}
+    list_sample=['01','04','05','06']
     for line in open(ifile, 'r'):
         line = line.strip()
         if len(line) > 0 and not line.startswith('#'):
             if line.startswith('>'):
                 header = line[1:]
                 if header[:2] in list_sample:
+                    sample_name = header[:2]
                     header = header.split(':')[0].strip()
-                    if len(header) > 20:
-                        header = header[0:20]
+                    if len(header) > 25:
+                        header = header[0:25]
                     
                     samples = []
                     
@@ -139,8 +141,13 @@ def parse_proteins(blasthash):
                         for i in range(len(list_sample)):
                             if hash_data[header][i] != samples[i]:
                                 hash_data[header][i] = '+'
+                                
+                    if header not in hash_data_sample:
+                        hash_data_sample[header] = sample_name
+                    else:
+                        hash_data_sample[header] += ',' + sample_name
     for acc in hash_data:
-        print acc+'\t'+'\t'.join(hash_data[acc])
+        print acc+'\t'+'\t'.join(hash_data[acc]) + '\t' + hash_data_sample[acc]
 
 if __name__ == "__main__":
     
