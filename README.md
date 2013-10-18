@@ -127,6 +127,7 @@ mysql_batch - for saving file into the mysql database <br />
 16.py <br />
 16b_blast_reciprocal.py <br/>
 16c_make_hit_table.py <br/>
+16d_add_species.py <br />
 
 ### SpearmanRank
 spr.py open file and calculate spearman co-efficient between all columns <br />
@@ -228,6 +229,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ay_countFixDifference.py - script to calculate the ancestral alleles and fix differneces <br />
 21az_addNRanno.py - script to add nr annotation to GFF3 file <br />
 21ba_getGeneBasedAlign.py - script to extract gene specific information from MAF file <br />
+21bb_getGeneBasedAlignLength.py - script to extract gene specific information from MAF file <br />
 
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -299,3 +301,5 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 124_removeFastaDups.py - Script to remove the duplicates from the fasta file <br />
 125_pileup2bed.py - Script to convert from Pileup to Bed format <br />
 126_maf2bed.py - Script to convert from MAF to Bed format <br />
+127_vcf_fasta.py - Script to convert VCF to fasta file <br />
+128_PFformatter.py - Script to create pathologic formatted file <br />

@@ -72,7 +72,7 @@ def options(argv):
             
 def hash_blast():
     blasthash = {}
-    list_sample=['01','04','05','06']
+    list_sample=['01','04','05','07']
     for line in open(blast,'r'):
         line = line.strip()
         tokens = line.split('\t')
@@ -95,11 +95,11 @@ def hash_blast():
     return blasthash
                             
 def parse_proteins(blasthash):
-    HEADER='Accessions\tSymbiosome\tSoybeanNodule\tMedicagoNodule\tLotusRoots'
+    HEADER='Accessions\tSymbiosome\tSoybeanNodule\tMedicagoNodule\tLotusRoots\tOrigin'
     print HEADER
     hash_data={}
     hash_data_sample = {}
-    list_sample=['01','04','05','06']
+    list_sample=['01','04','05','07']
     for line in open(ifile, 'r'):
         line = line.strip()
         if len(line) > 0 and not line.startswith('#'):
