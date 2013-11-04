@@ -140,4 +140,18 @@ class VCF:
             return 0
         else:
             return 1
+    
+    def TwoPQ(self):
+        zeros = 0
+        ones = 0
+        for i in range(len(self.GENOTYPE)):
+            if self.genotype(i) == '0/0':
+                zeros += 2
+            elif self.genotype(i) == '0/1':
+                zeros += 1
+                ones += 1
+            elif self.genotype(i) == '1/1':
+                ones += 2
+        return (zeros*ones)/float(len(self.GENOTYPE)**2)
+        
         

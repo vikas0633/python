@@ -24,17 +24,23 @@
 
 
 ### import modules
-import os,sys,getopt, re
+import os,sys,getopt, re, time
 
 
 ### global variables
-global ifile
+global ifile, time_start
+start_time = time.time()
 
 ### make a logfile
 import datetime
 now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 
+### return time eclapsed
+def PrinteclapsedTime():
+    diff = time.time() - start_time
+    minutes, seconds = int(diff)/60, diff % 60
+    print('Time taken Min:Sec ==> ' + str(minutes) + ':' + str(round(seconds,2)))
 
 
 ### write logfile

@@ -1,7 +1,10 @@
 ### classes
-classMAF.py - script to parse maf format file 
-
-
+classMAF.py - script to parse maf format file <br />
+classCigar.py - script to parse cigar code from the sam file <br />
+classGene.py - script to parse GFF3 files <br />
+classGeneStructure.py - script to get the gene structure from the GFF3 file <br />
+classVCF.py - script to parse Variant calling format (VCF) <br />
+classmRNA.py - script to parse mRNA from GFF3 file <br />
 
 ## Custom Made Modules
 A_hash_file.py - a script that hash the second column using first column as key  <br />
@@ -230,6 +233,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21az_addNRanno.py - script to add nr annotation to GFF3 file <br />
 21ba_getGeneBasedAlign.py - script to extract gene specific information from MAF file <br />
 21bb_getGeneBasedAlignLength.py - script to extract gene specific information from MAF file <br />
+21bc_GenotypicDistance.py - script to calculate the genotypic distances among the samples <br />
 
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -303,3 +307,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 126_maf2bed.py - Script to convert from MAF to Bed format <br />
 127_vcf_fasta.py - Script to convert VCF to fasta file <br />
 128_PFformatter.py - Script to create pathologic formatted file <br />
+129_splitIPR.py - Script to split IPRscan output <br />

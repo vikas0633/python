@@ -46,7 +46,7 @@ def print_len(length):
 	import operator
 	sorted_len = sorted(length.iteritems(), key=operator.itemgetter(1),reverse=True)
 	for key in sorted_len:
-		print str(key[0]) +':  '+ str(key[1])	
+		print str(key[0]) +'\t'+ str(key[1])	
 
 
 if __name__ == "__main__":

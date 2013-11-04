@@ -106,6 +106,8 @@ def hashEC():
                 Name[t_id] = tokens[9]
                 GeneComment[t_id] = tokens[11]
     
+    print "Number of genes with EC terms:", len(EC)
+    print "Number of genes with NAMEs:", len(Name)
     return EC, Function, Name, GeneComment
 
 def hashGO():
@@ -127,6 +129,7 @@ def hashGO():
         line = line.strip()
         if len(line) > 0 and not line.startswith('#'):
             tokens = line.split('\t')
+            t_id = tokens[1]
             ProductType[t_id] = 'P'
             go_id = tokens[5]+'|'+ tokens[3][3:] + '|' + '22914220 | IMP'
             if t_id in GO:
@@ -135,38 +138,41 @@ def hashGO():
                 GO[t_id] = [go_id]
                 SYNONYM[t_id] = tokens[4]
     
+    print "Number of genes with GO terms:", len(GO)
     return ProductType, GO, SYNONYM
 
 def parseGFF3(EC, Function, Name, GeneComment, ProductType, GO, SYNONYM, header, pf_out, g):
     ### Attributes
     #attributes = ['ID', 'NAME', 'STARTBASE', 'ENDBASE', 'PRODUCT-TYPE','SYNONYM','GENE-COMMENT','FUNCTION','EC','GO','DBLINK','//']
-
+    genetic_elem_write = True
     for line in open(gff3, 'r'):
         line = line.strip()
         if len(line)>0 and not line.startswith('#'):
             obj = classGene.GFF3(line)
             if obj.types() == 'mRNA' and obj.seqids() == header:
                 t_id = str(obj)
-                g.write('ID\t'+str(header)+'\n')
-                g.write('Name\t'+str(header)+'\n')
-                g.write('TYPE\t:CHRSM\n')
-                g.write('CIRCULAR?\tN\n')
-                g.write('ANNOT-FILE\t'+header+'.pf\n')
-                g.write('SEQ-FILE\t'+header+'.fa\n')
-                g.write('\\\\'+'\n')
-                        
+                if genetic_elem_write == True:
+                    g.write('ID\t'+str(header)+'\n')
+                    g.write('Name\t'+str(header)+'\n')
+                    g.write('TYPE\t:CHRSM\n')
+                    g.write('CIRCULAR?\tN\n')
+                    g.write('ANNOT-FILE\t'+header+'.pf\n')
+                    g.write('SEQ-FILE\t'+header+'.fa\n')
+                    g.write('//'+'\n')
+                    genetic_elem_write = False   
 
+
+                pf_out.write('ID\t'+str(t_id)+'\n')
+                pf_out.write(attributes[1] +'\t'+ '.'.join(t_id.split('.')[:-1])+'\n')
+                pf_out.write(attributes[2] + '\t' + str(obj.starts())+'\n')
+                pf_out.write(attributes[3] + '\t' + str(obj.ends())+'\n')
+                if t_id in ProductType:
+                    pf_out.write(attributes[4] + '\t' + str(ProductType[t_id])+'\n')
+                else:
+                    pf_out.write(attributes[4] + '\t' + str('P')+'\n')
+                if t_id in SYNONYM:
+                    pf_out.write(attributes[5] + '\t' + str(SYNONYM[t_id])+'\n')
                 if t_id in Name:
-                    pf_out.write('ID\tVc_'+str(t_id)+'\n')
-                    pf_out.write(attributes[1] +'\t'+ Name[t_id]+'\n')
-                    pf_out.write(attributes[2] + '\t' + str(obj.starts())+'\n')
-                    pf_out.write(attributes[3] + '\t' + str(obj.ends())+'\n')
-                    if t_id in ProductType:
-                        pf_out.write(attributes[4] + '\t' + str(ProductType[t_id])+'\n')
-                    else:
-                        pf_out.write(attributes[4] + '\t' + str('P')+'\n')
-                    if t_id in SYNONYM:
-                        pf_out.write(attributes[5] + '\t' + str(SYNONYM[t_id])+'\n')
                     if t_id in GeneComment:
                         pf_out.write(attributes[6] + '\t' + str(GeneComment[t_id])+'\n')
                     if t_id in Function:
@@ -177,12 +183,12 @@ def parseGFF3(EC, Function, Name, GeneComment, ProductType, GO, SYNONYM, header,
                             if len(ec_no.split('.')) == 3:
                                 ec_no +=  '.-'
                             pf_out.write(attributes[8] + '\t' + str(ec_no+'\n'))
-                    if t_id in GO:
-                        for j in range(len(GO[t_id])):
-                            pf_out.write(attributes[9] + '\t' + str(GO[t_id][j])+'\n')
-                            pf_out.write(attributes[10] + '\tGO:' + str(GO[t_id][j]).split('|')[1]+'\n')
-                    pf_out.write(attributes[11]+'\n')
-
+                if t_id in GO:
+                    for j in range(len(GO[t_id])):
+                        pf_out.write(attributes[9] + '\t' + str(GO[t_id][j])+'\n')
+                        pf_out.write(attributes[10] + '\tGO:' + str(GO[t_id][j]).split('|')[1]+'\n')
+                pf_out.write(attributes[11]+'\n')
+    pf_out.close()
 if __name__ == "__main__":
     
     options(sys.argv[1:])

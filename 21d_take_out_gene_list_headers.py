@@ -1,3 +1,4 @@
+import re, sys
 
 def fasta_len(file):
 	first_line = True
@@ -35,8 +36,8 @@ def extract_seq(file,header_file,seq):
 if __name__ == "__main__":
     
     # get the file and header
-    file="/Users/vgupta/Desktop/03_Lotus_annotation/svend/Lj2.5_proteins.faa"
-    header="/Users/vgupta/Desktop/03_Lotus_annotation/svend/7.lotus"
+    file=sys.argv[1]
+    header=sys.argv[2]
     
     seq = fasta_len(file)
     # get the sequence

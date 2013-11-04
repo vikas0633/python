@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# 119d_vcfParser.py - report callable loci                  |
+# 119_vcfParser.py - script to parse vcf format file       |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -20,17 +20,15 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/Desktop/script/python/119_vcfParser.py -i snp.90.PhredQual_5000.vcf
+# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
-import os,sys,getopt, re, time, classVCF
+import os,sys,getopt, re, classVCF, time
 
 
 ### global variables
-global ifile, HEADER, start_time
-
-start_time = time.time()
+global ifile
 
 ### make a logfile
 import datetime
@@ -70,54 +68,75 @@ def options(argv):
             
     logfile(ifile)
             
-### check if file empty
-def empty_file(infile):
-    if os.stat(infile).st_size==0:
-        sys.exit('File is empty')
-                                
-### return time eclapsed
-def PrinteclapsedTime():
-    diff = time.time() - start_time
-    minutes, seconds = int(diff)/60, diff % 60
-    print('Time taken Min:Sec ==> ' + str(minutes) + ':' + str(round(seconds,2)))
-    
 
-def parseFile(ifile):
-    o = open(ifile+'.tbl','w')
-    global HEADER
-    HEADER = '#Chromosome\tPosition\tCallable\tSNP\tDepth\tgenotypeCalls\tgenotypeCallsHete\tgenotypeCallsHomo\tInbreedingCoeffs\tHaplotypeScores'
-    count = 0
-    o.write(HEADER+'\n')
-    for line in open(ifile,'r'):
-        if len(line) > 1 and not line.startswith('#'):
-            line = line.strip('\n')
-            obj = classVCF.VCF(line)
-            genotypes = obj.genotypes()
-            '''
-            ### check if the MG20 is 0/0 reference Homozygous
-            if int(obj.genotypeDepthSUM()) > int(obj.genotypeDepth(2)):  ### check if its not only MG20 coverage
-                if obj.genotype(2) == '0/0':
-                    o.write(line+'\n')
-                    count += 1
-            '''
-            count += 1
-            if count%1000 == 0:
-                print 'Number of markers processed: ', '{:9,.0f}'.format(count)
-                PrinteclapsedTime()
-                
-            line = str(obj.chroms())+'\t'+str(obj.poss())+'\t'+ '1' + '\t' + str(obj.variants()) + '\t' + str(obj.depth()) + '\t'+\
-            str(obj.genotypeCalls()) + '\t' + str(obj.genotypeCallsHete()) + '\t' + str(obj.genotypeCallsHomo()) + '\t' +\
-            str(obj.InbreedingCoeffs()) + '\t' + str(obj.HaplotypeScores()) + '\t' + str(round(obj.TwoPQ(),2))
-            o.write(line+'\n')
-            
+def calc_dist(g1, g2):
+    dist = 0
+    
+    if g1 == '0/0' and g2 == '0/1':
+        dist += 0.5
+    elif g1 == '0/1' and g2 == '0/0':
+        dist += 0.5 
+    elif g1 == '0/1' and g2 == '1/1':
+        dist += 0.5
+    elif g1 == '1/1' and g2 == '0/1':
+        dist += 0.5
+    
+    elif g1 == '0/0' and g2 == '1/1':
+        dist += 1
+    elif g1 == '1/1' and g2 == '0/0':
+        dist += 1
+    
+    return dist
+        
+        
+
+def printOut(dist_mat, genotypes):
+    o = open(ifile+'.dist','w')
+    o.write(str(len(genotypes)))
+    for i in range(len(genotypes)):
+        o.write('\n'+genotypes[i])
+        for j in range(len(genotypes)):
+            o.write('\t'+str(dist_mat[i,j]))
     o.close()
- 
+
+def parse():
+    count = 0
+    then = time.time()
+    for line in open(ifile, 'r'):
+        if len(line) > 0 and not line.startswith('##'):
+            line = line.strip()
+            obj = classVCF.VCF(line)
+            
+            
+            count += 1
+            if count%10000 == 0:
+                diff = time.time() - then
+                minutes, seconds = int(diff)/60, diff % 60
+                print 'Number of markers processed: ', '{:9,.0f}'.format(count)
+                print('Time taken Min:Sec ==> ' + str(minutes) + ':' + str(round(seconds,2)))
+            
+            if line.startswith('#'):
+                genotypes = obj.genotypes()
+                g_count = len(genotypes)
+                dist_mat = {}
+                for i in range(g_count):
+                    for j in range(g_count):
+                        dist_mat[i,j] = 0
+            else:
+                for i in range(g_count):
+                    for j in range(g_count):
+                        geno1 = obj.genotype(i)
+                        geno2 = obj.genotype(j)
+                        dist_mat[i,j] += calc_dist(geno1, geno2)
+    
+    printOut(dist_mat, genotypes)
+
 if __name__ == "__main__":
     
     options(sys.argv[1:])
-    empty_file(ifile)
     
-    parseFile(ifile)
+    ### parse vcf
+    parse()
     
     
     ### close the logfile
