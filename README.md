@@ -214,7 +214,20 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ar_findLongestIsoform_GFF3.py - Find the longest isoform for each gene in a gff3 file <br />
 21as_calc5primeCdnaDistance.py - calculate 5' distances of insersions <br />
 21at_FindLongestProtein.py - Finds Longest Protein <br />
-	
+21au_trim3primeCDS.py - trims the 3 prime ends of CDS <br />
+21aw_CallFractionexon.py - calculate the callable fraction on the genome <br />
+21ax_LongestProteinCodingIsoform.py - Find the longest protein coding isoform <br />
+21ay_countFixDifference.py - Script for counting the Fix Differences in Population genetics <br />
+21az_addNRanno.py - Script for adding blast annotations from NR database <br />
+21b_better_header.py - Script to fix the fasta headers <br />
+21ba_getGeneBasedAlign.py - Script to calculate the gene alignment length from the MAF output <br />
+21bb_getGeneBasedAlignLength.py - Script to calculate the gene alignment length from the MAF output <br />
+21bc_GenotypicDistance.py - Script to calculate the genotypic distance from the VCF format file <br />
+21bd_summerizeArrayData.py - Script to summerize the array data <br />
+21be_bMakeHeatMap.py - Script to make the heatmap <br />
+21bf_ortho2fasta.py - Script to transfer the ortholog groups to fasta files <br />
+
+
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
 22b.py - normalize transcript profile table <br />
