@@ -33,7 +33,6 @@ def get_PARENT(line):
 class GFF3:
     def __init__(self, line):
         
-        self.line = line
         tokens = split_line(line)
         
         self.seqid = tokens[0]
@@ -77,9 +76,6 @@ class GFF3:
     
     def attributes(self):
         return self.attribute
-    
-    def get_parent(self):
-        return get_PARENT(self.line)
 
 def process_objs(obj):
     return obj.seqids() + '\t' + \
@@ -174,27 +170,3 @@ def print_out(genes):
     for gene in genes:
         print process_objs(gene.obj, gene.strand)
         print gene.features
-        
-class LongestCodingIsoform:
-    def __init__(self, line, obj):
-        self.obj = obj
-        self.id = str(obj)
-        self.parent = get_PARENT(line)
-        self.features = ''
-        self.exon_length = 0
-        self.cds_length = 0
-        self.data = line + '\n'
-        
-    def __str__(self):
-        return str(self.gene)
-    
-    def addExon(self,line, obj):
-        self.exon_length += int(obj.ends()) - int(obj.starts()) + 1
-        
-    def addCDS(self,line, obj):
-        self.cds_length += int(obj.ends()) - int(obj.starts()) + 1
-        
-    
-    def getLongestIsoform(self):
-        return self.id, self.parent, self.exon_length, self.cds_length
-    

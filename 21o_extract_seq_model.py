@@ -11,9 +11,9 @@ def file_empty(file):
 
 ### get the options 
 def options(argv):
-	complete = False; GTF = False; start = ''; end = '';file='';bed=False
+	complete = False; GTF = False; start = ''; end = '';file=''
 	try:
-		opts, args = getopt.getopt(argv,"hf:n:s:e:gb",["fasta=","header=","start=","end=","GTF=", "bed="])
+		opts, args = getopt.getopt(argv,"hf:n:s:e:g",["fasta=","header=","start=","end=","GTF="])
 	except getopt.GetoptError:
 		print	''' 
 			Usages:
@@ -23,7 +23,6 @@ def options(argv):
 						-s <start>  [leave empty if whole sequence need to be extracted] 
 						-e <end>
 						-g <GTF> [by defualt fasta file]
-						-b <bed> [by defualt fasta file]
 				'''
 		sys.exit(2)
 	for opt, arg in opts:
@@ -36,7 +35,6 @@ def options(argv):
 						-s <start>  [leave empty if whole sequence need to be extracted] 
 						-e <end>
 						-g <GTF> [by defualt fasta file]
-						-b <bed> [by defualt fasta file]
 				'''
 			sys.exit()
 		elif opt in ("-f", "--fasta"):
@@ -48,13 +46,10 @@ def options(argv):
 		elif opt in ("-e", "--end"):
 			end = int(arg)
 		elif opt in ("-g", "--GTF"):
-			GTF = True
-		elif opt in ("-b", "--bed"):
-			bed = True
-		
-	return file, header, start, end , GTF, complete, bed
+			GTF = True		
+	return file, header, start, end , GTF, complete
 
-def extract_seq(file, header, start, end , GTF, complete, bed):
+def extract_seq(file, header, start, end , GTF, complete):
 	header = header.replace(' ','').replace('>','')
 	flag = False
 	length = 0
@@ -77,7 +72,7 @@ def extract_seq(file, header, start, end , GTF, complete, bed):
 							line = line.strip()
 							print line
 
-def extract_gtf(file, header, start, end , GTF, complete, bed):
+def extract_gtf(file, header, start, end , GTF, complete):
 	for line in open(file,'r'):
 		line = line.strip()
 		if len(line) > 0:
@@ -88,25 +83,12 @@ def extract_gtf(file, header, start, end , GTF, complete, bed):
 						print line
 				else:
 					if (token[0] == header) & (start <= int(token[3])) & (int(token[4]) <= end):
-						print line
-						
-def extract_bed(file, header, start, end , GTF, complete, bed):
-	for line in open(file,'r'):
-		line = line.strip()
-		if len(line) > 0:
-			if line[0] != '#':
-				token = line.split('\t')
-				if complete == True:
-					if token[0] == header:
-						print line
-				else:
-					if (token[0] == header) & (start <= int(token[1])) & (int(token[2]) <= end):
 						print line 
 	
 if __name__ == "__main__":
     
     # get the file and header
-    file, header, start, end , GTF, complete, bed = options(sys.argv[1:])
+    file, header, start, end , GTF, complete = options(sys.argv[1:])
     if start == '':
        		complete = True
     
@@ -117,11 +99,9 @@ if __name__ == "__main__":
     if index == False:
     	os.system('formatdb -i '+file+' -p F -o T')
     if GTF == True:
-    	extract_gtf(file, header, start, end , GTF, complete, bed)
-    elif bed == True:
-	extract_bed(file, header, start, end , GTF, complete, bed)
+    	extract_gtf(file, header, start, end , GTF, complete)
     else:
-	# get the sequence
-	extract_seq(file, header, start, end , GTF, complete, bed)
+		# get the sequence
+		extract_seq(file, header, start, end , GTF, complete)
 			
     

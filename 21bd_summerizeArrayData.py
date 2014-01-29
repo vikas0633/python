@@ -1,10 +1,10 @@
 #-----------------------------------------------------------+
 #                                                           |
-# template.py - template for python scripting               |
+# 21bd_summerizeArrayData.py - script to calculate the mean and std for micro array data       |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
-# AUTHOR: Vikas Gupta                                        |
+# AUTHOR: Vikas Gupta                                       |
 # CONTACT: vikas0633@gmail.com                              |
 # STARTED: 09/06/2013                                       |
 # UPDATED: 09/06/2013                                       |
@@ -24,16 +24,24 @@
 
 
 ### import modules
-import os,sys,getopt, re
+import os,sys,getopt, re, time
+import numpy as np
 
 
 ### global variables
+global ifile, time_start
+start_time = time.time()
 
 ### make a logfile
 import datetime
 now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 
+### return time eclapsed
+def PrinteclapsedTime():
+    diff = time.time() - start_time
+    minutes, seconds = int(diff)/60, diff % 60
+    print('Time taken Min:Sec ==> ' + str(minutes) + ':' + str(round(seconds,2)))
 
 
 ### write logfile
@@ -53,8 +61,8 @@ def help():
 ### main argument to 
 
 def options(argv):
-    infile = ''
-    gff3 = ''
+    global ifile
+    ifile = ''
     try:
         opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
@@ -63,19 +71,45 @@ def options(argv):
         if opt == '-h':
             help()
         elif opt in ("-i", "--ifile"):
-            infile = arg
+            ifile = arg
             
-    logfile(infile)
+    logfile(ifile)
             
-    return infile
-    
+def parse(ifile):
+    reps = [3,2,3,2,4,4,3,4,3,3,3,3,3,3,3,3,3,3,2,2,2,3,3,3,2,3,3,3,3,3,3,3,3,2,2,3,3,3,1,1,3,3,3,3,2,3,1,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3,3]
+    header = True
+    for line in open(ifile, 'r'):
+        line = line.strip()
+        tokens = line.split('\t')
+        if len(line) > 1 and not line.startswith('#'):
+            if header == True:
+                string = tokens[0]
+                cols = 0
+                for i in range(len(reps)):
+                    string += '\t' + 'SampleValues_'+ tokens[cols+1] + '\tMean_' + tokens[cols+1] +'\tStd_'+tokens[cols+1]
+                    cols += reps[i]
+            else:
+                cols = 0
+                string = tokens[0]
+                for i in range(len(reps)):
+                    values = [float(tokens[cols+j+1]) for j in range(reps[i])]
+                    mean = round(np.mean(values),2)
+                    std = round(np.std(values),2)
+                    string += '\t' + '_'.join([(tokens[cols+j+1]) for j in range(reps[i])])
+                    string += '\t' + str(mean) + '\t' + str(std)
+                    cols += reps[i]
+                    
+            header = False
                             
-        
+            print string
 
 if __name__ == "__main__":
     
-    file = options(sys.argv[1:])
+    options(sys.argv[1:])
     
+    
+    ### parse file
+    parse(ifile)
     
     ### close the logfile
     o.close()

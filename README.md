@@ -1,11 +1,3 @@
-### classes
-classMAF.py - script to parse maf format file <br />
-classCigar.py - script to parse cigar code from the sam file <br />
-classGene.py - script to parse GFF3 files <br />
-classGeneStructure.py - script to get the gene structure from the GFF3 file <br />
-classVCF.py - script to parse Variant calling format (VCF) <br />
-classmRNA.py - script to parse mRNA from GFF3 file <br />
-
 ## Custom Made Modules
 A_hash_file.py - a script that hash the second column using first column as key  <br />
 B_hash_mRNA_IDs.py - returns a uniq mRNA id hash <br />
@@ -128,9 +120,6 @@ mysql_batch - for saving file into the mysql database <br />
 
 ### Svend's Data 
 16.py <br />
-16b_blast_reciprocal.py <br/>
-16c_make_hit_table.py <br/>
-16d_add_species.py <br />
 
 ### SpearmanRank
 spr.py open file and calculate spearman co-efficient between all columns <br />
@@ -217,24 +206,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21ak_remove_redundant.py - script to remove the redundant node gene models <br />
 21al_correct_strand.py - this script takes strand from CDS and assigns the same to mRNA, exons and UTRs, GFF3 files <br />
 21am_update_GFF3_fasta.py - this script updates GFF3 and fasta given a different file <br />
-21an_hash_MySQLid.py - this script makes a 2 column table one with Id and another with yes/no <br />
-21ak_update_GFF3_IDsOnly.py this script take a two column id and replaces these in the GFF3 file <br />
-21ao_keep_fasta_ifGFF3.py - script to throw out excessive sequences in fasta file <br />
-21ap_TranscriptSummary.py - Summerizes GFF3 transcript wise <br />
-21aq_addGeneStrand.py - Adds the strand to the gene based on the mRNAs strands <br />
-21ar_findLongestIsoform_GFF3.py - Find the longest isoform for each gene in a gff3 file <br />
-21as_calc5primeCdnaDistance.py - calculate 5' distances of insersions <br />
-21at_FindLongestProtein.py - Finds Longest Protein <br />
-21au_trim3primeCDS.py - script to trim 3' end of cds sequences <br />
-12av_removeMAFoverlaps.py - script to take longest alignment from the overlapping alignments <br />
-21aw_CallFractionexon.py - script to calculate the callable fraction by transcripts in exonic regions <br />
-21ax_LongestProteinCodingIsoform - script to find longest protein coding isoform <br />
-21ay_countFixDifference.py - script to calculate the ancestral alleles and fix differneces <br />
-21az_addNRanno.py - script to add nr annotation to GFF3 file <br />
-21ba_getGeneBasedAlign.py - script to extract gene specific information from MAF file <br />
-21bb_getGeneBasedAlignLength.py - script to extract gene specific information from MAF file <br />
-21bc_GenotypicDistance.py - script to calculate the genotypic distances among the samples <br />
 
+	
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
 22b.py - normalize transcript profile table <br />
@@ -268,13 +241,9 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 28c_gff3_validator.py - Script to validate a gff3 file <br />
 
 
-
 ### 29. snpEff data analysis
 29a_MakeGeneWideTable.py - script to put the snpEff data togehter <br />
 29b_MakeGeneWideTableUnique.py - script to summarize snpEff data <br />
-
-### 30. Degradome data analysis
-30a_count_5prime_stacks.py - script for counting 5' degradome mappings from BAM file <br /> 
 
 ### General Scripts
 100_intersect_columns.py - script to find non-overlapping entries between the two columns <br />
@@ -289,22 +258,3 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 108_filterExactOverlapGFF3.py - script to filter overlapping start/end genemodels <br />
 109_AddPhaseGFF3.py - script to add Phase <br />
 110_getGene.py - script take a list of genes and extracts the genemodels from the GFF3 file <br />
-111_blastoutput_parser.py - script to parse blast output and return a table <br />
-112_iprscanout_parser.py - script to parse blast output and return a table <br />
-113_validate_GFF3.py - GFF3 validation script <br />
-114_validate_Fasta.py - Fasta validation script <br />
-115_MapFastq.py - Script to Map Fastq files <br />
-116_runGATK.py - script to run GATK analysis <br />
-117_addReadGroup.py - script to add readgroup in sam or bam file <br />
-118_flankingRegion.py - script to extract flanking region given set of co-ordinates and range <br />
-119_vcfParser.py - script to parse vcf format file <br />
-120_takeOutPos.py - script to take out matching coords <br />
-121_SlidingWindow.py - plot data with sliding window on multiple chromosome <br />
-122_split_DNA_protein_fasta.py - script to split fasta file between DNA and protein sequences <br />
-123_longestORF.py - script to find longest opening reading frame from a DNA sequence <br />
-124_removeFastaDups.py - Script to remove the duplicates from the fasta file <br />
-125_pileup2bed.py - Script to convert from Pileup to Bed format <br />
-126_maf2bed.py - Script to convert from MAF to Bed format <br />
-127_vcf_fasta.py - Script to convert VCF to fasta file <br />
-128_PFformatter.py - Script to create pathologic formatted file <br />
-129_splitIPR.py - Script to split IPRscan output <br />

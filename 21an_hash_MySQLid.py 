@@ -1,6 +1,8 @@
+
 #-----------------------------------------------------------+
 #                                                           |
-# 114_validate_Fasta.py - Fasta validation script           |
+# 21an_hash_MySQLid.py - this script makes a 2 column table |
+#    one with Id and another with yes/no                    |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -10,7 +12,8 @@
 # UPDATED: 09/06/2013                                       |
 #                                                           |
 # DESCRIPTION:                                              | 
-# Short script to test fasta file                           |
+# this script makes a 2 column table one with Id and another|
+# with yes/no                                               |
 #                                                           |
 # LICENSE:                                                  |
 #  GNU General Public License, Version 3                    |
@@ -19,7 +22,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/114_validate_Fasta.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -45,7 +48,7 @@ def logfile(infile):
     
 def help():
     print '''
-            python 114_validate_Fasta.py -i <ifile>
+            python 100b_fasta2flat.py -i <ifile>
             '''
     sys.exit(2)
 
@@ -63,30 +66,39 @@ def options(argv):
             help()
         elif opt in ("-i", "--ifile"):
             infile = arg
+        elif opt in ("-d", "--data"):
+            data = arg
+        
             
     logfile(infile)
             
-    return infile
+    return infile, data
     
+def hash_file(file):
+    hash_data ={}
+    for line in open(file, 'r'):
+        line = line.strip()
+        hash_data[line] = ''
                             
-def duplicate(infile):
-    headers = {}
-    for line in open(infile):
-        if line.startswith('>'):
-            header = line[1:].strip().split(',')[0]
-            if header in headers:
-                print 'Error at line'
-                print line
-                sys.exit('Duplicate fasta header. Header is the first part of the line stariting with ">" ')
-            headers[header] = ''
+    return hash_data
+
+def printOut(hash_data, data):
+    
+    for line in open(data,'r'):
+        line = line.strip()
+        
+        if line in hash_data:
+            print line + '\t' + 'yes'
+        else:
+            print line + '\t' + 'no'
 
 if __name__ == "__main__":
     
-    infile = options(sys.argv[1:])
+    Ids, data  = options(sys.argv[1:])
     
-    ### fasta file
-    #check the duplicacy in the fasta file
-    duplicate(infile)
+    hash_data = hash_file(Ids)
+    
+    printOut(hash_data, data)
     
     ### close the logfile
     o.close()

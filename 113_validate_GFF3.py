@@ -247,6 +247,7 @@ def get_statistics(infile):
     features = {}
     elements = {'gene':[]}
     mRNA = {}
+    mRNA_intron = {}
     for line in open(infile, 'r'):
         if (len(line) > 1) & (not line.startswith('#')):
             obj = GFF3(line)
@@ -263,6 +264,7 @@ def get_statistics(infile):
                 if obj.types() == 'mRNA':
                     mRNA_id = str(obj)
                     mRNA[mRNA_id] = 0
+                    mRNA_intron[mRNA_id] = int(obj.ends()) - int(obj.starts())
                 if obj.types() == 'exon':
                     mRNA[mRNA_id] += int(obj.ends()) - int(obj.starts())
 
@@ -307,8 +309,8 @@ def get_statistics(infile):
             
             print '%10s %10s %10s %10s' % (str('Intron') , \
             str(stats.counts()-len(mRNA.values())) , \
-            str(gene_length - stats.total_length()) , \
-            str((gene_length - stats.total_length())/(stats.counts()-len(mRNA.values()))))
+            str(sum(mRNA_intron.values()) - stats.total_length()) , \
+            str((sum(mRNA_intron.values()) - stats.total_length())/(stats.counts()-len(mRNA.values()))))
         
         else:
             print '%10s %10s %10s %10s %10s %10s' %  (str(stats) , \

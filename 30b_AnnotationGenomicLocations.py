@@ -172,29 +172,28 @@ def annotate(infile, chro, exons, cds, utr, intron, mRNA_type):
     
     header = True
     for line in open(infile, 'r'):
-        if len(line) > 1 and not line.startswith('#'):
-            if header == False:
-                line = line.strip()
-                token = line.split('\t')
-                chr = token[chr_col-1]
-                start = int(token[start_col-1])
-                if start in mRNA_type:
-                    types = mRNA_type[start]
-                else:
-                    types = 'Intergenic'
-                if chro == chr:
-                    if start in cds:
-                        print line+'\t'+ 'cds\t' + types
-                    elif start in utr:
-                        print line+'\t'+'utr\t' +  types
-                    elif start in exons:
-                        print line+'\t'+ 'exon\t' +  types
-                    elif start in intron:
-                        print line+'\t'+ 'intronic\t' +  types
-                    else:
-                        print line+'\t'+ 'intergenic\t' +  types
+        if header == False:
+            line = line.strip()
+            token = line.split('\t')
+            chr = token[chr_col-1]
+            start = int(token[start_col-1])
+            if start in mRNA_type:
+                types = mRNA_type[start]
             else:
-                header = False
+                types = 'Intergenic'
+            if chro == chr:
+                if start in cds:
+                    print line+'\t'+ 'cds\t' + types
+                elif start in utr:
+                    print line+'\t'+'utr\t' +  types
+                elif start in exons:
+                    print line+'\t'+ 'exon\t' +  types
+                elif start in intron:
+                    print line+'\t'+ 'intronic\t' +  types
+                else:
+                    print line+'\t'+ 'intergenic\t' +  types
+        else:
+            header = False
         
 
 if __name__ == "__main__":

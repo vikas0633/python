@@ -52,41 +52,47 @@ def filter_blast(hash,blast):
 	first_line = True
 	flag = False
 	for line in open(blast,'r'):
-	    line = line.strip()
-	    token = line.split('\t')
-	    query = token[0].split(',')[0]
-	    flag2 = True 
-	    annotation = hash[token[1]][1:].split(']')[0]+']'
-	    annotation2 = ' '.join(annotation.split(' ')[1:]) + ' '+annotation.split(' ')[0]
-	    identity = token[2]
-	    e_value = token[10]
-	
-	    if first_line == False:
-		if last_query != query:
-		    if flag == False:
-		        print last_query +'\t'+last_annotation +'\t'+ last_identity +'\t'+ last_e_value ### print for last query if all were putative
-		    flag = False
-	    
-	    filter_key = ['Uncharacterized', 'Putative','Unnamed','Predicted','hypothetical protein', 'Uncharacterized protein', 'unknown']
-	    for key in filter_key:
-		if re.search(key.lower(), annotation2):
-		    flag2 = False 
-		    break
-	    if flag == False:
-		if flag2 == True:
-		    print query +'\t'+annotation2 +'\t'+ identity +'\t'+ e_value ### print for last query if all were putative
-		    flag = True
-		
+		line = line.strip()
+		token = line.split('\t')
+		query = token[0]
 
-	    
-	    last_query = query
-	    last_annotation = annotation2 
-	    last_identity = identity
-	    last_e_value = e_value 
-	    first_line = False
+		annotation = hash[token[1]][1:] 
+		identity = token[2]
+		e_value = token[10]
+		key1 = 'Uncharacterized'
+		key2 = 'Putative'
+		
+		if first_line == True:
+			x = 1
+		if query == last_query:
+			if  re.search(key1.lower(),last_annotation.lower()):
+				continue
+			elif re.search(key2.lower(),last_annotation.lower()):
+				continue
+			else:
+				if flag == False:
+					print last_query +'\t'+ last_annotation +'\t'+ last_identity +'\t'+ last_e_value
+					flag = True
+		
+		if (query != last_query) & (first_line == False): ### check for new query
+			
+			if flag == False:
+				if re.search(key1.lower(),last_annotation.lower()):
+					print last_query +'\t'+'Non Chatacterized Hit- '+last_annotation +'\t'+ last_identity +'\t'+ last_e_value ### print for last query if all were putative
+				elif re.search(key2.lower(),last_annotation.lower()):
+					print last_query +'\t'+'Non Chatacterized Hit- '+last_annotation +'\t'+ last_identity +'\t'+ last_e_value ### print for last query if all were putative
+				else:
+					print last_query +'\t'+ last_annotation +'\t'+ last_identity +'\t'+ last_e_value ### print for last query if all were putative
+			flag = False
+		
+		last_query = query
+		last_annotation = annotation 
+		last_identity = identity
+		last_e_value = e_value 
+		first_line = False
 		
 	if flag == False:
-	    print last_query +'\t'+last_annotation +'\t'+ last_identity +'\t'+ last_e_value ### print for last query if all were putative
+		print last_query +'\t'+last_annotation +'\t'+ last_identity +'\t'+ last_e_value ### print for last query if all were putative
 		
 		
 if __name__ == "__main__":

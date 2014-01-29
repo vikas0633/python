@@ -24,11 +24,11 @@
 
 
 ### import modules
-import os,sys,getopt, re
-
+import os,sys,getopt, re, threading
+from multiprocessing import Process, Queue
 
 ### global variables
-global ifile, window_size, step_size, window_count, step_count, callable_file
+global ifile, window_size, step_size, window_count, step_count
 
 ### make a logfile
 import datetime
@@ -48,13 +48,12 @@ def logfile(infile):
 def help():
     print '''
             python 100b_fasta2flat.py -i <ifile>
-                                        -j <callable_file>
                                         -w <window_size_pos> ### Position based
                                         -c <window_size_count> ### count based
                                         
                                         
             File must follow the format:
-            <chromosome> <Position> <DataPoints>
+            <chromosome> <Position> <Group>
             
             '''
     sys.exit(2)
@@ -62,15 +61,14 @@ def help():
 ### main argument to 
 
 def options(argv):
-    global ifile, window_size, step_size, window_count, step_count, callable_file
+    global ifile, window_size, step_size, window_count, step_count
     ifile = ''
-    callable_file = ''
-    window_size = 1000
-    step_size = 100
+    window_size = 1000000
+    step_size = 100000
     window_count = 1000
     step_count = 100
     try:
-        opts, args = getopt.getopt(argv,"hi:j:w:c:s:d:",["ifile=","callable_file=","window_size_pos=","step_size_pos=","window_size_count=","step_size_count=" ])
+        opts, args = getopt.getopt(argv,"hi:w:c:s:d:",["ifile=","window_size_pos=","step_size_pos=","window_size_count=","step_size_count=" ])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -78,8 +76,6 @@ def options(argv):
             help()
         elif opt in ("-i", "--ifile"):
             ifile = arg
-        elif opt in ("-j", "--callable_file"):
-            callable_file = arg
         elif opt in ("-w", "--window_size_pos"):
             window_size = int(arg)
         elif opt in ("-c", "--window_size_count"):
@@ -92,6 +88,7 @@ def options(argv):
     logfile(ifile)
             
 def get_size(file):
+    first_line = True
     count = 0
     chroHash = {}
     for line in open(file,'r'):
@@ -100,108 +97,92 @@ def get_size(file):
         if count%100000 == 0:
             print 'Lines processed: ', '{:9,.0f}'.format(count)
         line = line.strip()
-        if len(line)>1 and not line.startswith('#'):
+        if len(line)>1 and not line.startswith('#') and first_line == False:
             token = line.split('\t')
             if token[0] not in chroHash:
-                chroHash[token[0]] = '' 				
+                chroHash[token[0]] = ''
+        first_line = False
     return chroHash
 
-def parse_call(chromosome,callable_file):
-    hash = {}
-    for line in open(callable_file,'r'):
-        if len(line)>1 and not line.startswith('#'):
-            count += 1
-            ### print the lines processed
-            if count%100000 == 0:
-                print 'Lines processed in callable fraction file: ', chromosome, '{:9,.0f}'.format(count)
-            line = line.strip()
-            tokens = line.split('\t')
-            if tokens[0]==chromosome:
-                pos = int(tokens[1])
-                hash[pos] = ''
-    return hash
- 
-def parse(chromosome, o):
-    count = 0
-    data_hash = {}
-    for line in open(ifile, 'r'):
-        if len(line)>1 and not line.startswith('#'):
-            count += 1
-            ### print the lines processed
-            if count%100000 == 0:
-                print 'Lines processed in the variant file: ', chromosome, '{:9,.0f}'.format(count)
-            line = line.strip()
-            tokens = line.split('\t')
-            if tokens[0]==chromosome:
-                pos = int(tokens[1])
-                data_hash[pos] = float(tokens[2]), float(tokens[3]), float(tokens[4]), float(tokens[5]), float(tokens[6]), float(tokens[7]) ,\
-                float(tokens[8]), float(tokens[9])
-                
-                
-    return data_hash
-def window(chromosome, o, data_hash, call_hash):
+def window(chromosome, o, data_hash, data_type):
     ### run the window position based analysis    
-
+    
+    
+    start = 0
+    end = 200000000
+    
+    '''
     if len(data_hash)>0:
         start = min(data_hash)
         end = max(data_hash)
-
+   '''
     for i in range(start, end+1, step_size):
         print 'Lines processed printing out: ', chromosome, '{:9,.0f}'.format(i)
-        call_sum = 0
-        snp_sum = 0
-        depth_sum = 0
-        genotypeCalls_sum = 0
-        genotypeCallsHete_sum = 0
-        genotypeCallsHomo_sum = 0
-        InbreedingCoeffs_sum = 0
-        HaplotypeScores_sum = 0
-        temp_count = 0
-        for j in range(i, i+window_size):
-            if j in call_hash:
-                temp_count += 1
-            if j in data_hash:
-                call, snp, depth, genotypeCalls, genotypeCallsHete, genotypeCallsHomo, InbreedingCoeffs, HaplotypeScores = data_hash[j]
-                snp_sum += snp
-                depth_sum += depth
-                genotypeCalls_sum += genotypeCalls
-                genotypeCallsHete_sum += genotypeCallsHete
-                genotypeCallsHomo_sum += genotypeCallsHomo
-                InbreedingCoeffs_sum += InbreedingCoeffs
-                HaplotypeScores_sum += HaplotypeScores
-                temp_count += 1
-                
-        if temp_count > 0:    
-            o.write(chromosome+'\t'+ \
-                    str(i+window_size/2) + '\t' + \
-            str(temp_count/float(temp_count))+ '\t' + \
-            str(snp_sum/float(temp_count))+ '\t' + \
-            str(depth_sum/float(temp_count))+ '\t'+ \
-            str(genotypeCalls_sum/float(temp_count))+ '\t' + \
-            str(genotypeCallsHete_sum/float(temp_count))+ '\t'+ \
-            str(genotypeCallsHomo_sum/float(temp_count))+ '\t'+ \
-            str(InbreedingCoeffs_sum/float(temp_count))+ '\t'+ \
-            str(HaplotypeScores_sum/float(temp_count))+ '\n')
+        for d_type in data_type:
+            temp_sum = 0
+            for j in range(i, i+window_size):
+                if j in data_hash[d_type]:
+                    temp_sum += data_hash[d_type][j]
+            o.write(chromosome+'\t'+ str(i+window_size/2) + '\t' + d_type + '\t' + str(temp_sum)+'\n')
+            
+def parse(chromosome, count):
+    #global data_hash, data_type
+    o = open('tempThread'+str(count), 'w')
+    first_line = True
+    count = 0
+    data_hash = {}
+    data_type = []
+    for line in open(ifile, 'r'):
+        if len(line)>1 and not line.startswith('#') and first_line == False:
+            count += 1
+            ### print the lines processed
+            if count%100000 == 0:
+                print 'Lines processed: ', chromosome, '{:9,.0f}'.format(count)
+            line = line.strip()
+            tokens = line.split('\t')
+            if tokens[0]==chromosome:
+                pos = int(tokens[1])
+                DataType = tokens[2]
+                if DataType in data_type:
+                    data_hash[DataType][pos] = 1
+                else:
+                    data_type.append(DataType)
+                    data_hash[DataType] = {}
+                    data_hash[DataType][pos] = 1
+                    
+        first_line = False
+    window(chromosome, o, data_hash, data_type)
+
 
 if __name__ == "__main__":
     
     options(sys.argv[1:])
     
-    HEADER = '#Chromosome\tPosition\tCallable\tSNP\tDepth\tgenotypeCalls\tgenotypeCallsHete\tgenotypeCallsHomo\tInbreedingCoeffs\tHaplotypeScores'
+    HEADER = 'Chromosome\tPosition\tData'
+    o.write(HEADER+'\n')
     
     print 'Hashing the chromosomes name'
     chroHash = get_size(ifile)
     
     o = open(ifile+'.w'+str(window_size)+'.s'+str(step_size), 'w')
-    o.write(HEADER+'\n')
     
+    ### multithreading
+    thread_list = []
+    count = 0
     for chromosome in sorted(chroHash):
-        ### hash the callable fraction
-        call_hash = parse_call(chromosome,callable_file)
+        count += 1
+        t = Process(target=parse, args=(chromosome,count,))
+        t.start()
+        thread_list.append(t)
+    for thread in thread_list:
+        thread.join()
         
+    '''
+    for chromosome in sorted(chroHash):
         ### parse file
-        data_hash = parse(chromosome, o)
-        window(chromosome, o, data_hash, call_hash)
-    
+        #data_hash,data_type  = parse(chromosome, o)
+        window(chromosome, o, data_hash, data_type)
+    '''
     ### close the logfile
+    os.system('rm tempThread*')
     o.close()

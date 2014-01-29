@@ -26,18 +26,10 @@ class mRNA:
                 self.hash_cds[i] = ''
         
     def GetExonicOverlap(self, hash): ### takes a hash with co-ordinates for exonic overlap
-        temp = 0
-        for i in hash:
-            if i in self.hash_exon:
-                temp += 1
-        return temp
+        return len(set(hash).intersection(set(self.hash_exon)))
     
     def GetCDSOverlap(self, hash): ### takes a hash with co-ordinates for exonic overlap
-        temp = 0
-        for i in hash:
-            if i in self.hash_cds:
-                temp += 1
-        return temp
+        return len(set(hash).intersection(set(self.hash_cds)))
         
     def GetmRNALength(self):
         return self.mRNA_length

@@ -24,13 +24,11 @@
 
 
 ### import modules
-import os,sys,getopt, re, time, classVCF
+import os,sys,getopt, re, classVCF
 
 
 ### global variables
-global ifile, HEADER, start_time
-
-start_time = time.time()
+global ifile, HEADER
 
 ### make a logfile
 import datetime
@@ -75,13 +73,7 @@ def empty_file(infile):
     if os.stat(infile).st_size==0:
         sys.exit('File is empty')
                                 
-### return time eclapsed
-def PrinteclapsedTime():
-    diff = time.time() - start_time
-    minutes, seconds = int(diff)/60, diff % 60
-    print('Time taken Min:Sec ==> ' + str(minutes) + ':' + str(round(seconds,2)))
-    
-
+        
 def parseFile(ifile):
     o = open(ifile+'.tbl','w')
     global HEADER
@@ -100,14 +92,9 @@ def parseFile(ifile):
                     o.write(line+'\n')
                     count += 1
             '''
-            count += 1
-            if count%1000 == 0:
-                print 'Number of markers processed: ', '{:9,.0f}'.format(count)
-                PrinteclapsedTime()
-                
             line = str(obj.chroms())+'\t'+str(obj.poss())+'\t'+ '1' + '\t' + str(obj.variants()) + '\t' + str(obj.depth()) + '\t'+\
             str(obj.genotypeCalls()) + '\t' + str(obj.genotypeCallsHete()) + '\t' + str(obj.genotypeCallsHomo()) + '\t' +\
-            str(obj.InbreedingCoeffs()) + '\t' + str(obj.HaplotypeScores()) + '\t' + str(round(obj.TwoPQ(),2))
+            str(obj.InbreedingCoeffs()) + '\t' + str(obj.HaplotypeScores()) 
             o.write(line+'\n')
             
     o.close()

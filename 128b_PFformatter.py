@@ -133,7 +133,7 @@ def hashGO():
                 GO[t_id].append(go_id)
             else:
                 GO[t_id] = [go_id]
-                SYNONYM[t_id] = tokens[5]
+                SYNONYM[t_id] = tokens[4]
     
     return ProductType, GO, SYNONYM
 
