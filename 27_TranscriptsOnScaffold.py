@@ -1,10 +1,11 @@
 #-----------------------------------------------------------+
 #                                                           |
-# template.py - template for python scripting               |
+# 27_TranscriptsOnScaffold.py -                             |
+# Script to extract all the transcripts on given scaffolds  |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
-# AUTHOR: Vikas Gupta                                        |
+# AUTHOR: Vikas Gupta                                       |
 # CONTACT: vikas0633@gmail.com                              |
 # STARTED: 09/06/2013                                       |
 # UPDATED: 09/06/2013                                       |
@@ -20,7 +21,7 @@
 #-----------------------------------------------------------+
 
 # Example:
-# python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
+# python ~/script/python/27_TranscriptsOnScaffold.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
 
 ### import modules
@@ -28,7 +29,7 @@ import os,sys,getopt, re
 import classGene
 
 ### global variables
-global infile
+global infile, gff3, FeatureType
 
 ### make a logfile
 import datetime
@@ -47,17 +48,20 @@ def logfile(infile):
     
 def help():
     print '''
-            python 100b_fasta2flat.py -i <ifile>
+            python 100b_fasta2flat.py -i <ifile> -g <gff3> -t <type>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
+    global infile, gff3, FeatureType
     infile = ''
     gff3 = ''
+    FeatureType = 'mRNA'
+    
     try:
-        opts, args = getopt.getopt(argv,"hi:",["ifile="])
+        opts, args = getopt.getopt(argv,"hi:g:t:",["ifile=","gff3=","type="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -65,18 +69,43 @@ def options(argv):
             help()
         elif opt in ("-i", "--ifile"):
             infile = arg
-            
-    logfile(infile)
-            
-    return infile
-    
-                            
+        elif opt in ("-g", "--gff3"):
+            gff3 = arg
+        elif opt in ("-t", "--type"):
+            FeatureType = arg        
         
+        
+    logfile(infile)
+    
+def HashCol():
+    Hash = {}
+    for line in open(infile, 'r'):
+        line = line.strip()
+        token = line.split()
+        Hash[token[0]] = ''
+    
+    return Hash
+
+def printOut(Hash):
+    
+    
+    for line in open(gff3, 'r'):
+        if len(line) > 0 and not line.startswith('#'):
+            obj = classGene.GFF3(line)
+            if obj.types() == FeatureType:
+                if obj.seqids() in Hash:
+                    print obj
 
 if __name__ == "__main__":
     
-    file = options(sys.argv[1:])
+    options(sys.argv[1:])
     
+    
+    ### hash the scaffolds
+    Hash = HashCol()
+    
+    ### print out the feature ids
+    printOut(Hash)
     
     ### close the logfile
     o.close()

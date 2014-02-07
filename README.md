@@ -254,6 +254,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 ### Spider Project
 27_summary_MS_hit.py - script for process MS hit text file <br />
 27_foramt_fasta_spider.py - script to format the fasta headers according to the Thomas's explanations <br />
+27_TranscriptsOnScaffold.py - Script to extract all the transcripts on given scaffolds <br />
 
 ### UNC RNA-seq project
 28a_obo_parser.py - script to obo file from the geneontology.org <br />
