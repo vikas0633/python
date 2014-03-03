@@ -25,7 +25,6 @@
 
 ### import modules
 import os,sys,getopt, re
-import classGene
 
 ### global variables
 global infile

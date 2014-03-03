@@ -1,4 +1,4 @@
-### 21t_tau.py - script to add ORF to the gff file - /Users/vikas0633/Desktop/script/python
+### 31c_TAU.py - script to add ORF to the gff3 file
 
 
 '''
@@ -23,11 +23,12 @@ import os,sys, getopt
 from D_longest_fasta_sequence_header import *
 
 ### GLOBAL VARIABLEs
-#TAU_PATH="/users/vgupta/Desktop/tools/TAU"
-#SCRIPT_DIR="/users/vgupta/Desktop/script/python"
+global  infile, gff, intron_size
+TAU_PATH="~/scripts/TAU"
+SCRIPT_DIR="~/scripts"
 
-TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
-SCRIPT_DIR="/u/vgupta/script/python"
+#TAU_PATH="/u/vgupta/01_genome_annotation/tools/TAU"
+#SCRIPT_DIR="/u/vgupta/script/python"
 
 def file_empty(file):
     count = sum([1 for line in open(file)])
@@ -37,9 +38,9 @@ def file_empty(file):
 
 
 def options(argv):
-    infile = ''
+    global  infile, gff, intron_size
     try:
-        opts, args = getopt.getopt(argv,"hf:g:",["genome=","gff="])
+        opts, args = getopt.getopt(argv,"hf:g:I:",["genome=","gff=","--intron_size="])
     except getopt.GetoptError:
         print 'python 21t_tau.py -f <genome> -g <gff>'
         sys.exit(2)
@@ -51,8 +52,8 @@ def options(argv):
             infile = arg
         elif opt in ("-g", "--gff"):
             gff = arg
-    
-    return infile, gff
+        elif opt in ("-I", "--intron_size"):
+            intron_size = arg 
     
 def extract_seq(infile, header, mRNA_st, mRNA_en):
     os.system('echo ">"'+str(header)+' >temp.fa')
@@ -423,7 +424,7 @@ def process_gff(gff,infile):
                         ### change the format of the gff3 file
                         os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
                         ### run TAU
-                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+                        os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I '+ str(intron_size)+' -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
                         file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
                         
                         
@@ -474,7 +475,7 @@ def process_gff(gff,infile):
     os.system('nice -n 19 python '+SCRIPT_DIR+'/21u_make_gff2.py -i tau_in -o temp.gff')
 
     ### run TAU
-    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I 100000 -A temp.fa -G temp.gff -O temp'+str(count) +' ')    
+    os.system('nice -n 19 perl '+TAU_PATH +'/TAU.pl -I '+ str(intron_size)+' -A temp.fa -G temp.gff -O temp'+str(count) +' ')  
     
     
     file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
@@ -491,7 +492,8 @@ def remove_temp_files():
 
 if __name__ == "__main__":
 
-    infile,gff = options(sys.argv[1:]) 
+    options(sys.argv[1:])
+    
     ### sort the gff file according to gene name
     hash_gff_gene = {}
     hash_gff_start = {}
@@ -503,7 +505,7 @@ if __name__ == "__main__":
     remove_temp_files()
     
     ### format ref database
-    #os.system('formatdb -i '+infile+' -p F -o T')
+    os.system('formatdb -i '+infile+' -p F -o T')
     
     for line in open(gff,'r'):
         line = line.strip()
@@ -512,7 +514,7 @@ if __name__ == "__main__":
             if line[0] != '#':
                 if token[2] == "gene":
                     if (token[1]== "CUFFLINKS") or (token[1]=="Cufflinks"):
-                        id = line.split('Name=')[1].split(';')[0]
+                        id = line.split('Name=')[1].split('%')[-1][2:]
                         hash_gff_gene[id]=line
                     else:
                         id = line.split('ID=')[1].split(';')[0]
@@ -549,4 +551,4 @@ if __name__ == "__main__":
     ### process gene model file
     process_gff(gff,infile)
     
-    #os.system('rm -r temp*')
+    os.system('rm -r temp*')
