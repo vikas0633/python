@@ -57,7 +57,7 @@ def options(argv):
                             
 def remove_genes(file):
     ''' file -> (NULL)
-    this function removes unnecessary gene names assigned by cuyfflinks 
+    this function removes unnecessary gene names assigned by cufflinks 
     '''   
     gene_ID_hash = {}
     mRNA_ID_hash = {}

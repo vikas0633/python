@@ -1,6 +1,6 @@
 ### Gene class 
 
-import re
+import re, sys
 
 ### split line
 def split_line(line):

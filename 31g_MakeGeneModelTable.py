@@ -185,7 +185,9 @@ def IPRSCAN(file):
 def format(inf, cDNA, cds, protein, homology, exons, orthoMCL, orthofamily, blast, ljrblast, denseGene, iprScan):
 	count = 0
 	### print header
-	print 'Number'+'\t'+'Source'+'\t'+'ID'+'\t'+'Chromosome'+'\t'+'Start'+'\t'+'End'+'\t'+'Strand'+'\t'+'cDNASeq'+'\t'+'cDNASeq_length'+'\t'+'cdsSeq'+'\t'+'cdsSeq_len'+'\t'+'proteinSeq'+'\t'+'proteinSeq_len'+'\t'+'BlastHit[Medicago]'+'\t'+'BlastHit[Soyabean]'+'\t'+'ExonCount'+'\t'+'ExonicLength'+'\t'+'RepeatFraction' + '\t' + 'CDS/mRNA length ratio' + '\t' + 'OrthoMCL group' + '\t' +'ljr\t'+'mtr\t'+'gmax\t'+'ath\t'+'ptr\t'+'osa\t'+'sob\t'+ 'Annotation [UniProtBlast]' +'\t'+ '%Identity_UniProt' +'\t'+'Evalue_UniProt' + '\t' + 'Protein [Complete/Partial]' + '\tgene_name' + '\t' + 'Annotation [LjRep]' +'\t'+ '%Identity_LjRep' +'\t'+'Evalue_LjRep' + '\t' + 'Gene_density[>5]' + 'InterProScan'
+	print 'Number'+'\t'+'Source'+'\t'+'ID'+'\t'+'Chromosome'+'\t'+'Start'+'\t'+'End'+'\t'+'Strand'+'\t'+'cDNASeq'+'\t'+ \
+	'cDNASeq_length'+'\t'+'cdsSeq'+'\t'+'cdsSeq_len'+'\t'+'proteinSeq'+'\t'+'proteinSeq_len'+'\t'+'ExonCount'+'\t'+ \
+	'ExonicLength'+'\t'+'RepeatFraction' + '\t' + 'CDS/mRNA length ratio' + '\t' + 'Protein [Complete/Partial]' + '\tgene_name'
 	
 	for line in open(inf,'r'):
 		token = line.split('\t')
@@ -299,8 +301,10 @@ def format(inf, cDNA, cds, protein, homology, exons, orthoMCL, orthofamily, blas
 				
 				
 				
-				print str(count)+'\t'+source+'\t'+ID+'\t'+token[0]+'\t'+token[3]+'\t'+token[4]+'\t'+token[6]+'\t'+cdnaSeq+'\t'+str(len(cdnaSeq))+'\t'+cdsSeq+'\t'+str(len(cdsSeq))+'\t'+proteinSeq+'\t'+str(len(proteinSeq))+'\t'+blast_hit+'\t' + exon + \
-				'\t' + str(round(float(len(cdsSeq))/len(cdnaSeq),2)) + '\t' + oMCL + '\t' +ofamily+'\t'+ blast_hit_UniProt + '\t' + proteins +'\t' + gene_name +'\t' + blast_hit_Ljrep +'\t'+ gene_desnsity + '\t' + ipr
+				print str(count) +'\t'+source+'\t'+ID+'\t'+token[0]+'\t'+token[3]+'\t'+token[4]+ \
+				'\t'+token[6]+'\t'+cdnaSeq+'\t'+str(len(cdnaSeq))+'\t'+cdsSeq+'\t'+str(len(cdsSeq))+ \
+				'\t'+proteinSeq+'\t'+str(len(proteinSeq))+'\t' + exon + '\t' \
+				+ str(round(float(len(cdsSeq))/len(cdnaSeq),2)) + '\t' + proteins +'\t' + gene_name
 
 
 if __name__ == "__main__":

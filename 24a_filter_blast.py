@@ -61,6 +61,11 @@ def filter_blast(hash,blast):
 		e_value = token[10]
 		key1 = 'Uncharacterized'
 		key2 = 'Putative'
+		key3 = 'Hypothetical'
+		key4 = 'novel'
+		key5 = 'Unknown'
+		
+		
 		
 		if first_line == True:
 			x = 1
@@ -68,6 +73,12 @@ def filter_blast(hash,blast):
 			if  re.search(key1.lower(),last_annotation.lower()):
 				continue
 			elif re.search(key2.lower(),last_annotation.lower()):
+				continue
+			elif re.search(key3.lower(),last_annotation.lower()):
+				continue
+			elif re.search(key4.lower(),last_annotation.lower()):
+				continue
+			elif re.search(key5.lower(),last_annotation.lower()):
 				continue
 			else:
 				if flag == False:

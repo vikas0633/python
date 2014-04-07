@@ -32,12 +32,23 @@ def options(argv):
 
 def process_file():
 	o = open('temp.gff','w')
-	for line in open(infile,'r'):
-	        line = line.strip()
-		token = line.split('\t')
-		if (token[2] == "exon"):
-		        lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+token[3]+'\t'+token[4]+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+line.split('=')[2].split(';')[0]
-		        o.write(lin+'\n')
+	
+	if sum([1 for line1 in open(infile)]) == 2:
+		for line in open(infile,'r'):
+                        line = line.strip()
+                        token = line.split("\t")
+                        if token[2] == "exon":
+				lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+token[3]+'\t'+str(int(token[4])-1)+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+line.split('=')[2].split(';')[0]
+				o.write(lin+'\n')
+	else:
+		for line in open(infile,'r'):
+			line = line.strip()
+			token = line.split("\t")
+			if token[2] == "exon":
+				lin = token[0]+'\t'+token[1]+'\t'+token[2]+'\t'+token[3]+'\t'+token[4]+'\t'+token[5]+'\t'+token[6]+'\t'+token[7]+'\t'+line.split('=')[2].split(';')[0]
+				o.write(lin+'\n')
+	
+	print sum([1 for line1 in open(infile)])
 	o.close()
 if __name__ == "__main__":
 

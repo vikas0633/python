@@ -227,10 +227,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21be_bMakeHeatMap.py - Script to make the heatmap <br />
 21bf_ortho2fasta.py - Script to transfer the ortholog groups to fasta files <br />
 
-### GABox specific
-31a_reformat_gff3.py - script to replace the ref column of gff3 by priority <br />
-31b_combine_GTF.py - This is the script for combining various annotations files <br />
-31c_TAU.py - script to add ORF to the gff3 file <br />
+
 
 ### Transcripts Handlers
 22a.py - script for parsing tophat/cufflink generated GTF files against a target (-G cufflink) annotation file <br />
@@ -274,6 +271,15 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 ### 30. Degradome data analysis
 30a_count_5prime_stacks.py - script for counting 5' degradome mappings from BAM file <br /> 
 
+### GABox specific
+31a_reformat_gff3.py - script to replace the ref column of gff3 by priority <br />
+31b_combine_GTF.py - This is the script for combining various annotations files <br />
+31c_TAU.py - script to add ORF to the gff3 file <br />
+31d_modify_gene_names.py - script to modify gene names based on N counts <br />
+31e_ReplaceWithLongerCodingRegion.py - Script to find the longest protein coding evidence with overlapping exons <br />
+31e_2_ReplaceWithLongerCodingRegion.py - Script to find the longest protein coding evidence with overlapping exons <br />
+31f_get_CuffBasedGenemodels - script to extract cufflinks based genemodels <br />
+31g_MakeGeneModelTable.py - same as 21v2_format_gff3.py <br />
 
 ### General Scripts
 100_intersect_columns.py - script to find non-overlapping entries between the two columns <br />
@@ -295,3 +301,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 115_MapFastq.py - Script to Map Fastq files <br />
 116_runGATK.py - script to run GATK analysis <br />
 117_addReadGroup.py - script to add readgroup in sam or bam file <br />
+118_gaps2bed.py - script takes a fasta file and created bed file with gap co-ordinates <br />
+129_splitIPR.py - script to split IPR file <br />
+130_shuffle_header.py - script to shuffle header of a given file <br />
+131_replace_values.py - script to replace all the values in a row <br />

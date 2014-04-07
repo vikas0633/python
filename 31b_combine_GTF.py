@@ -116,7 +116,7 @@ def find_overlap(file,chr,hash_cov,hash_aug,key,print_gene_models,gene_id):
 					temp[i]=''
 				temp_set = set(temp)
 				if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set)))  or (len(temp_set.intersection(hash_aug_set)) > 0.8*(len(temp_set))):
-					if (token[1] == 'CUFFLINKS') or  (token[1] == 'GlimmerHMM') or (token[1] == 'Augustus') or (token[1] == 'GeneMark.hmm'):
+					if (token[1] == 'GlimmerHMM') or (token[1] == 'Augustus') or (token[1] == 'GeneMark.hmm'):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
 						print line
@@ -129,6 +129,13 @@ def find_overlap(file,chr,hash_cov,hash_aug,key,print_gene_models,gene_id):
 						print line
 						
 					
+					for i in range(int(token[3]),int(token[4])+1):
+						hash[i]=''
+				
+				elif token[1] == 'CUFFLINKS': ### let cufflinks gene models pass even if low coverage or no augustus
+					ID=(line.split('=')[1]).split(';')[0]
+					gene_id[ID]=''
+					print line
 					for i in range(int(token[3]),int(token[4])+1):
 						hash[i]=''
 					
@@ -428,7 +435,7 @@ def get_size(file):
 	size = {}
 	for line in open(file,'r'):
 		line = line.strip()
-		if len(line) > 0:
+		if len(line) > 1:
 			if line[0] != '#':
 				token = line.split('\t')
 				
