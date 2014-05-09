@@ -39,23 +39,56 @@ def help():
     sys.exit(2)
 
 def options(argv):
-    global infile, prior
-    infile = ''
-    prior = ''
-    try:
-        opts, args = getopt.getopt(argv,"hi:p:",["ifile=","priority="])
-    except getopt.GetoptError:
-        help()
-    for opt, arg in opts:
-        if opt == '-h':
-            help()
-        elif opt in ("-i", "--ifile"):
-            infile = arg
-        elif opt in ("-p", "--priority"):
-            prior = arg
-            
-    logfile(infile)
-    return infile
+	global infile, prior,database, genome, cores
+	infile = ''
+	prior = ''
+	cores = 4
+	try:
+		opts, args = getopt.getopt(argv,"hi:p:d:g:c:",["ifile=","priority=","database=","genome=","cores="])
+	except getopt.GetoptError:
+		help()
+	for opt, arg in opts:
+		if opt == '-h':
+			help()
+		elif opt in ("-i", "--ifile"):
+			infile = arg
+		elif opt in ("-p", "--priority"):
+			prior = arg
+		elif opt in ("-d", "--database"):
+			database = arg
+		elif opt in ("-g", "--genome"):
+			genome = arg
+		elif opt in ("-c", "--cores"):
+			cores = arg
+	logfile(infile)
+	return infile
+
+
+def translate_dna(sequence):
+ 
+    gencode = {
+    'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M',
+    'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
+    'AAC':'N', 'AAT':'N', 'AAA':'K', 'AAG':'K',
+    'AGC':'S', 'AGT':'S', 'AGA':'R', 'AGG':'R',
+    'CTA':'L', 'CTC':'L', 'CTG':'L', 'CTT':'L',
+    'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCT':'P',
+    'CAC':'H', 'CAT':'H', 'CAA':'Q', 'CAG':'Q',
+    'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGT':'R',
+    'GTA':'V', 'GTC':'V', 'GTG':'V', 'GTT':'V',
+    'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCT':'A',
+    'GAC':'D', 'GAT':'D', 'GAA':'E', 'GAG':'E',
+    'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGT':'G',
+    'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
+    'TTC':'F', 'TTT':'F', 'TTA':'L', 'TTG':'L',
+    'TAC':'Y', 'TAT':'Y', 'TAA':'', 'TAG':'',
+    'TGC':'C', 'TGT':'C', 'TGA':'', 'TGG':'W',
+    }
+    proteinseq = ''
+    for n in range(0,len(sequence),3):
+        if gencode.has_key(sequence[n:n+3]) == True:
+			proteinseq += gencode[sequence[n:n+3]]
+    return proteinseq
 
 def parse(file,chr,hash,key,print_gene_models,gene_id):
 	for line in open(file,'r'):
@@ -110,12 +143,13 @@ def find_overlap(file,chr,hash_cov,hash_aug,key,print_gene_models,gene_id):
 		temp = {}
 		line = line.strip()
 		token = line.split('\t')
-		if len(line) > 0 and not line.startswith('#'):
+		if len(line) > 0 and not line.startswith('#') and len(token)>3:
 			if (token[1] == key) & (token[0] == chr) & (token[2] == "gene"):
 				for i in range(int(token[3]),int(token[4])+1):
 					temp[i]=''
 				temp_set = set(temp)
-				if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set)))  or (len(temp_set.intersection(hash_aug_set)) > 0.8*(len(temp_set))):
+				#if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set)))  or (len(temp_set.intersection(hash_aug_set)) > 0.8*(len(temp_set))): ### removing coverage condition
+				if True:
 					if (token[1] == 'GlimmerHMM') or (token[1] == 'Augustus') or (token[1] == 'GeneMark.hmm'):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
@@ -153,18 +187,26 @@ def find_overlap_denovo(file,chr,hash_cov,key,print_gene_models,gene_id):
 				for i in range(int(token[3]),int(token[4])+1):
 					temp[i]=''
 				temp_set = set(temp)
-				if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set))):
+				if (len(temp_set.intersection(hash_cov_set)) > 0.8*(len(temp_set))): 
 					if (token[1] == 'CUFFLINKS'):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID]=''
 						print line
-					elif (token[1] == "GlimmerHMM") or (token[1] == "Augustus"):
+					elif token[1] == "GlimmerHMM":
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID] = ''
 						ID_tokens = ID.split('.')
 						ID = 'model'+'.'+'.'.join(ID_tokens[1:])
 						gene_id[ID]=''
 						print line
+					elif token[1] == "Augustus":
+						ID=(line.split('=')[1]).split(';')[0]
+						gene_id[ID] = ''
+						ID_tokens = ID.split('.')
+						ID = 'model'+'.'+'.'.join(ID_tokens[1:])
+						gene_id[ID]=''
+						l = line.replace('gene.g','gene.g_'+chr+'_')
+						print l
 					elif (token[1] == "GeneMark.hmm"):
 						ID=(line.split('=')[1]).split(';')[0]
 						gene_id[ID] = ''
@@ -182,8 +224,9 @@ def find_overlap_denovo(file,chr,hash_cov,key,print_gene_models,gene_id):
 
 def do_blast(file,chr,hash,print_gene_models,gene_id,query):
 	flag = False
+
 	### do the blast
-	os.system('nice -n 19 blastx -db '+database+' -query temp.fa -evalue 0.0000000001 -outfmt 6 -out temp.blastout')
+	os.system('nice -n 19 blastp -num_threads '+cores+' -db '+database+' -query temp.fa -evalue 0.00000001 -outfmt 6 -out temp.blastout')
 	### get the length of the query
 	len_query=int((commands.getoutput('wc -c temp.fa')).split()[0]) - int((commands.getoutput('wc -l temp.fa')).split()[0]) - 5
 	count = sum([1 for line in open('temp.blastout')])
@@ -202,7 +245,17 @@ def do_blast(file,chr,hash,print_gene_models,gene_id,query):
 		token=line.split('\t')
 		ID=(line.split('=')[1]).split(';')[0]
 		gene_id[ID]=''
-		print line+'.homology'
+		
+		if token[1] == "Augustus":
+			ID=(line.split('=')[1]).split(';')[0]
+			gene_id[ID] = ''
+			ID_tokens = ID.split('.')
+			ID = 'model'+'.'+'.'.join(ID_tokens[1:])
+			gene_id[ID]=''
+		
+		l = line.replace('gene.g','gene.g_'+chr+'_')
+		print l+'.homology'
+		print >> sys.stderr, "Blasted:"+ID
 		for i in range(int(token[3]),int(token[4])+1):
 			hash[i]=''
 	return hash,gene_id
@@ -224,20 +277,34 @@ def homology_evidence(file,chr,hash,print_gene_models,gene_id,key):
 				if (token[2]=="gene") :
 					if new_gene == True:
 						### get the fasta file
+						
 						if int((commands.getoutput('wc -c temp.fa')).split()[0]) > 10 : ### make sure that sequence is not empty [pileup gene models have no exons]
+							dna_temp = open('dna.temp.fa','w')
+							temp_seq = ''
+							for line2 in open('temp.fa','r'):
+								line2 = line2.strip()
+								if len(line2) > 1:
+									if line2.startswith('>'):
+										dna_temp.write(line2+'\n')
+									else:
+										temp_seq += line2 
+							dna_temp.write(translate_dna(temp_seq)+'\n')
+							dna_temp.close()
+							os.system('cp dna.temp.fa temp.fa')
+							print >> sys.stderr, "Blasting: "+line 
 							hash,gene_id=do_blast(file,chr,hash,print_gene_models,gene_id,query)
 						os.system('echo ">"'+str('temp')+' >temp.fa')
 					new_gene = True
 					query = line
 				if token[2]=="exon":
-					os.system('nice -n 19 fastacmd -d '+ref_seq+' -p F -s '+token[0]+' -L '+str(token[3])+','+str(token[4]) +' | awk "NR>1" >>temp.fa')
+					os.system('nice -n 19 fastacmd -d '+genome+' -p F -s '+token[0]+' -L '+str(token[3])+','+str(token[4]) +' | awk "NR>1" >>temp.fa')
 			
 	
 	return hash,gene_id
 	
 	
 
-def gene_stru(gene_id,infile):
+def gene_stru(gene_id,infile,chr):
 	
 	### get Parent
 	def get_parent(line):
@@ -249,8 +316,8 @@ def gene_stru(gene_id,infile):
 	for line in open(infile,'r'):
 		line = line.strip()
 		token = line.split('\t')
-		if len(line) > 0:
-			if (line[0] != '#'):
+		if len(line) > 0 and not line.startswith('#'):
+			if (token[0]==chr):
 				if (token[2] == 'mRNA') or (token[2] == 'exon'):
 					if (token[1] == 'CUFFLINKS'):
 						keys = (line.split('=')[-1]).split('.')
@@ -260,7 +327,9 @@ def gene_stru(gene_id,infile):
 					elif (token[1] == 'Augustus'):
 						key = get_parent(line)
 						if key in gene_id:
-							print line
+							l = line.replace('gene.g','gene.g_'+chr+'_')
+							l = l.replace('model.g','model.g_'+chr+'_')
+							print l
 					elif (token[1] == 'GlimmerHMM'):
 						match = re.search(r'Parent=.+',line)
 						key = match.group().replace('Parent=','')
@@ -301,7 +370,9 @@ def call_gff(file,size):
 	
 	infile = file
 	for chr in sorted(size.keys()):
-	
+		
+		print >> sys.stderr, chr
+		
 		### store gene_ids
 		gene_id = {}
 		
@@ -320,6 +391,9 @@ def call_gff(file,size):
 		
 		for i in range(len(hash_priors)):
 			evidence = hash_priors[str(i+1)].strip()
+			
+			
+			
 			
 			if i != 0:
 				file = 'temp'
@@ -377,7 +451,16 @@ def call_gff(file,size):
 				filter_out(chr,hash,file)
 				
 			
-	
+			if evidence == 'Augustus':
+				### de-novo
+				### hash the Augustus co-ordinates and find overlap against coverage file and TC
+				print_gene_models = True
+				key = 'Augustus'
+				hash = {}
+				hash,gene_id = homology_evidence(file,chr,hash,print_gene_models,gene_id,key)
+				os.system('cp '+file+' temp2')
+				file = 'temp2'
+				filter_out(chr,hash,file)
 		
 			'''
 				### Homology based
@@ -426,10 +509,10 @@ def call_gff(file,size):
 			'''
 		
 		### print gene structure
-		gene_stru(gene_id,infile)
+		gene_stru(gene_id,infile,chr)
 		
 		file = infile
-
+		
 		
 def get_size(file):
 	size = {}
@@ -451,10 +534,7 @@ def get_size(file):
 if __name__ == "__main__":
 	
 	options(sys.argv[1:])
-	
-	database = 'refseq.aa.fa'
-	ref_seq = '454Scaffolds.fna'
-	
+		
 	#os.system('makeblastdb -in '+database +' >blast.temp')
 	#os.system('formatdb -i '+ref_seq+' -p F -o T'+' >blast.temp')
 	

@@ -126,7 +126,9 @@ def hash_last_gff3_CDS(chromosome):
     CDS = {}
     count = 0
     exons = {}
-    for line in open(last_gff3,'r'):
+    last_gff3_temp = last_gff3+'.temp'
+    os.system('grep '+chromosome+"'\t' "+last_gff3+' > '+ last_gff3_temp)
+    for line in open(last_gff3_temp,'r'):
         line = line.strip()
         if len(line) > 0 and not line.startswith('#'):
             ### print the lines processed
@@ -146,11 +148,14 @@ def hash_last_gff3_CDS(chromosome):
                     if ID in CDS:
                         CDS[ID] += (int(obj.ends()) - int(obj.starts()) + 1)                  
     
+    os.system('rm '+last_gff3_temp)
     return exons, CDS
 
 def find_gene_overlaps(evidences, exons_transcript, CDS_transcript, exons, CDS, chromosome):
     count = 0
-    for line in open(last_gff3,'r'):
+    last_gff3_temp = last_gff3+'.temp'
+    os.system('grep '+chromosome+"'\t' "+last_gff3+' > '+ last_gff3_temp)
+    for line in open(last_gff3_temp,'r'):
         line = line.strip()
         if len(line) > 0 and not line.startswith('#'):
             count += 1
@@ -188,14 +193,16 @@ def find_gene_overlaps(evidences, exons_transcript, CDS_transcript, exons, CDS, 
                 if larger_found == True:
                     outfile.write(evi_list[delta_CDS.index(min(delta_CDS))]+'\n')
                 
-
+    os.system('rm '+last_gff3_temp)
 
 def hash_evidences(chromosome, exons, CDS):
     evidences = {} ### hash exonic co-ordinates by evidence
     CDS_transcript = {}
     exons_transcript = {}
     count = 0
-    for line in open(evidences_gff3,'r'):
+    evidences_gff3_temp = evidences_gff3+'.temp'
+    os.system('grep '+chromosome+"'\t' "+evidences_gff3+' > '+ evidences_gff3_temp)
+    for line in open(evidences_gff3_temp,'r'):
         line = line.strip()
         count += 1
         if len(line) > 0 and not line.startswith('#'):
@@ -223,6 +230,7 @@ def hash_evidences(chromosome, exons, CDS):
                    
     
     find_gene_overlaps(evidences, exons_transcript, CDS_transcript, exons, CDS, chromosome)
+    os.system('rm '+evidences_gff3_temp)
 
 def parse(chromosome):
     

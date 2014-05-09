@@ -226,6 +226,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21bd_summerizeArrayData.py - Script to summerize the array data <br />
 21be_bMakeHeatMap.py - Script to make the heatmap <br />
 21bf_ortho2fasta.py - Script to transfer the ortholog groups to fasta files <br />
+21bg_find_fragmented_genemodels.py - Script to find fragmented genemodels <br />
 
 
 
@@ -305,3 +306,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 129_splitIPR.py - script to split IPR file <br />
 130_shuffle_header.py - script to shuffle header of a given file <br />
 131_replace_values.py - script to replace all the values in a row <br />
+132_translateDNA.py - script to convert DNA to protein <br />

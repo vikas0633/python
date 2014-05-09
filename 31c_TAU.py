@@ -440,12 +440,12 @@ def process_gff(gff,infile):
                         file = './temp'+str(count)+'/temp'+str(count)+'.cdna.fa'
                         
                         
-        
-                        if sum([1 for line1 in open(file)]) != 0:
-                            ### process transcript
-                            hedaer, cds_strand = process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
-                            save_files(last_gene_id+'.'+str(last_model_no),count,hedaer, cds_strand)
-                            o.write(exon_line)                
+                        if os.path.isfile(file):
+                            if sum([1 for line1 in open(file)]) != 0:
+                                ### process transcript
+                                hedaer, cds_strand = process_transcript(count,last_gene_id,last_gene_model,mRNA_st,mRNA_en,strand,last_model_no)
+                                save_files(last_gene_id+'.'+str(last_model_no),count,hedaer, cds_strand)
+                                o.write(exon_line)                
                         
                         #sys.exit(0)
                     new_transcript = True

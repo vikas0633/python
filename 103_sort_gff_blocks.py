@@ -87,7 +87,10 @@ def sortGFF3(file,chr):
     gene = {} ### store gene line
     mRNA_names = {}
     global count
-    for line in open(file,'r'):
+    p_ID = ''
+    file_temp = file+'.temp'
+    os.system('grep '+chr+"'\t' "+file+' > '+ file_temp)
+    for line in open(file_temp,'r'):
         line = line.strip()
         if len(line)>1:
             if line[0]!='#':
@@ -112,13 +115,16 @@ def sortGFF3(file,chr):
                         mRNA_names[match] = ''
                             
                     else:
-                        hash[p_ID] += line + '\n'
+                        if p_ID in hash:
+                            hash[p_ID] += line + '\n'
                         
     
     for key in sorted(gene_starts):
         g_ID =  gene_starts[key]
-        print gene[g_ID]
-        print hash[g_ID]
+        if g_ID in hash:
+            print gene[g_ID]
+            print hash[g_ID]
+    os.system('rm '+file_temp)
     
 if __name__ == "__main__":
     

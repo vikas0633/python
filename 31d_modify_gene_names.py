@@ -35,7 +35,7 @@ def options(argv):
     infile = ''
     gff3 = ''
     try:
-        opts, args = getopt.getopt(argv,"hg:n:",["gff3=","N_counts"])
+        opts, args = getopt.getopt(argv,"hg:n:s:",["gff3=","N_counts=","specie="])
     except getopt.GetoptError:
         print '''
             python 21ai_modify_gene_names.py 
@@ -54,9 +54,12 @@ def options(argv):
             gff3 = arg
         elif opt in ("-n", "--N_counts"):
             N_counts = arg
+        elif opt in ("-s", "--specie"):
+            specie = arg
+            
     logfile(gff3)
             
-    return gff3, N_counts
+    return gff3, N_counts,specie
     
 
 ### hash Ns in from the gap count script
@@ -77,7 +80,7 @@ def hash_Ns(ifile):
     return hash_count
         
 ### modify gene names
-def modifyGeneNames(gff3,chr, hash):
+def modifyGeneNames(gff3,chr, hash, specie):
     gene_ID_hash = {}
     count = 0
     for line in open(gff3,'r'):
@@ -124,14 +127,14 @@ def modifyGeneNames(gff3,chr, hash):
                         if flag == True:
                             ### print gene 
                             lin = '\t'.join(gene.split('\t')[0:len(gene.split('\t'))-1]) ### all information except ID
-                            lin += '\t'+"ID="+token[0].replace('scaffold','Vc')+'g'+ str(Count).zfill(5)+';Name='+token[0].replace('scaffold','Vc')+'g'+ str(Count).zfill(5)+';'
+                            lin += '\t'+"ID="+token[0].replace('scaffold',specie)+'g'+ str(Count).zfill(5)+';Name='+token[0].replace('scaffold',specie)+'g'+ str(Count).zfill(5)+';'
                             #lin += '\t'+"ID="+chr_name[token[0]]+ str(count).zfill(7)+';Type='+gene_type+';'
                             print lin
                             
                         ### print mRNA
-                        mRNA_ID = token[0].replace('scaffold','Vc')+'g'+ str(Count).zfill(5)+'.'+variant_no_mRNA
+                        mRNA_ID = token[0].replace('scaffold',specie)+'g'+ str(Count).zfill(5)+'.'+variant_no_mRNA
                         lin = '\t'.join(line.split('\t')[0:len(line.split('\t'))-1]) ### all information except ID
-                        lin += '\t'+"ID="+mRNA_ID+';Parent='+token[0].replace('scaffold','Vc')+'g'+str(Count).zfill(5)+";Name="+mRNA_ID+';'
+                        lin += '\t'+"ID="+mRNA_ID+';Parent='+token[0].replace('scaffold',specie)+'g'+str(Count).zfill(5)+";Name="+mRNA_ID+';'
                         print lin
                     
                     else:
@@ -149,7 +152,7 @@ def modifyGeneNames(gff3,chr, hash):
 
 if __name__ == "__main__":
     
-    gff3, N_counts = options(sys.argv[1:])
+    gff3, N_counts, specie = options(sys.argv[1:])
     
 
     ### hash the N counts from the file
@@ -159,7 +162,7 @@ if __name__ == "__main__":
     size = E_get_chr_size_gff3.get_size(gff3)
     for chr in sorted(size):
         ### modify gene names
-        modifyGeneNames(gff3,chr, hash)
+        modifyGeneNames(gff3,chr, hash, specie)
     
     ### close the logfile
     o.close()

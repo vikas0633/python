@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# template.py - template for python scripting               |
+# 132_translateDNA.py - script to convert DNA to protein    |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -38,24 +38,32 @@ now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 
 
-def get_size(file):
-    size = {}
-    for line in open(file,'r'):
-        line = line.strip()
-        if len(line) > 0:
-            if line[0] != '#':
-                token = line.split('\t')
-                
-                if token[0] not in size:
-                    size[token[0]] = int(token[4])
-                    
-                else:
-                    if int(token[4]) > size[token[0]]:
-                        size[token[0]] = int(token[4])
-    size_sorted={}
-    for w in sorted(size, key=size.get, reverse=False):
-        size_sorted[w]=size[w]
-    return size_sorted
+def translate_dna(sequence):
+ 
+    gencode = {
+    'ATA':'I', 'ATC':'I', 'ATT':'I', 'ATG':'M',
+    'ACA':'T', 'ACC':'T', 'ACG':'T', 'ACT':'T',
+    'AAC':'N', 'AAT':'N', 'AAA':'K', 'AAG':'K',
+    'AGC':'S', 'AGT':'S', 'AGA':'R', 'AGG':'R',
+    'CTA':'L', 'CTC':'L', 'CTG':'L', 'CTT':'L',
+    'CCA':'P', 'CCC':'P', 'CCG':'P', 'CCT':'P',
+    'CAC':'H', 'CAT':'H', 'CAA':'Q', 'CAG':'Q',
+    'CGA':'R', 'CGC':'R', 'CGG':'R', 'CGT':'R',
+    'GTA':'V', 'GTC':'V', 'GTG':'V', 'GTT':'V',
+    'GCA':'A', 'GCC':'A', 'GCG':'A', 'GCT':'A',
+    'GAC':'D', 'GAT':'D', 'GAA':'E', 'GAG':'E',
+    'GGA':'G', 'GGC':'G', 'GGG':'G', 'GGT':'G',
+    'TCA':'S', 'TCC':'S', 'TCG':'S', 'TCT':'S',
+    'TTC':'F', 'TTT':'F', 'TTA':'L', 'TTG':'L',
+    'TAC':'Y', 'TAT':'Y', 'TAA':'_', 'TAG':'_',
+    'TGC':'C', 'TGT':'C', 'TGA':'_', 'TGG':'W',
+    }
+ 
+    proteinseq = ''
+    for n in range(0,len(sequence),3):
+        if gencode.has_key(sequence[n:n+3]) == True:
+            proteinseq += gencode[sequence[n:n+3]]
+    return proteinseq
 
 
 ### write logfile
@@ -68,49 +76,51 @@ def logfile(infile):
     
 def help():
     print '''
-            python 100b_fasta2flat.py -i <ifile>
+            python 132_translateDNA.py -i <ifile> -o <ofile>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    global infile, gff3
-    infile = ''
-    gff3 = ''
+    global ifile, ofile
+    ifile = ''
+    ofile = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:g:",["ifile=","gff3="])
+        opts, args = getopt.getopt(argv,"hi:o:",["ifile=","ofile="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h':
             help()
         elif opt in ("-i", "--ifile"):
-            infile = arg
-        elif opt in ("-g", "--gff3"):
-            gff3 = arg
+            ifile = arg
+        elif opt in ("-o", "--ofile"):
+            ofile = arg
             
-    logfile(infile)
-    
+    logfile(ifile)
+
+def readFile():
+    dna_temp = open(ofile,'w')
+    temp_seq = ''
+    for line2 in open(ifile,'r'):
+        line2 = line2.strip()
+        if len(line2) > 1:
+            print line2
+            if line2.startswith('>'):
+                dna_temp.write(line2+'\n')
+            else:
+                temp_seq += line2 
+    dna_temp.write(translate_dna(temp_seq)+'\n')
+    dna_temp.close()
         
 
 if __name__ == "__main__":
     
-    file = options(sys.argv[1:])
+    options(sys.argv[1:])
     
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
-    
-    ### multithreading
-    thread_list = []
-    count = 0
-    for chromosome in sorted(chroHash):
-        count += 1
-        t = Process(target=find_avg_gene_density, args=(chromosome,count,))
-        t.start()
-        thread_list.append(t)
-    for thread in thread_list:
-        thread.join()
+    ### translate DNA
+    readFile()
     
     ### close the logfile
     o.close()
