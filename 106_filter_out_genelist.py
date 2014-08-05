@@ -116,6 +116,7 @@ def filter_gff3(infile, keys):
     for line in open(infile):
         if len(line) > 1:
             if line[0] != '#':
+                line = line.strip()
                 token = line.split('\t')
                 if token[2] == "gene":
                     id = get_ID(line)

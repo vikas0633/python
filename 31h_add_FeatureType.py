@@ -1,10 +1,10 @@
 #-----------------------------------------------------------+
 #                                                           |
-# template.py - Python template                             |
+# 31h_add_FeatureType.py - script to modify GFF3 second column   |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
-# AUTHOR: Vikas Gupta                                        |
+# AUTHOR: Vikas Gupta                                       |
 # CONTACT: vikas0633@gmail.com                              |
 # STARTED: 09/06/2013                                       |
 # UPDATED: 09/06/2013                                       |
@@ -25,11 +25,6 @@
 ### import modules
 import os,sys,getopt, re
 
-import threading
-
-from multiprocessing import Process, Queue, Manager
-from threading import Thread
-import classGene
 ### global variables
 global infile
 
@@ -37,29 +32,6 @@ global infile
 import datetime
 now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
-
-
-print 'Input GFF3 file must be sorted '
-
-def get_size(file):
-    size = {}
-    for line in open(file,'r'):
-        line = line.strip()
-        if len(line) > 0:
-            if line[0] != '#':
-                token = line.split('\t')
-                
-                if token[0] not in size:
-                    size[token[0]] = int(token[4])
-                    
-                else:
-                    if int(token[4]) > size[token[0]]:
-                        size[token[0]] = int(token[4])
-    size_sorted={}
-    for w in sorted(size, key=size.get, reverse=False):
-        size_sorted[w]=size[w]
-    return size_sorted
-
 
 ### write logfile
 
@@ -71,19 +43,18 @@ def logfile(infile):
     
 def help():
     print '''
-            python 100b_fasta2flat.py -i <ifile>
+            python 31h_add_FeatureType.py -i <ifile>
             '''
     sys.exit(2)
 
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile
     infile = ''
-    threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:m:t:",["ifile=","max_dist=","threads="])
+        opts, args = getopt.getopt(argv,"hi:",["ifile="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -91,46 +62,33 @@ def options(argv):
             help()
         elif opt in ("-i", "--ifile"):
             infile = arg
-        elif opt in ("-t", "--threads"):
-            threads = int(arg)
             
-    
     logfile(infile)
             
-    
+
+def reaplce_feature():
+    out = open(infile+'.biotype','w')
+    for line in open(infile,'r'):
+        line = line.strip()
+        if len(line) > 0 and not line.startswith('#'):
+            tokens = line.split('\t')
+            if re.search(r'Type2="NULL"',line):
+                out.write(tokens[0]+'\t'+'processed_transcript'+'\t'+'\t'.join(tokens[2:])+';\n')
+            elif re.search(r'Type2="repeat"',line):
+                out.write(tokens[0]+'\t'+'processed_transcript'+'\t'+'\t'.join(tokens[2:])+';\n')
+            elif re.search(r'Type2="protein_coding"',line):
+                out.write(tokens[0]+'\t'+'protein_coding'+'\t'+'\t'.join(tokens[2:])+';\n')
+            else:
+                sys.exit('Correct type not found' + line)
+    out.close()
 
 if __name__ == "__main__":
     
 
-    file = options(sys.argv[1:])
+    options(sys.argv[1:])
     
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
-    
-    '''
-    print 'Chromosome sizes based on the GFF3 file are: '
-    for chro in sorted(chroHash):
-        print chro, chroHash[chro]
-    ''' 
         
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
+    reaplce_feature()
      
     o.close()
     

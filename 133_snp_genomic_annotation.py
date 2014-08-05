@@ -1,6 +1,6 @@
 #-----------------------------------------------------------+
 #                                                           |
-# template.py - Python template                             |
+# 133_snp_genomic_annotation.py - script to calculate the snps genomic distribution               |
 #                                                           |
 #-----------------------------------------------------------+
 #                                                           |
@@ -22,14 +22,14 @@
 # Example:
 # python ~/script/python/100b_fasta2flat.py -i 02_Stegodyphous_cdna.refined.fa.orf.tr_longest_frame
 
+
 ### import modules
 import os,sys,getopt, re
-
 import threading
+import classGene
 
 from multiprocessing import Process, Queue, Manager
 from threading import Thread
-import classGene
 ### global variables
 global infile
 
@@ -38,8 +38,6 @@ import datetime
 now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 
-
-print 'Input GFF3 file must be sorted '
 
 def get_size(file):
     size = {}
@@ -78,12 +76,11 @@ def help():
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, gff3
     infile = ''
-    threads = 2
-    
+    gff3 = ''
     try:
-        opts, args = getopt.getopt(argv,"hi:m:t:",["ifile=","max_dist=","threads="])
+        opts, args = getopt.getopt(argv,"hi:g:",["ifile=","gff3="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -91,46 +88,96 @@ def options(argv):
             help()
         elif opt in ("-i", "--ifile"):
             infile = arg
-        elif opt in ("-t", "--threads"):
-            threads = int(arg)
+        elif opt in ("-g", "--gff3"):
+            gff3 = arg
             
-    
     logfile(infile)
-            
-    
 
+def hash_GFF3(chromosome):
+    
+    count = 0
+    coords = {}
+    for line in open(gff3,'r'):
+        line = line.strip()
+        if len(line) > 0 and not line.startswith('#'):
+            obj = classGene.GFF3(line)
+            if obj.seqids() == chromosome:
+                count += 1
+                if count%1000 == 0:
+                    print 'Number of lines processed: ', chromosome, '{:9,.0f}'.format(count)
+                for i in range(int(obj.starts()), int(obj.ends())+1):
+                    if obj.types()=='mRNA':
+                        coords[i] = 'mRNA'
+                    if obj.types()=='exon':
+                        coords[i] = 'exon'
+                    if obj.types()=='CDS':
+                        coords[i] = 'CDS'                        
+    return coords
+
+    
+def annotate_snp(chromosome, snp_count):
+    
+    coords = hash_GFF3(chromosome)
+    
+    genic = 0
+    exonic = 0
+    cds = 0
+    utr = 0
+    intronic = 0
+    intergenic = 0
+    
+    count = 0
+    for line in open(infile,'r'):
+        line = line.strip()
+        if len(line) > 0 and not line.startswith('#'):
+            token = line.split()
+            if token[0] == chromosome:
+                count += 1
+                if count%1000 == 0:
+                    print 'Number of lines processed: ', chromosome, '{:9,.0f}'.format(count)
+                if int(token[1]) in coords:
+                    genic += 1
+                    
+                    if coords[int(token[1])] == 'CDS':
+                        cds += 1
+                        exonic += 1
+                        
+                    elif coords[int(token[1])] == 'exon':
+                        exonic += 1
+                        utr += 1
+                    
+                    else:
+                        intronic += 1
+                    
+                else:
+                    intergenic += 1
+            
+    snp_count[chromosome] =  str(genic) + '\t' + str(exonic) + '\t' + str(cds) + '\t' + str(utr) + '\t' + str(intronic) + '\t' + str(intergenic)     
+    
 if __name__ == "__main__":
     
-
     file = options(sys.argv[1:])
     
     print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
+    chroHash = get_size(gff3)
     
-    '''
-    print 'Chromosome sizes based on the GFF3 file are: '
-    for chro in sorted(chroHash):
-        print chro, chroHash[chro]
-    ''' 
-        
-    ### multithreading        
+    ### multithreading
     thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
+    manager = Manager()
+    snp_count = manager.dict()
+    for chromosome in sorted(chroHash):
+        t = Process(target=annotate_snp, args=(chromosome,snp_count))
+        t.start()
+        thread_list.append(t)
+    for thread in thread_list:
+        thread.join()
     
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
+    snp_count = dict(snp_count)
+    
+    ### print results
+    print 'chromosome'+'\t'+'genic' + '\t' + 'exonic' + '\t' + 'cds' + '\t' + 'utr' + '\t' + 'intronic' + '\t' + 'intergenic'
+    for chro in snp_count:
+        print chro+'\t'+snp_count[chro]
+    
+    ### close the logfile
     o.close()
-    

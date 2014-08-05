@@ -281,6 +281,8 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 31e_2_ReplaceWithLongerCodingRegion.py - Script to find the longest protein coding evidence with overlapping exons <br />
 31f_get_CuffBasedGenemodels - script to extract cufflinks based genemodels <br />
 31g_MakeGeneModelTable.py - same as 21v2_format_gff3.py <br />
+31h_add_FeatureType.py - script to modify GFF3 second column <br />
+31i_FixBoundries.py - script to modify GFF3 feature boundries <br />
 
 ### General Scripts
 100_intersect_columns.py - script to find non-overlapping entries between the two columns <br />
@@ -307,3 +309,4 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 130_shuffle_header.py - script to shuffle header of a given file <br />
 131_replace_values.py - script to replace all the values in a row <br />
 132_translateDNA.py - script to convert DNA to protein <br />
+133_snp_genomic_annotation.py - script to calculate the snps genomic distribution <br />

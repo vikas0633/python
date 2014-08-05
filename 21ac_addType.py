@@ -82,9 +82,9 @@ def load_elements(inf,hash):
 					match = get_ID(line)
 					match = match.replace('mrna','path')
 					if g_id in elements:
-						elements[g_id] += line + ';Type="'+hash[match]+'"\n'
+						elements[g_id] += line + ';Type2="'+hash[match]+'"\n'
 					else:
-						elements[g_id] = line + ';Type="'+hash[match]+'"\n'
+						elements[g_id] = line + ';Type2="'+hash[match]+'"\n'
 				else:
 					match = get_ID(line)
 					match = match.replace('mrna','path')
@@ -94,12 +94,12 @@ def load_elements(inf,hash):
 						hash[match] = 'protein_coding'
 					
 					if g_id in elements:
-						elements[g_id] += line +';Type="'+hash[match]+'"\n'
+						elements[g_id] += line +';Type2="'+hash[match]+'"\n'
 					else:
-						elements[g_id] = line +';Type="'+hash[match]+'"\n'
+						elements[g_id] = line +';Type2="'+hash[match]+'"\n'
 				hash[g_id] = hash[match]
 			if (token[2] != "gene") & (token[2] != "mRNA"):
-				elements[g_id] += line +';Type="'+hash[match]+'"\n'
+				elements[g_id] += line +';Type2="'+hash[match]+'"\n'
 	return elements
 	
 def write_elements(inf,elements):
@@ -112,9 +112,9 @@ def write_elements(inf,elements):
 				g_id = get_ID(line)
 				if g_id in elements:
 					if line[-1] != ';':
-						print line + ';Type="'+hash[g_id]+'"'
+						print line + ';Type2="'+hash[g_id]+'"'
 					else:
-						print line + 'Type="'+hash[g_id]+'"'
+						print line + 'Type2="'+hash[g_id]+'"'
 					print elements[g_id]
 
 if __name__ == "__main__":

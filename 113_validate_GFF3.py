@@ -187,6 +187,11 @@ def parse(gff3):
                 ### hash gene names
                 if obj.types() == "gene":
                     data[str(obj)] = line
+                    
+                    ### hash gene coords
+                    gene_coord = {}
+                    for i in range(int(obj.starts()), int(obj.ends())+1):
+                        gene_coord[i] = ''
                     if str(obj) in gene_names:
                         print 'Error at line'
                         print line
@@ -196,6 +201,18 @@ def parse(gff3):
 
                 ### check orphans and hash mRNA names
                 elif obj.types() == "mRNA":
+                    
+                    ### hash mRNA coords
+                    mRNA_coord = {}
+                    for i in range(int(obj.starts()), int(obj.ends())+1):
+                        mRNA_coord[i] = ''
+                        
+                    ### check if mRNA coords are within gene
+                    
+                    if int(obj.starts()) not in gene_coord or int(obj.ends()) not in gene_coord:
+                        print 'Error at line'
+                        print line
+                        sys.exit('Wrong coords nesting '+get_ID(line))
                     p_ID = get_PARENT(line)
                     if p_ID not in gene_names:
                         print 'Error at line'
@@ -210,6 +227,10 @@ def parse(gff3):
                         mRNA_names[str(obj)] = ''
                     
                 else:
+                    if int(obj.starts()) not in mRNA_coord or int(obj.ends()) not in mRNA_coord:
+                        print 'Error at line'
+                        print line
+                        sys.exit('Wrong coords nesting '+get_ID(line))
                     p_ID = get_PARENT(line)
                     if p_ID not in mRNA_names:
                         print 'Error at line'
@@ -334,8 +355,11 @@ if __name__ == "__main__":
     ### parse GFF3 file
     parse(gff3)
     
+    
+    
     ### get the statistics
     get_statistics(gff3)
+    
     
     ### get the statistics
     print "\nYour GFF3 file has passed Vikas Gupta's completeness check\n"
