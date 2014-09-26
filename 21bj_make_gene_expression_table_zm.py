@@ -79,12 +79,12 @@ def temp(file):
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, threads, corr
     infile = ''
     threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:t:c:",["infile=","threads=","corr="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -94,19 +94,29 @@ def options(argv):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
+        elif opt in ("-c", "--corr"):
+            corr = arg
             
     
     logfile(infile)
+
+def print_expression():
+    global header
+    gene_ID = {}
+    first_line = True
+    for line in open(infile,'r'):
+        if first_line == False:
+            line = line.strip()
+            tokens = line.split('\t')
             
-    
+            print tokens[0].replace('_FGT','_FGP').replace('_T','_P')+'\t'+'\t'.join(tokens[1:])
+        else:
+            print line.strip()
+        first_line = False 
 
 if __name__ == "__main__":
-    
 
     options(sys.argv[1:])
-    
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
     
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
@@ -114,26 +124,5 @@ if __name__ == "__main__":
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
-
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
     
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
-    
+    print_expression()

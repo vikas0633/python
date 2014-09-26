@@ -39,26 +39,6 @@ now = datetime.datetime.now()
 o = open(str(now.strftime("%Y-%m-%d_%H%M."))+'logfile','w')
 
 
-def get_size(file):
-    size = {}
-    for line in open(file,'r'):
-        line = line.strip()
-        if len(line) > 0:
-            if line[0] != '#':
-                token = line.split('\t')
-                
-                if token[0] not in size:
-                    size[token[0]] = int(token[4])
-                    
-                else:
-                    if int(token[4]) > size[token[0]]:
-                        size[token[0]] = int(token[4])
-    size_sorted={}
-    for w in sorted(size, key=size.get, reverse=False):
-        size_sorted[w]=size[w]
-    return size_sorted
-
-
 ### write logfile
 
 def logfile(infile):
@@ -79,12 +59,12 @@ def temp(file):
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, threads, corr
     infile = ''
     threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:t:c:",["infile=","threads=","corr="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -94,19 +74,53 @@ def options(argv):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
+        elif opt in ("-c", "--corr"):
+            corr = arg
             
     
     logfile(infile)
             
+
+def Load_Expression():
+    global header
+    data = {}
+    first_line = True
+    for line in open(infile, 'r'):
+        if first_line == True:
+            header = line.strip()
+        else:    
+            line = line.strip()
+            tokens = line.split('\t')
+            data[tokens[0]] = '\t'.join(tokens[1:])
+        first_line = False
+    return data
+
+def print_expression(data):
+    global header
+    gene_ID = {}
+    first_line = True
+    for line in open(corr,'r'):
+        if first_line == False:
+            line = line.strip()
+            tokens = line.split('\t')
+            try:
+                for i in tokens[2].split(';'):
+                    if tokens[0] in data: 
+                        gene_ID[i] = tokens[0]
+            except:
+                continue
+        first_line = False 
     
+    print "Gene_Id\tProbe_Id\t"+header
+    for key in sorted(gene_ID):
+        try:
+            print key+'\t'+gene_ID[key]+'\t'+data[gene_ID[key]]
+        except:
+            continue
 
 if __name__ == "__main__":
-    
 
     options(sys.argv[1:])
-    
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
     
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
@@ -114,26 +128,8 @@ if __name__ == "__main__":
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
-
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
     
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
+    ### load the expression data
+    data = Load_Expression()
     
+    print_expression(data)

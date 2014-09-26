@@ -227,7 +227,7 @@ gff_to_genbank.py - Convert a GFF and associated FASTA file into GenBank format 
 21be_bMakeHeatMap.py - Script to make the heatmap <br />
 21bf_ortho2fasta.py - Script to transfer the ortholog groups to fasta files <br />
 21bg_find_fragmented_genemodels.py - Script to find fragmented genemodels <br />
-
+21bi_search_blast.py - Script to blast a list of genes against a database and back <br />
 
 
 ### Transcripts Handlers

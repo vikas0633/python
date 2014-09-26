@@ -1,3 +1,5 @@
+
+
 #-----------------------------------------------------------+
 #                                                           |
 # template.py - Python template                             |
@@ -69,12 +71,9 @@ def logfile(infile):
     
 def help():
     print '''
-            python 100b_fasta2flat.py -i <infile>
+            python 100b_fasta2flat.py -i <ifile>
             '''
     sys.exit(2)
-
-def temp(file):
-    return
 
 ### main argument to 
 
@@ -84,56 +83,60 @@ def options(argv):
     threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:m:t:",["ifile=","max_dist=","threads="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
         if opt == '-h':
             help()
-        elif opt in ("-i", "--infile"):
+        elif opt in ("-i", "--ifile"):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
             
     
     logfile(infile)
+
+## get PARENT ID
+def get_PARENT(line):
+    line = line.strip()
+    match = re.search(r'Parent=.+',line)
+    if match:
+        return match.group().split(';')[0].replace('Parent=','')
+    else:
+        print 'Error at line'
+        print line
+        sys.exit('Parent ID is missing in the attributes')        
+
+    
+def print_intron(file):
+    last_parent_ID = ''
+    last_end = ''
+    
+    for line in open(file,'r'):
+        line = line.strip()
+        if len(line) > 1 and not line.startswith('#'):
+            obj = classGene.GFF3(line)
             
+            if obj.types() == 'exon':
+                if  last_parent_ID == get_PARENT(line):
+                    print abs(last_end - int(obj.starts()))
+                last_parent_ID = get_PARENT(line)
+                last_end = int(obj.ends())
     
 
 if __name__ == "__main__":
     
 
     options(sys.argv[1:])
-    
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
-    
-    start_time = datetime.datetime.now()
-    print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
-    print >> sys.stderr, "Input count: " + str(temp(infile))
-    print >> sys.stderr, "Output count: " + str(temp(infile))
-    print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
-    print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
+    print_intron(infile)    
     
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
+    '''
+    print 'Chromosome sizes based on the GFF3 file are: '
+    for chro in sorted(chroHash):
+        print chro, chroHash[chro]
+    ''' 
      
     o.close()
     

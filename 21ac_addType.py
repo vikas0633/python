@@ -69,6 +69,7 @@ def load_elements(inf,hash):
 	for line in open(inf,'r'):
 		line = line.strip()
 		line = line.split('Type=')[0] ## remove type if present
+		line = line.split('Type2')[0]
 		
 		### find parent name
 		token = line.split('\t')
@@ -97,7 +98,11 @@ def load_elements(inf,hash):
 						elements[g_id] += line +';Type2="'+hash[match]+'"\n'
 					else:
 						elements[g_id] = line +';Type2="'+hash[match]+'"\n'
-				hash[g_id] = hash[match]
+				if g_id not in hash:	
+					hash[g_id] = hash[match]
+				elif hash[g_id] != "protein_coding":
+					hash[g_id] = hash[match]
+			
 			if (token[2] != "gene") & (token[2] != "mRNA"):
 				elements[g_id] += line +';Type2="'+hash[match]+'"\n'
 	return elements
@@ -105,6 +110,7 @@ def load_elements(inf,hash):
 def write_elements(inf,elements):
 	for line in open(inf,'r'):
 		line = line.strip()
+		line = line.split('Type2')[0]
 		### find parent name
 		token = line.split('\t')
 		if len(token) > 3:

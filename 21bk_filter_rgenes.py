@@ -97,43 +97,56 @@ def options(argv):
             
     
     logfile(infile)
-            
-    
 
+def test_query():
+    found = False
+    if fixed_key.lower() in short_names:
+        for key in optional_keys:
+            if found == False:
+                for item in short_names:
+                    if (item.lower()).startswith(key.lower()):
+                        print last_query
+                        found = True
+                        break
+
+def filter_genes():
+    global short_names, last_query, last_line
+    last_query = ''
+    short_names = {}
+    first_time = True
+    for line in open(infile, 'r'):
+        line = line.strip()
+        
+        if len(line) > 0 and not line.startswith('#') and not line.startswith('Query'):
+            current_query = line.split('[')[1].split(']')[0]
+            tokens= line.split('\t')
+            
+            if current_query != last_query:
+                if first_time == False:
+                    test_query()
+                first_time = False
+                short_names = []
+                short_names.append(tokens[8].lower())
+            else:
+                short_names.append(tokens[8].lower())
+            last_query = current_query
+            last_line = line
+    test_query()
+    
 if __name__ == "__main__":
     
-
+    global fixed_key, optional_keys
     options(sys.argv[1:])
     
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
+    fixed_key = 'NB-ARC'
+    optional_keys = ['LRR', 'TIR', 'PLN00113', 'PLN03194', 'PLN03210']
     
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Input count: " + str(temp(infile))
+    
+    filter_genes()
+    
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
-
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
-    

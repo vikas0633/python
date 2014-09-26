@@ -450,7 +450,7 @@ def call_gff(file,size):
 				file = 'temp2'
 				filter_out(chr,hash,file)
 				
-			
+			'''
 			if evidence == 'Augustus':
 				### de-novo
 				### hash the Augustus co-ordinates and find overlap against coverage file and TC
@@ -461,7 +461,8 @@ def call_gff(file,size):
 				os.system('cp '+file+' temp2')
 				file = 'temp2'
 				filter_out(chr,hash,file)
-		
+			'''
+			
 			'''
 				### Homology based
 				#os.system('touch protein_match.gff3')

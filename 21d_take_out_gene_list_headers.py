@@ -10,22 +10,24 @@ def fasta_len(file):
 				if first_line == False:
 					seq[header] = sq
 				sq = ''
-				header = line[1:].split(' ')[0]
+				header = line[1:].split()[0]
 			else:
 				sq += line
 		first_line = False			
 	seq[header] = sq
-	
 	return seq
 
 def extract_seq(file,header_file,seq):
 	o=open(header_file+'.fa','w')
+	count = 0
 	for line in open(header_file,'r'):
 		line = line.strip()
 		if len(line) > 0 and not line.startswith('#'):
-			header = line.strip()	
+			header = line.strip().split()[0]	
 			header = header.replace(' ','').replace('>','')
+			count += 1
 			if header in seq:
+				print str(count)+'. '+header
 				o.write('>'+header+'\n')
 				o.write(seq[header]+'\n')
 				
