@@ -157,7 +157,7 @@ def print_rgb():
                 elif value >= 2:
                     r, g, b  = col[2]
                     at_up += 1
-                print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Lotus
             if tokens[1].startswith('Lotus'):
                 if value <= -2 :
@@ -217,7 +217,7 @@ def print_rgb():
                 elif value >= 1:
                     r, g, b  = col[2]
                     os_up += 1
-                print 'prefix\t' + tokens[0][:-1] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0][:-1] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Maize
             if tokens[1].startswith('Maize'):
                 if value <= -0.5 :
@@ -234,7 +234,7 @@ def print_rgb():
                     zm_up += 1
             
                 #r, g, b = convert_to_rgb(min_value, max_value, value, colors)
-                print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
                 
             ### Lupin
             if tokens[1].startswith('Lupin'):
@@ -270,7 +270,7 @@ def print_rgb():
                     la_up += 1
             
                 #r, g, b = convert_to_rgb(min_value, max_value, value, colors)
-                print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
                 
 
     print >> sys.stderr, "at_down :"+str(at_down)
