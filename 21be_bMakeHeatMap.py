@@ -137,6 +137,7 @@ def hash_anno():
 
 def printOut(samples, ArrayHash, BlastHash, AnnoHash):
     SampleDict = {}
+    gene_id_hash = {}
     '''
     for line in open(SampleList, 'r'):
         line = line.strip()
@@ -144,37 +145,41 @@ def printOut(samples, ArrayHash, BlastHash, AnnoHash):
     '''
     ### print output to a file
     o = open(GeneList+'.arrayData', 'w')
-    header = '\t'.join([samples[3*i+1] for i in range(len(samples)/3)])
-    o.write('ProbeID\t'+'Annotation\t'+header+'\n')
+    #header = '\t'.join([samples[3*i+1] for i in range(len(samples)/3)])
+    header = '\t'.join(samples)
+    o.write('GeneID\t'+'Annotation\t'+header+'\n')
     for line in open(GeneList, 'r'):
         line = line.strip()
         if len(line) > 0 and not line.startswith('#'):
             gene_id = line.split()[0]
-            
-            if gene_id in BlastHash:
-                if UseAvg == False:
-                    for i in range(len(BlastHash[gene_id])):
-                        probe_id = BlastHash[gene_id][i]
-                        #o.write(gene_id+'.'+str(i+1)+'_'+probe_id+'\n')
-                        o.write(gene_id+'.'+str(i+1)+'_'+probe_id+'\t'+'\t'.join(ArrayHash[probe_id])+'\n')
-                
+            if gene_id not in gene_id_hash:
+                gene_id_hash[gene_id] = ''
+                if gene_id in BlastHash:
+                    if UseAvg == False:
+                        for i in range(len(BlastHash[gene_id])):
+                            probe_id = BlastHash[gene_id][i]
+                            #o.write(gene_id+'.'+str(i+1)+'_'+probe_id+'\n')
+                            o.write(gene_id+'\t'+AnnoHash[gene_id]+'\t'+'\t'.join(ArrayHash[probe_id])+'\n')
+                            break ### keep only one probe
+                    
+                    else:
+                        high_std = False
+                        probe_id = BlastHash[gene_id][0]
+                        avg = [0 for i in range(len(ArrayHash[probe_id])/3)]
+                        for i in range(len(BlastHash[gene_id])):
+                            probe_id = BlastHash[gene_id][i]
+                            for j in range(len(avg)):
+                                
+                                ### check for standard deviation
+                                #if float(ArrayHash[probe_id][3*j+2])/float(ArrayHash[probe_id][3*j+1]) < 0.2:
+                                avg[j] += float(ArrayHash[probe_id][3*j+1])
+                                break ### keep only one probe
+                                
+                            #print ArrayHash[probe_id][3*0+1], avg[0], len(BlastHash[gene_id])
+                        avg = [str(round(avg[i]/float(len(BlastHash[gene_id])),2)) for i in range(len(avg))]
+                        o.write(gene_id+'\t'+AnnoHash[gene_id]+'\t'+'\t'.join(avg)+'\n')
                 else:
-                    high_std = False
-                    probe_id = BlastHash[gene_id][0]
-                    avg = [0 for i in range(len(ArrayHash[probe_id])/3)]
-                    for i in range(len(BlastHash[gene_id])):
-                        probe_id = BlastHash[gene_id][i]
-                        for j in range(len(avg)):
-                            
-                            ### check for standard deviation
-                            #if float(ArrayHash[probe_id][3*j+2])/float(ArrayHash[probe_id][3*j+1]) < 0.2:
-                            avg[j] += float(ArrayHash[probe_id][3*j+1])
-                            
-                        #print ArrayHash[probe_id][3*0+1], avg[0], len(BlastHash[gene_id])
-                    avg = [str(round(avg[i]/float(len(BlastHash[gene_id])),2)) for i in range(len(avg))]
-                    o.write(gene_id+'\t'+AnnoHash[gene_id]+'\t'+'\t'.join(avg)+'\n')
-            else:
-                print "GeneID not found: ", gene_id 
+                    print "GeneID not found: ", gene_id 
     o.close()
     
     

@@ -67,7 +67,7 @@ def help():
 
 def options(argv):
     global GeneList, SampleList, ArrayData, BlastResults, UseAvg, anno
-    UseAvg = True
+    UseAvg = False
     ifile = ''
     try:
         opts, args = getopt.getopt(argv,"hg:s:d:b:ia:",["GeneList=","SampleList=","ArrayData=","BlastResults=","IndProbe","anno="])
@@ -144,7 +144,8 @@ def printOut(samples, ArrayHash, BlastHash, AnnoHash):
     '''
     ### print output to a file
     o = open(GeneList+'.arrayData', 'w')
-    header = '\t'.join([samples[3*i+1] for i in range(len(samples)/3)])
+    #header = 'GeneID\t'+ '\t'.join([samples[3*i+1] for i in range(len(samples)/3)])
+    header = 'GeneID\t'+ '\t'.join(samples)
     o.write(header+'\n')
     for line in open(GeneList, 'r'):
         line = line.strip()
