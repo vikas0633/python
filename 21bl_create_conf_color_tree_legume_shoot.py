@@ -149,105 +149,105 @@ def print_rgb():
             
             ### Arabidopsis
             if tokens[1].startswith('Arabidopsis'):
-                if value <= 3 :
+                if value <= -2 :
                     r, g, b  = col[0]
                     at_down += 1
-                elif 3 <= value < 7:
+                elif -2 <= value < 2:
                     r, g, b  = col[1]
-                elif value >= 7:
+                elif value >= 2:
                     r, g, b  = col[2]
                     at_up += 1
-                print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Lotus
             if tokens[1].startswith('Lotus'):
-                if value <= 2.5 :
+                if value <= -2 :
                     r, g, b  = col[0]
                     lj_down += 1
-                elif 2.5 <= value < 3:
+                elif -2 <= value < - 0.5:
                     r, g, b  = col[3]
-                elif 3 <= value < 3.5:
+                elif -0.5 <= value < 0.5:
                     r, g, b  = col[1]
-                elif 3.5 <= value < 4:
+                elif 0.5 <= value < 2:
                     r, g, b  = col[4]
-                elif value >= 4:
+                elif value >= 2:
                     r, g, b  = col[2]
                     lj_up += 1
                 print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Soybean
             if tokens[1].startswith('Soybean'):
-                if value <= 1 :
+                if value <= -0.5 :
                     r, g, b  = col[0]
                     gm_down += 1
-                elif 1 <= value < 1.5:
+                elif -0.5 <= value < -0.15:
                     r, g, b  = col[3]
-                elif 1.5 <= value < 2.0:
+                elif -0.15 <= value < 0.15:
                     r, g, b  = col[1]
-                elif 2.0 <= value < 2.5:
+                elif 0.15 <= value < 0.5:
                     r, g, b  = col[4]
-                elif value >= 2.5:
+                elif value >= 0.5:
                     r, g, b  = col[2]
                     gm_up += 1
                 print 'prefix\t' + tokens[0][:-1] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Medicago
             if tokens[1].startswith('Medicago'):
-                if value <= 0.5 :
+                if value <= -0.5 :
                     r, g, b  = col[0]
                     mt_down += 1
-                elif 0.5 <= value < 1.5:
+                elif -0.5 <= value < -0.15:
                     r, g, b  = col[3]
-                elif 1.5 <= value < 1.75:
+                elif -0.15 <= value < 0.15:
                     r, g, b  = col[1]
-                elif 1.75 <= value < 2:
+                elif 0.15 <= value < 0.5:
                     r, g, b  = col[4]
-                elif value >= 2:
+                elif value >= 0.5:
                     r, g, b  = col[2]
                     mt_up += 1
                 print 'contain\t' + tokens[0].split('|')[1][:-1] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Rice
             if tokens[1].startswith('Rice'):
-                if value <= 2.5 :
+                if value <= -1 :
                     r, g, b  = col[0]
                     os_down += 1
-                elif 2.5 <= value < 6.0:
+                elif -1 <= value < -0.5:
                     r, g, b  = col[3]
-                elif 6.0 <= value < 7.5:
+                elif -0.5 <= value < 0.5:
                     r, g, b  = col[1]
-                elif 7.5 <= value < 9:
+                elif 0.5 <= value < 1:
                     r, g, b  = col[4]
-                elif value >= 9:
+                elif value >= 1:
                     r, g, b  = col[2]
                     os_up += 1
-                print 'prefix\t' + tokens[0][:-1] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0][:-1] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Maize
             if tokens[1].startswith('Maize'):
-                if value <= 6 :
+                if value <= -0.5 :
                     zm_down += 1
                     r, g, b  = col[0]
-                elif 6 <= value < 8:
+                elif -0.5 <= value < -0.25:
                     r, g, b  = col[3]
-                elif 8 <= value < 10:
+                elif -0.25 <= value < 0.25:
                     r, g, b  = col[1]
-                elif 10 <= value < 12:
+                elif 0.25 <= value < 0.5:
                     r, g, b  = col[4]
-                elif value >= 12:
+                elif value >= 0.5:
                     r, g, b  = col[2]
                     zm_up += 1
             
                 #r, g, b = convert_to_rgb(min_value, max_value, value, colors)
-                print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
                 
             ### Lupin
             if tokens[1].startswith('Lupin'):
-                if value <= -1 :
+                if value <= -2.5 :
                     la_down += 1
                     r, g, b  = col[0]
-                elif -1 <= value < 0:
+                elif -2.5 <= value < -1:
                     r, g, b  = col[3]
-                elif 0 <= value < 1.5:
+                elif -1 <= value < 1:
                     r, g, b  = col[1]
-                elif 1.5 <= value < 2:
+                elif 1 <= value < 2.5:
                     r, g, b  = col[4]
-                elif value >= 2:
+                elif value >= 2.5:
                     r, g, b  = col[2]
                     la_up += 1
             
@@ -256,21 +256,21 @@ def print_rgb():
             
             ### Brassica
             if tokens[1].startswith('Brassica'):
-                if value <= -5 :
+                if value <= -2.5 :
                     la_down += 1
                     r, g, b  = col[0]
-                elif -5 <= value < -2:
+                elif -2.5 <= value < -1:
                     r, g, b  = col[3]
-                elif -2 <= value < 1:
+                elif -1 <= value < 1:
                     r, g, b  = col[1]
-                elif 1 <= value < 5:
+                elif 1 <= value < 2.5:
                     r, g, b  = col[4]
-                elif value >= 5:
+                elif value >= 2.5:
                     r, g, b  = col[2]
                     la_up += 1
             
                 #r, g, b = convert_to_rgb(min_value, max_value, value, colors)
-                print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
+                #print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
                 
 
     print >> sys.stderr, "at_down :"+str(at_down)

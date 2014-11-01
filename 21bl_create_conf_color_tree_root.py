@@ -160,16 +160,16 @@ def print_rgb():
                 print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
             ### Lotus
             if tokens[1].startswith('Lotus'):
-                if value <= 2.5 :
+                if value <= 3 :
                     r, g, b  = col[0]
                     lj_down += 1
-                elif 2.5 <= value < 3:
+                elif 3 <= value < 4:
                     r, g, b  = col[3]
-                elif 3 <= value < 3.5:
+                elif 4 <= value < 5.5:
                     r, g, b  = col[1]
-                elif 3.5 <= value < 4:
+                elif 5.5 <= value < 6:
                     r, g, b  = col[4]
-                elif value >= 4:
+                elif value >= 6:
                     r, g, b  = col[2]
                     lj_up += 1
                 print 'prefix\t' + tokens[0] + '\t' + str(r)+' '+str(g)+' '+str(b)+'\t'+'\t'+ '2'
@@ -227,9 +227,9 @@ def print_rgb():
                     r, g, b  = col[3]
                 elif 8 <= value < 10:
                     r, g, b  = col[1]
-                elif 10 <= value < 12:
+                elif 10 <= value < 13:
                     r, g, b  = col[4]
-                elif value >= 12:
+                elif value >= 13:
                     r, g, b  = col[2]
                     zm_up += 1
             

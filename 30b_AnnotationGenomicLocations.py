@@ -148,21 +148,21 @@ def hash_annotations(gff3, chro):
         line = line.strip()
         if len(line) > 1 and not line.startswith('#'):
             obj = classGene.GFF3(line)
-            
-            if obj.types() == 'mRNA':
-                
-                if first_line == False:
-                    exons, cds, utr, intron, mRNA_type = addCoords(gs, exons, cds, utr, intron, mRNA_type)
+            if obj.seqids() == chro:
+                if obj.types() == 'mRNA':
                     
-                first_line = False
-                gs = classGeneStructure.GeneStructure(obj)
-                gs.addmRNA(obj)
-    
-            if obj.types() == 'exon':
-                gs.addexon(obj)
-    
-            if obj.types() == 'CDS':
-                gs.addcds(obj)
+                    if first_line == False:
+                        exons, cds, utr, intron, mRNA_type = addCoords(gs, exons, cds, utr, intron, mRNA_type)
+                        
+                    first_line = False
+                    gs = classGeneStructure.GeneStructure(obj)
+                    gs.addmRNA(obj)
+        
+                if obj.types() == 'exon':
+                    gs.addexon(obj)
+        
+                if obj.types() == 'CDS':
+                    gs.addcds(obj)
     
     exons, cds, utr, intron, mRNA_type = addCoords(gs, exons, cds, utr, intron, mRNA_type)
     

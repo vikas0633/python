@@ -74,18 +74,17 @@ def help():
     sys.exit(2)
 
 def temp(file):
-    num_lines = sum(1 for line in open(file))
-    return num_lines
+    return
 
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, threads, GFF3
     infile = ''
     threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:t:g:",["infile=","threads=","GFF3="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -95,10 +94,40 @@ def options(argv):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
+        elif opt in ("-g", "--GFF3"):
+            GFF3 = arg
             
     
     logfile(infile)
             
+def hash_gff3(chromosome):
+    HASH_GFF3 = {}
+    for line in open(GFF3,'r'):
+        line = line.strip()
+        obj = classGene.GFF3(line)
+        
+        if obj.types()=='mRNA' and obj.seqids()==chromosome:
+            try:
+                anno = re.search(r'Annotation=".+"',line).group(0).split('"')[1]
+                for i in range(int(obj.starts()),int(obj.ends())):
+                    if i not in HASH_GFF3:
+                        HASH_GFF3[i] = anno
+            except:
+                continue
+    return HASH_GFF3
+            
+
+def add_anno(chromosome,VAR):
+    HASH_GFF3 = hash_gff3(chromosome)
+    
+    for line in open(infile,'r'):
+        line = line.strip()
+        tokens = line.split('\t')
+        if tokens[0] == chromosome:
+            if int(tokens[1]) in HASH_GFF3:
+                print line + '\t' + HASH_GFF3[int(tokens[1])]
+            else:
+                print line + '\t' + "No_gene"
     
 
 if __name__ == "__main__":
@@ -106,15 +135,11 @@ if __name__ == "__main__":
 
     options(sys.argv[1:])
     
-    print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
+    chroHash = get_size(GFF3)
     
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Input count: " + str(temp(infile))
-    print >> sys.stderr, "Output count: " + str(temp(infile))
-    print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
-    print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
         
     ### multithreading        
@@ -125,7 +150,7 @@ if __name__ == "__main__":
         VAR = manager.dict()
         for chromosome in sorted(chroHash):
             count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
+            t = Process(target=add_anno, args=(chromosome,VAR))
             thread_list.append(t)
             t.start()
     
@@ -134,7 +159,11 @@ if __name__ == "__main__":
     else:
         VAR = {}
         for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
+            add_anno(chromosome,VAR)
      
     o.close()
+    
+    print >> sys.stderr, "Output count: " + str(temp(infile))
+    print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
+    print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
     

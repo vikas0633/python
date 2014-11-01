@@ -16,7 +16,7 @@ for line in open(sys.argv[1],'r'):
 	else:
 		if(len(line)>0):
 			for i in range(1,len(token)):
-				sum_lib[i-1] += int(token[i]) 
+				sum_lib[i-1] += float(token[i]) 
 	
 ### take out lowest library count
 minimum=min(sum_lib)
@@ -45,7 +45,7 @@ for line in open(sys.argv[1],'r'):
 			first_line = False
 		else:
 			tokens=line.split('\t')
-			line += '\t'+str(sum([int(n) for n in tokens[1:]]))
+			line += '\t'+str(sum([float(n) for n in tokens[1:]]))
 			for i in range(1,len(tokens)): ### modify to have sum_norm as sum of all the other norm columns 
 				if(float(tokens[i])==0):
 					tokens[i]=1

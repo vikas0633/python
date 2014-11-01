@@ -86,7 +86,8 @@ def hash_prior():
             index = list_file_names.index((infile.split('/')[-1]).replace('.gff3',''))
             first_line = False
         else:
-            prior_n = index + 1
+            priors = line.split(',')
+            prior_n = priors[index]
     return prior_n
 
 def change_gff3(prior_n):

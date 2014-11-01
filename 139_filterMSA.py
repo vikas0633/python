@@ -80,12 +80,12 @@ def temp(file):
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, threads, coverage
     infile = ''
     threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:t:c:",["infile=","threads=","coverage="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -95,11 +95,68 @@ def options(argv):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
+        elif opt in ("-c", "--coverage"):
+            coverage = int(arg)
             
     
     logfile(infile)
             
+
+def LOADfasta(file):
+    headers = []
+    first_line = True
+    seq = {}
+    string = ''
+    for line in open(file,'r'):
+            line = line.strip()
+            if len(line) > 0 :			
+                    if line[0] == '>':
+                            if first_line == False:
+                                    if string != '': 
+                                            seq[header] = string
+                            string = ''
+                            header = line[1:].strip().split()[0]
+                            headers.append(header)
+                    else:
+                            string += line
+            first_line = False			
+    if string != '': 
+            seq[header] = string
+    return seq, headers
+
+def count_coverage(seqs, headers):
     
+    ### count coverage of each position
+    pos_cov = {}
+    out = open(infile+'.'+str(coverage)+'.fa',"w")
+    for seq in seqs:
+        for i in range(len(seqs[seq])):
+            if i in pos_cov:
+                if seqs[seq][i]=='-':
+                    continue
+                else:
+                    pos_cov[i] += 1
+            else:
+                if seqs[seq][i]=='-':
+                    continue
+                else:
+                    pos_cov[i] = 1
+    
+    ### print positions with higher coverage
+    for seq in headers:
+        out.write('>'+seq+'\n')
+        count = 0
+        for i in range(len(seqs[seq])):
+            if pos_cov[i] > coverage:
+                count += 1
+                out.write(seqs[seq][i])
+                if count%60 == 0:
+                    out.write('\n')
+        out.write('\n')
+    for i in range(len(pos_cov)):
+        print i, pos_cov[i]
+            
+
 
 if __name__ == "__main__":
     
@@ -107,7 +164,9 @@ if __name__ == "__main__":
     options(sys.argv[1:])
     
     print 'Hashing the chromosomes name'
-    chroHash = get_size(infile)
+    
+    seqs, headers = LOADfasta(infile)
+    count_coverage(seqs, headers)
     
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
@@ -116,25 +175,4 @@ if __name__ == "__main__":
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
     
