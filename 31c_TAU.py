@@ -120,12 +120,12 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             five_prime_UTR_st = mRNA_st -1
                             five_prime_UTR_en = start - exons[1][0] + mRNA_st -2
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_st)+'\t'+str(five_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_st)+'\t'+str(five_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             CDS_st = start
                             CDS_en = end
                             ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_st + mRNA_st )+'\t'+str(CDS_en + mRNA_st -1 )+'\t'+'.'+'\t'+cds_strand+'\t'+str(frame)+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_st + mRNA_st )+'\t'+str(CDS_en + mRNA_st -1 )+'\t'+'.'+'\t'+cds_strand+'\t'+str(frame)+'\t'+ID
                             o.write(lin+'\n')
                             cds_len = CDS_en - CDS_st + 1
                             exon_st = exons[1][0]
@@ -136,7 +136,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             three_prime_UTR_en = exons[len(exons)][1] + mRNA_st - exons[1][0]
                             ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             if (three_prime_UTR_en - three_prime_UTR_st > 1):
-                                lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
+                                lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                                 o.write(lin+'\n')
                                 
                         elif (cds_strand == mRNA_strand):
@@ -155,12 +155,12 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             five_prime_UTR_st = mRNA_st - exons[1][0]
                             five_prime_UTR_en = start + introns + mRNA_st -1
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_st)+'\t'+str(five_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_st)+'\t'+str(five_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             CDS_st = start + introns -1
                             if exons[j][1] - exons[1][0] - introns >= end:
                                 if (start < (exons[1][1] - exons[1][0]))&(end > (exons[1][1] - exons[1][0])):
-                                    lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str((start)+mRNA_st)+'\t'+str(exons[1][1]+ mRNA_st )+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                    lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str((start)+mRNA_st)+'\t'+str(exons[1][1]+ mRNA_st )+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                     o.write(lin+'\n')
                                 three_prime_UTR_st = (end+introns) + 1 + mRNA_st
                                 CDS_en = (end+introns) + 1 
@@ -169,7 +169,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                 CDS_en = exons[j][1] - exons[1][0] -1
                                 flag_end = False
                             ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_st+ mRNA_st + 1)+'\t'+str(CDS_en+ mRNA_st )+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_st+ mRNA_st + 1)+'\t'+str(CDS_en+ mRNA_st )+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                             o.write(lin+'\n')
                             three_prime_UTR_st = CDS_en + mRNA_st + 1 - exons[1][0]
                             cds_len = CDS_en - CDS_st + 1
@@ -185,14 +185,14 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                     ID = 'ID='+mRNA_id+'.'+str('CDS.')+str(i)+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             
                                     if (start <= exon_st) & (end-start > cds_len):
-                                        lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exon_st+ mRNA_st)+'\t'+str(exon_en+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                        lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exon_st+ mRNA_st)+'\t'+str(exon_en+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                         o.write(lin+'\n')
                                         three_prime_UTR_st = exon_st+ mRNA_st + 1
                                         frame = 3 - (cds_len)%3
                                         if frame == 3:
                                             frame = 0
                                     elif end-start <= cds_len:
-                                        lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exon_st+ mRNA_st)+'\t'+str(exon_st+(end - start - last_cds_len)+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                        lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exon_st+ mRNA_st)+'\t'+str(exon_st+(end - start - last_cds_len)+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                         o.write(lin+'\n')
                                         three_prime_UTR_st = exon_st+(end - start - last_cds_len) + 3 + mRNA_st
                                         break
@@ -200,7 +200,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             three_prime_UTR_en = exons[len(exons)][1] + mRNA_st - exons[1][0]
                             ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             if (three_prime_UTR_en - three_prime_UTR_st > 1):
-                                lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                                lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_st)+'\t'+str(three_prime_UTR_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
                                 o.write(lin+'\n')
                     
                     if cds_strand == '-':
@@ -210,7 +210,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             five_prime_UTR_st =  mRNA_en
                             five_prime_UTR_en =  exons[len(exons)][1] - start  + mRNA_st - 1
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             if len(all_exons) == 1:
@@ -225,7 +225,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                 CDS_st = exons[len(exons)][1] - start -1 - exons[1][0] 
                                 CDS_en = exons[len(exons)][1] - end - exons[1][0]
                             
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_en + mRNA_st +1 )+'\t'+str(CDS_st + mRNA_st + 1)+'\t'+'.'+'\t'+cds_strand+'\t'+str(frame)+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_en + mRNA_st +1 )+'\t'+str(CDS_st + mRNA_st + 1)+'\t'+'.'+'\t'+cds_strand+'\t'+str(frame)+'\t'+ID
                             o.write(lin+'\n')
                             cds_len = CDS_st - CDS_en + 1
                             frame = 3- (cds_len) % 3
@@ -235,7 +235,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             three_prime_UTR_st = CDS_en - 1 + mRNA_st
                             three_prime_UTR_en = mRNA_st - 1
                             ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+cds_strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             
                         elif (cds_strand == mRNA_strand):
@@ -252,7 +252,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             five_prime_UTR_st =  mRNA_en
                             five_prime_UTR_en =  exons[len(exons)][1] - start - introns + mRNA_st - 1
                             ID = 'ID='+mRNA_id+'.'+str('5_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'five_prime_UTR'+'\t'+str(five_prime_UTR_en)+'\t'+str(five_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
                             ID = 'ID='+mRNA_id+'.'+str('CDS.1')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
                             
@@ -268,7 +268,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                     frame=0
 
                                 if (start < (exons[len(exons)][1] - exons[len(exons)][0])) & (end > (exons[len(exons)][1] - exons[len(exons)][0])):
-                                    lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exons[len(exons)][0]+ mRNA_st +1 )+'\t'+str(exons[j][1] - start + mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                    lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exons[len(exons)][0]+ mRNA_st +1 )+'\t'+str(exons[j][1] - start + mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                     o.write(lin+'\n')
                                 three_prime_UTR_st = exons[len(exons)][1] - (end+introns) - 1 + mRNA_st
                                 flag_end = True
@@ -282,7 +282,7 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                             
                             print CDS_en, CDS_st
                             if CDS_en <= CDS_st + 3 :
-                                lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_en+ mRNA_st)+'\t'+str(CDS_st+ mRNA_st + 1)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(CDS_en+ mRNA_st)+'\t'+str(CDS_st+ mRNA_st + 1)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                 o.write(lin+'\n')
                             three_prime_UTR_st = CDS_en + mRNA_st -1
                             if flag_end == False:
@@ -297,17 +297,17 @@ def call_CDS(count,mRNA_id,gene_model,mRNA_st,mRNA_en,strand,model_no, exons, ch
                                         frame = (cds_len) % 3
                                         if frame == 3:
                                             frame = 0
-                                        lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exon_st+ mRNA_st)+'\t'+str(exon_en+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                        lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exon_st+ mRNA_st)+'\t'+str(exon_en+ mRNA_st)+'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                         o.write(lin+'\n')
                                         three_prime_UTR_st = exon_st+ mRNA_st -1
                                     elif end-start <= cds_len:
-                                        lin = token[0][1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exons[i][1]-(end -start -last_cds_len)+mRNA_st + 1)+'\t'+str(exons[i][1]+ mRNA_st -1) +'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
+                                        lin = ".".join(token[:len(token)-2])[1:]+'\t'+'TAU'+'\t'+'CDS'+'\t'+str(exons[i][1]-(end -start -last_cds_len)+mRNA_st + 1)+'\t'+str(exons[i][1]+ mRNA_st -1) +'\t'+'.'+'\t'+strand+'\t'+str(frame)+'\t'+ID
                                         o.write(lin+'\n')
                                         three_prime_UTR_st = exons[i][1]-(end -start -last_cds_len) - 1 + mRNA_st
                                         break
                             three_prime_UTR_en = mRNA_st - 1
                             ID = 'ID='+mRNA_id+'.'+str('3_prime_UTR')+';'+'Parent='+mRNA_id+'.'+str(no)+';'
-                            lin = token[0][1:]+'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+                            lin = ".".join(token[:len(token)-2])[1:] +'\t'+'TAU'+'\t'+'three_prime_UTR'+'\t'+str(three_prime_UTR_en)+'\t'+str(three_prime_UTR_st)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
                             o.write(lin+'\n')
     return cds_strand
                 
@@ -328,8 +328,8 @@ def mRNA(count,gene_id,gene_model,mRNA_st,mRNA_en,strand,model_no):
             ID = 'ID='+gene_id+'.'+str(model_no)+';'+'Parent='+gene_id+';'
             mRNA_id = gene_id+'.'+str(model_no)
             #strand = tokens[4].strip()                                                 # Do not take strand from cdna file
-            #lin = token[0][1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(start)+'\t'+str(end)+'\t'+'.'+'\t'+tokens[4].strip()+'\t'+'.'+'\t'+ID
-            lin = token[0][1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(mRNA_st)+'\t'+str(mRNA_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
+            #lin = ".".join(token[:len(token)-2])[1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(start)+'\t'+str(end)+'\t'+'.'+'\t'+tokens[4].strip()+'\t'+'.'+'\t'+ID
+            lin = ".".join(token[:len(token)-2])[1:]+'\t'+gene_model+'\t'+'mRNA'+'\t'+str(mRNA_st)+'\t'+str(mRNA_en)+'\t'+'.'+'\t'+strand+'\t'+'.'+'\t'+ID
             cds_strand = strand
             if flag == False:
                 o.write(lin+'\n')
@@ -499,8 +499,8 @@ def process_gff(gff,infile):
                 
                 
 def remove_temp_files():
-    os.system('[ -f tau_in ] && rm -r TAU_* || echo "No trash in the directory"')
-    os.system('[ -f tau_in ] && rm -r temp* || echo "No trash in the directory"')
+    os.system('[ -f tau_in ] && rm -rf TAU_* || echo "No trash in the directory"')
+    os.system('[ -f tau_in ] && rm -rf temp* || echo "No trash in the directory"')
 
 if __name__ == "__main__":
 
@@ -563,4 +563,4 @@ if __name__ == "__main__":
     ### process gene model file
     process_gff(gff,infile)
     
-    os.system('rm -r temp*')
+    os.system('rm -rf temp*')

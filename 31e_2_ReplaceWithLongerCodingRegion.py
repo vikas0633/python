@@ -136,26 +136,27 @@ def make_gff3(reaplcement_IDs, hash_combine):
             elif  obj.types() == "mRNA":
                 ID = str(obj)
                 if ID in reaplcement_IDs:
-                    print_flag = False
-                    ### print new mRNA
                     token = hash_combine[reaplcement_IDs[ID]]['mRNA'].split('\t')
-                    out.write(token[0]+ '\t'+ source + '\t' + token[2]+ '\t' + token[3]+ '\t'+ token[4]+'\t'+ token[5]+ '\t'+ token[6]+'\t'+ token[7]+ '\t'+ (token[8].split("Parent=")[0]).replace(reaplcement_IDs[ID], ID)+"Parent="+g_id+";Name="+ID+'\n')
-                    
-                    ### print exon lines of the lines
-                    for i in hash_combine[reaplcement_IDs[ID]]['exon'].split(',')[1:]:
-                        i = i.replace(reaplcement_IDs[ID], ID)
-                        token = i.split('\t')
-                        out.write(token[0]+'\t'+ \
-                                  source + '\t' + \
-                                  '\t'.join(token[2:])+'\n')
+                    if obj.seqids() == token[0]:
+                        print_flag = False
+                        ### print new mRNA
+                        out.write(token[0]+ '\t'+ source + '\t' + token[2]+ '\t' + token[3]+ '\t'+ token[4]+'\t'+ token[5]+ '\t'+ token[6]+'\t'+ token[7]+ '\t'+ (token[8].split("Parent=")[0]).replace(reaplcement_IDs[ID], ID)+"Parent="+g_id+";Name="+ID+'\n')
                         
-                    ### print CDS lines of the lines
-                    CDS_count = 0
-                    for i in hash_combine[reaplcement_IDs[ID]]['CDS'].split(',')[1:]:
-                        CDS_count += 1
-                        i = i.replace(reaplcement_IDs[ID], ID)
-                        token = i.split('\t')
-                        out.write(token[0]+ '\t'+ source + '\t' + token[2]+ '\t' + token[3]+ '\t'+ token[4]+'\t'+ token[5]+ '\t'+ token[6]+'\t'+ token[7]+ '\t'+ (token[8].replace(reaplcement_IDs[ID], ID)).split("ID=")[0]+"ID="+ID+'.CDS.'+str(CDS_count)+";Parent="+ID+'\n')                    
+                        ### print exon lines of the lines
+                        for i in hash_combine[reaplcement_IDs[ID]]['exon'].split(',')[1:]:
+                            i = i.replace(reaplcement_IDs[ID], ID)
+                            token = i.split('\t')
+                            out.write(token[0]+'\t'+ \
+                                      source + '\t' + \
+                                      '\t'.join(token[2:])+'\n')
+                            
+                        ### print CDS lines of the lines
+                        CDS_count = 0
+                        for i in hash_combine[reaplcement_IDs[ID]]['CDS'].split(',')[1:]:
+                            CDS_count += 1
+                            i = i.replace(reaplcement_IDs[ID], ID)
+                            token = i.split('\t')
+                            out.write(token[0]+ '\t'+ source + '\t' + token[2]+ '\t' + token[3]+ '\t'+ token[4]+'\t'+ token[5]+ '\t'+ token[6]+'\t'+ token[7]+ '\t'+ (token[8].replace(reaplcement_IDs[ID], ID)).split("ID=")[0]+"ID="+ID+'.CDS.'+str(CDS_count)+";Parent="+ID+'\n')                    
                 else:
                     print_flag = True
                     out.write(line+'\n')
