@@ -14,7 +14,7 @@ def options(argv):
 	sep='\t'
 	first_line = False
 	try:
-		opts, args = getopt.getopt(argv,"hi:j:c:d:s:",["file1=","file2=","col1=","col2=",'separatedBy='])
+		opts, args = getopt.getopt(argv,"hi:j:c:d:s:f",["file1=","file2=","col1=","col2=",'separatedBy='])
 	except getopt.GetoptError:
 		print '''
 			python 100_intersect_columns.py
@@ -71,13 +71,15 @@ def HASH(file1,c1,sep,first_line):
 					key = ''
 					for i in lis:
 						key += '-'+token[int(i)-1]
-					hash[key] = ''
+					hash[key] = line
+				if first_line == True:
+					header = line.strip()
 				first_line = False
-	return hash
+	return hash, header
 
 
 ### parse the second file
-def PARSE(file2,c2,sep,first_line,hash):
+def PARSE(file2,c2,sep,first_line,hash, header):
 	for line in open(file2,'r'):
 		if len(line) > 1:
 			if line[0] != '#':
@@ -90,7 +92,9 @@ def PARSE(file2,c2,sep,first_line,hash):
 						key += '-'+token[int(i)-1] 
 					#if key not in hash:
 					if key in hash:
-						print line
+						print line + '\t' + hash[key]
+				if first_line == True:
+					print line.strip()+'\t'+header
 				first_line = False
 
 
@@ -99,7 +103,7 @@ if __name__ == "__main__":
 	file1, file2, col1, col2, sep, first_line = options(sys.argv[1:])
 	
 	### hash the first file
-	hash = HASH(file1,col1,sep,first_line)
+	hash,header = HASH(file1,col1,sep,first_line)
 	
 	### parse the second file
-	PARSE(file2,col2,sep,first_line, hash)
+	PARSE(file2,col2,sep,first_line, hash, header)

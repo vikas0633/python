@@ -88,7 +88,7 @@ def LOADfasta(file):
 					if string != '': 
 						seq[header] = string
 				string = ''
-				header = '.'.join(line[1:].strip().split()[0].split('.')[:-1])
+				header = line[1:].strip().split(' ')[0]
 			else:
 				string += line
 		first_line = False			
@@ -96,24 +96,16 @@ def LOADfasta(file):
 		seq[header] = string
 	return seq
 
-def hash_anno():
-    AnnoHash = {}
-    for line in open(anno, 'r'):
-        line = line.strip()
-        tokens = line.split('\t')
-        g_id = '.'.join(tokens[0].split('.')[:-1])
-        AnnoHash[g_id] = tokens[1].replace(' ','_')
-    
-    return AnnoHash
 
 def create_blast_database(database):
     os.system('nice -n 19 makeblastdb -in '+ database +" -dbtype 'prot'")
 
 ### main argument to
 def options(argv):
-	global infile, threads, anno, DATABASE1, DATABASE2
+	global infile, threads, anno, DATABASE1, DATABASE2, skip_first_line
 	infile = ''
 	threads = 2
+	skip_first_line = False
 	try:
 		opts, args = getopt.getopt(argv,"hi:t:a:d:e:",["infile=","threads=","anno=","DATABASE1=","DATABASE2="])
 	except getopt.GetoptError:
@@ -150,7 +142,7 @@ def process_seq(header, seq):
 	### extract the best hit
 	for line in open('temp.out', 'r'):
 		line = line.strip()
-		target_seq = '.'.join(line.split('\t')[1].split()[0].split('.')[:-1]) #At top hit
+		target_seq = line.split('\t')[1].split()[0] #At top hit
 		break
     
 	temp_line += '\t' + target_seq 
@@ -170,7 +162,7 @@ def process_seq(header, seq):
 		for line in open('temp.out', 'r'):
 			line = line.strip()
 			if first_line == True:
-				sec_target_seq = '.'.join(line.split('\t')[1].split()[0].split('.')[:-1]) #Lj top hit
+				sec_target_seq = line.split('\t')[1].split()[0] #Lj top hit
 				print >> sys.stderr, "Found second target: ", sec_target_seq
 			target_seq = line.split('\t')[1].split()[0] ## Lj pos
 			if len(line) > 0 and last_target_seq != target_seq:
@@ -184,49 +176,24 @@ def process_seq(header, seq):
 		if added == False:
 			temp_line += '\t'+ str('No_Hit')
 		
-		temp_line += '\t' + sec_target_seq 
-		
-		if sec_target_seq != 'No_Hit':
-			added = False ### flag for adding position
-			### fetch target seq from Database 1
-			seq = HASH_DATABASE1[sec_target_seq]
-			last_target_seq = ''
-			### blast against the second database
-			blast_seq(sec_target_seq, seq, DATABASE2) ## Lj -> At -3
-			count = 0
-			### find the position of original query
-			for line in open('temp.out', 'r'):
-				line = line.strip()
-				target_seq = line.split('\t')[1].split()[0] ## At pos
-				if len(line) > 0 and last_target_seq != target_seq:
-					count += 1
-				if re.search(At_header, target_seq):
-					temp_line += '\t'+ str(count)
-					added = True
-					break
-				last_target_seq = target_seq
-			
-			if added == False:
-				temp_line += '\t'+ str('No_Hit')
+		temp_line += '\t' + sec_target_seq
 			
 	return temp_line
 	
 def read_query():
-    global temp_line
-    first_line = True
-    ### read in the query file and blast individually
-    for line in open(infile,'r'):
-        line = line.strip()
-        
-        if len(line) > 0:
-            if first_line == False:
-				header = re.findall(r'AT.G.....',line.split()[0])[0] ###  make sure input file agree Lotus pattern
+	global temp_line
+	### read in the query file and blast individually
+	for line in open(infile,'r'):
+		line = line.strip()
+		if len(line) > 0:
+			if line.startswith('>'):
+				#header = re.findall(r'AT.G.....',line.split()[0])[0] ###  make sure input file agree Lotus pattern
+				header = line[1:].strip().split()[0]
 				print >> sys.stderr, "Running gene: " + str(header)
 				seq=HASH_DATABASE1[header]
 				temp_line=line.split('\t')[0] + '\t'+ header
 				print process_seq(header, seq)
-        first_line = False
-        
+		
 
 if __name__ == "__main__":
 	
@@ -237,7 +204,6 @@ if __name__ == "__main__":
 
 	### hash annotations
 	global AnnoHash, HASH_DATABASE1, HASH_DATABASE2
-	AnnoHash = hash_anno()
 	
 	### create blast databases for two genome
 	#create_blast_database(DATABASE1)

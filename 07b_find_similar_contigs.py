@@ -30,6 +30,7 @@ import threading
 from multiprocessing import Process, Queue, Manager
 from threading import Thread
 import classGene
+import operator
 ### global variables
 global infile
 
@@ -99,7 +100,47 @@ def options(argv):
     
     logfile(infile)
             
-    
+def count_genes():
+    count_contig = 1
+    count_same_contig = 0
+    count_different_contig = 0
+    count_replace = 0
+    count_replaced = 0
+    new_contig = True
+    first_line = True
+    count = 1
+    gene = {}
+    temp = {}
+    last_contig_1 = ''
+    last_contig_2 = ''
+    for line in open(infile,'r'):
+        line  = line.strip()
+        token = line.split('\t')
+        if len(line) > 1:
+            contig_1 = "g".join(token[0].split('g')[:-1])
+            contig_2 = "g".join(token[1].split('g')[:-1])
+            if len(token)>3:
+                if last_contig_1 == contig_1:
+                    count  += 1
+                    if token[1] not in temp:
+                        if contig_2 in gene:
+                            gene[contig_2] += 1
+                        else:
+                            gene[contig_2] = 1
+                    temp[token[1]] = ''
+                else:
+                    if first_line == False:
+                        print last_contig_1 +"\t"+ max(gene.iteritems(), key=operator.itemgetter(1))[0] +"\t"+ str(gene[max(gene.iteritems(), key=operator.itemgetter(1))[0]])
+                        gene = {}
+                        temp = {}
+                        count  = 1
+                        gene[contig_2] = 1
+                        temp[token[1]] = ''
+                
+                    last_contig_1 = contig_1
+                    last_contig_2 = contig_2
+        first_line = False
+    print last_contig_1 +"\t"+ max(gene.iteritems(), key=operator.itemgetter(1))[0] + '\t' + str(gene[max(gene.iteritems(), key=operator.itemgetter(1))[0]])
 
 if __name__ == "__main__":
     
@@ -109,29 +150,12 @@ if __name__ == "__main__":
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Input count: " + str(temp(infile))
+    
+    
+    count_genes()
+    
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
     

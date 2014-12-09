@@ -99,7 +99,45 @@ def options(argv):
     
     logfile(infile)
             
-    
+def count_genes():
+    count_contig = 1
+    count_same_contig = 0
+    count_different_contig = 0
+    count_replace = 0
+    count_replaced = 0
+    new_contig = True
+    first_line = True
+    gene = {}
+    for line in open(infile,'r'):
+        line  = line.strip()
+        token = line.split('\t')
+        contig_1 = "g".join(token[1].split('g')[:-1])
+        contig_2 = "g".join(token[2].split('g')[:-1])
+        if len(token)>3:
+            gene[token[2]] = ''
+            if first_line == False:
+                if last_contig_1 == contig_1:
+                    count_contig += 1
+                    if last_contig_2 == contig_2:
+                        count_same_contig += 1
+                        if token[3] != 'No_Hit':
+                            if 1 < int(token[3]) <= 10:
+                                count_replace += 1
+                            if int(token[3]) == 1:
+                                count_replaced += 1
+                    else:
+                        count_different_contig += 1
+                    
+            
+            last_contig_1 = contig_1
+            last_contig_2 = contig_2
+            first_line = False
+
+    print "Total number of contigs proccessed: \t"+ str(count_contig)
+    print "Total number of genes in matching contigs: \t" +  str(count_same_contig)
+    print "Total number of genes with bestreciprocal blast hit = 1: \t" + str(count_replaced)
+    print "Total number of genes with reciprocal hit 1< and <10: \t"+ str(count_replace)
+    print "Total number of genes present in different proginator contigs: \t " + str(count_different_contig)
 
 if __name__ == "__main__":
     
@@ -109,29 +147,12 @@ if __name__ == "__main__":
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Input count: " + str(temp(infile))
+    
+    
+    count_genes()
+    
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
     

@@ -69,7 +69,13 @@ def logfile(infile):
     
 def help():
     print '''
-            python 100b_fasta2flat.py -i <infile>
+            python 141_trim_fasta.py -i <infile>
+                -i/--infile STRING <input fasta>
+                -t/--threads INT <number of cpus>
+                -e/--end INT <5 or 3> "Operate on 5' or 3' end"
+                -k/--keep INT <keep the bases> <default>
+                -t/--trim INT <Remove these bases>
+                
             '''
     sys.exit(2)
 
@@ -80,12 +86,15 @@ def temp(file):
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, threads, end, keep, trim
     infile = ''
     threads = 2
+    end = 5
+    keep = 0
+    trim = 0
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:t:e:k:t:",["infile=","threads=","end=","keep=","trim="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -95,11 +104,57 @@ def options(argv):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
+        elif opt in ("-e", "--end"):
+            end = int(arg)
+        elif opt in ("-k", "--keep"):
+            keep = int(arg)
+        elif opt in ("-t", "--trim"):
+            trim = int(arg)
             
     
     logfile(infile)
-            
-    
+
+def LOADfasta(file):
+        o = open(file+'.temp','w')
+	first_line = True
+	seq = {}
+	string = ''
+	for line in open(file,'r'):
+		line = line.strip()
+		if len(line) > 0 :			
+			if line[0] == '>':
+				if first_line == False:
+					if string != '': 
+						o.write('>'+header+'\n')
+                                                o.write(string+'\n')
+				string = ''
+				header = line[1:].strip().split()[0]
+			else:
+				string += line
+		first_line = False			
+	if string != '':
+                o.write('>'+header+'\n')
+		o.write(string+'\n')
+        o.close()
+        
+def process_fasta(seq):
+    for line in open(infile+'.temp','r'):
+        line = line.strip()
+        if line.startswith('>'):
+            print line
+            header = line[1:].strip().split()[0]
+        else:
+            length = len(line)
+            if end == 5:
+                if keep != 0:
+                    print line[:keep]
+                elif trim != 0:
+                    print line[trim:]
+            elif end == 3:
+                if keep != 0:
+                    print line[length-keep:length]
+                elif trim != 0:
+                    print line[:length-trim]
 
 if __name__ == "__main__":
     
@@ -109,29 +164,13 @@ if __name__ == "__main__":
     start_time = datetime.datetime.now()
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Input count: " + str(temp(infile))
+    
+    seq = LOADfasta(infile)
+    
+    process_fasta(seq)
+    
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
     

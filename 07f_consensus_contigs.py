@@ -80,12 +80,12 @@ def temp(file):
 ### main argument to 
 
 def options(argv):
-    global infile, threads
+    global infile, threads, gaps
     infile = ''
     threads = 2
     
     try:
-        opts, args = getopt.getopt(argv,"hi:t:",["infile=","threads="])
+        opts, args = getopt.getopt(argv,"hi:t:g:",["infile=","threads=","gaps="])
     except getopt.GetoptError:
         help()
     for opt, arg in opts:
@@ -95,11 +95,56 @@ def options(argv):
             infile = arg
         elif opt in ("-t", "--threads"):
             threads = int(arg)
-            
+        elif opt in ("-g", "--gaps"):
+            gaps = int(arg)
     
     logfile(infile)
             
+def merge_contigs():
+    first_line = True
+    block_start = True
+    for line in open(infile,'r'):
+            
+        line = line.strip()
+        tokens = line.split('\t')
+        contig = tokens[0]
+        st = int(tokens[1])
+        en = int(tokens[2])
+        g_id = tokens[3].replace('ID=','')
+        score = tokens[4]
+        strand = tokens[5]
+        
+        if first_line == False:
+            if contig == last_contig:
+                ### check if new contig overlaps
+                if bl_en + gaps > st: 
+                    if en > bl_en:
+                        bl_en = en
+                        bl_id += '_' + g_id
+                else:
+                    block_start = True
+                    print last_contig + '\t' + str(bl_st) + '\t' + str(bl_en) + '\t' + 'id=' + bl_id+ '\t' + str(bl_score) + '\t' + str(bl_strand)
+            else:
+                block_start = True
+                print last_contig + '\t' + str(bl_st) + '\t' + str(bl_en) + '\t' + 'id=' + bl_id + '\t' + str(bl_score) + '\t' + str(bl_strand)
+            
+        ### check if new block starts
+        if block_start == True:
+            bl_st = st
+            bl_en = en
+            bl_id = g_id
+            bl_contig = contig
+            bl_score = score
+            bl_strand = strand 
+            block_start = False
+            
+        first_line = False
+        last_contig = contig
+        last_en = en
     
+    ### print the last line
+    print last_contig + '\t' + str(bl_st) + '\t' + str(bl_en) + '\t' + 'id=' + bl_id+ '\t' + str(bl_score) + '\t' + str(bl_strand)
+        
 
 if __name__ == "__main__":
     
@@ -107,31 +152,14 @@ if __name__ == "__main__":
     options(sys.argv[1:])
     
     start_time = datetime.datetime.now()
+    print >> sys.stderr, "Input file must be sorted"
     print >> sys.stderr, "Running temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Input count: " + str(temp(infile))
+    
+    merge_contigs()
+    
     print >> sys.stderr, "Output count: " + str(temp(infile))
     print >> sys.stderr, "Completed temp script: " + str(datetime.datetime.now())
     print >> sys.stderr, "Time take to complete: " + str(datetime.datetime.now() - start_time)
 
-        
-    ### multithreading        
-    thread_list = []
-    count = 0
-    if len(chroHash) <= threads:
-        manager = Manager()
-        VAR = manager.dict()
-        for chromosome in sorted(chroHash):
-            count += 1
-            t = Process(target=FUNCTION, args=(chromosome,VAR))
-            thread_list.append(t)
-            t.start()
-    
-        for thread in thread_list:
-            thread.join()
-    else:
-        VAR = {}
-        for chromosome in sorted(chroHash):
-            FUNCTION(chromosome,VAR)
-     
-    o.close()
     

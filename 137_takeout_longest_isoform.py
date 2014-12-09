@@ -110,7 +110,7 @@ def find_longest_isoform(infile):
             if first_line == False:
                 store_gene()
                 
-            temp_header = line[1:].split('.')[0]
+            temp_header = '.'.join(line[1:].split(' ')[0].split('.')[:-1])
             temp_seq = ''
             
         else:
