@@ -125,7 +125,13 @@ def hash_contig_order():
     for line in open(order, 'r'):
         line = line.strip()
         tokens = line.split("\t")
-        HashContig[tokens[0]] = tokens[1]
+        token = tokens[9].split('_')
+        for i in range(len(token)/2):
+            j = token[2*i] + '_' + token[2*i+1] 
+            if tokens[0] not in HashContig:
+                HashContig[tokens[0]] = ["g".join(j.split('g')[:-1])]
+            else:
+                HashContig[tokens[0]].append("g".join(j.split('g')[:-1]))
     
     return HashContig
         
@@ -135,6 +141,30 @@ def find_orthologs(HashBlast, HashBlastPair, HashContig):
     store_key1 = {}
     store_key2 = {}
     count = 0
+    
+    ### Condition -1: present in right contig and also has a blast hit
+    for line in open(infile, 'r'):
+        line = line.strip()
+        tokens = line.split("\t")
+        contig_1 = "g".join(tokens[1].split('g')[:-1])
+        contig_2 = "g".join(tokens[2].split('g')[:-1])    
+        if len(tokens) >= 4:
+            if tokens[3] != "No_Hit":  
+                ### Not best reciprocal but still present in correct contig
+                if tokens[1] not in store_key1 and tokens[2] not in store_key2:
+                    if contig_1 in HashContig:
+                        if int(tokens[3]) < 100:
+                            for i in HashContig[contig_1]:
+                                if contig_2 == i:
+                                    if tokens[1]+"_"+tokens[2] in HashBlast:
+                                        print "Condition-1:"+ '\t' + tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+HashBlast[tokens[1]+"_"+tokens[2]]
+                                    else:
+                                        print "Condition-1:"+ '\t' +tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+"Low quality blast"
+                                    store_key1[tokens[1]] = ''
+                                    store_key2[tokens[2]] = ''
+                                    break
+                            
+    ### Condition-2: Best reciprocal hit
     for line in open(infile, 'r'):
         line = line.strip()
         tokens = line.split("\t")
@@ -148,30 +178,13 @@ def find_orthologs(HashBlast, HashBlastPair, HashContig):
                         count += 1
                         print >> sys.stderr, count
                         if tokens[1]+"_"+tokens[2] in HashBlast:
-                            print "Condition-1:"+ '\t' + tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+HashBlast[tokens[1]+"_"+tokens[2]]
+                            print "Condition-2:"+ '\t' + tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+HashBlast[tokens[1]+"_"+tokens[2]]
                         else:
-                            print "Condition-1:"+ '\t' +tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+"Low quality blast"
+                            print "Condition-2:"+ '\t' +tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+"Low quality blast"
                         store_key1[tokens[1]] = ''
                         store_key2[tokens[2]] = ''
-
-    for line in open(infile, 'r'):
-        line = line.strip()
-        tokens = line.split("\t")
-        contig_1 = "g".join(tokens[1].split('g')[:-1])
-        contig_2 = "g".join(tokens[2].split('g')[:-1])    
-        if len(tokens) >= 4:
-            if tokens[3] != "No_Hit":  
-                ### Not best reciprocal but still present in correct contig
-                if tokens[1] not in store_key1 and tokens[2] not in store_key2:
-                    if contig_1 in HashContig:
-                        if int(tokens[3]) < 10 and contig_2 == HashContig[contig_1]:
-                            if tokens[1]+"_"+tokens[2] in HashBlast:
-                                print "Condition-2:"+ '\t' + tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+HashBlast[tokens[1]+"_"+tokens[2]]
-                            else:
-                                print "Condition-2:"+ '\t' +tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+"Low quality blast"
-                            store_key1[tokens[1]] = ''
-                            store_key2[tokens[2]] = ''
-
+                        
+    ### condition-3: find the best blast hit not previously used 
     for line in open(infile, 'r'):
         line = line.strip()
         tokens = line.split("\t")
@@ -185,10 +198,11 @@ def find_orthologs(HashBlast, HashBlastPair, HashContig):
                         identity = float(HashBlast[tokens[1]+"_"+tokens[2]].split("\t")[0])
                         align_length = int(HashBlast[tokens[1]+"_"+tokens[2]].split("\t")[1])
                         #print identity, align_length
-                        if identity > 50 or align_length>50:
+                        if identity > 90 or align_length>100:   
                             print "Condition-3:"+ '\t' +tokens[1]+"\t"+tokens[2]+"\t"+tokens[3]+"\t"+HashBlast[tokens[1]+"_"+tokens[2]]
                             store_key1[tokens[1]] = ''
                             store_key2[tokens[2]] = ''
+                            
     for line in open(infile, 'r'):
         line = line.strip()
         tokens = line.split("\t")
@@ -204,8 +218,8 @@ def find_orthologs(HashBlast, HashBlastPair, HashContig):
                             identity = float(HashBlast[tokens[1]+"_"+key].split("\t")[0])
                             align_length = int(HashBlast[tokens[1]+"_"+key].split("\t")[1])
                             #print identity, align_length
-                            if identity > 50 or align_length>50:
-                                print "Condition-5:"+ '\t' +tokens[1]+"\t"+key+"\t"+"0"+"\t"+HashBlast[tokens[1]+"_"+key]
+                            if identity > 90 or align_length>100:
+                                print "Condition-4:"+ '\t' +tokens[1]+"\t"+key+"\t"+"0"+"\t"+HashBlast[tokens[1]+"_"+key]
                                 store_key1[tokens[1]] = ''
                                 store_key2[key] = ''
                                 break

@@ -174,6 +174,12 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
         strand = tokens[5]
             
         if first_line == False and contig != last_contig:
+            if switches == '':
+                if last_g_id == 'temp':
+                    switches = last_temp_id
+                else:
+                    switches = last_g_id
+                
             if occi_bp > 0 or palle_bp > 0:
                 print last_contig + '\t' + str(HASH_LEN[last_contig]) + '\t' + str(occi_bp) + '\t' + str(palle_bp) + '\t' + str(round(float(occi_bp)/(occi_bp+palle_bp),3)) + '\t' + str(No_switch) + '\t' + str(Switch) + '\t' + str(Over_prog) + '\t' + str(Non_over_prog) + '\t' + str(switches)
             occi_bp = 0
@@ -211,7 +217,7 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
                                     #print 'accepted: ' + last_g_id +'_'+ g_id
                                     Switch += 1
                                     last_en = en
-                                    switches += last_g_id + '->' + g_id
+                                    switches += last_g_id + '_' + g_id
                                     last_g_id = g_id
                 if last_g_id[0] == g_id[0]:
                     No_switch += 1
@@ -239,8 +245,12 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
                                     first_frag = False
             
             last_contig = contig
-        
+        last_temp_id = g_id
         first_line = False
+    if last_g_id == 'temp':
+        switches = last_temp_id
+    else:
+        switches = last_g_id
     if occi_bp > 0 or palle_bp > 0:
         print last_contig + '\t' + str(HASH_LEN[last_contig]) + '\t' + str(occi_bp) + '\t' + str(palle_bp) + '\t' + str(round(float(occi_bp)/(occi_bp+palle_bp),3)) + '\t' + str(No_switch) + '\t' + str(Switch) + '\t' + str(Over_prog) + '\t' + str(Non_over_prog) + '\t' + str(switches)
     

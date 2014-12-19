@@ -7,12 +7,14 @@ import os,sys,getopt, re
 ### main argument to 
 
 def options(argv):
+	global header
 	file1 = ''
 	file2 = ''
 	col1 = ''
 	col2 = ''
 	sep='\t'
 	first_line = False
+	header = ''
 	try:
 		opts, args = getopt.getopt(argv,"hi:j:c:d:s:f",["file1=","file2=","col1=","col2=",'separatedBy='])
 	except getopt.GetoptError:
@@ -59,6 +61,7 @@ def options(argv):
 
 ### hash the first file
 def HASH(file1,c1,sep,first_line):
+	header = ''
 	hash = {}
 	for line in open(file1,'r'):
 		
