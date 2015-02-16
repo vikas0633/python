@@ -162,7 +162,8 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
     last_en = 1000000000000
     first_frag = True
     switches = ''
-    print 'Contig\tContig_len\tOcci_bases\tPalle_bases\tOcci_fraction\tNo_switch\tSwitch\tOverlapping_progenators\tNon-Overlapping_progenators\tswitches'
+    bp_coords = '' 
+    print 'Contig\tContig_len\tOcci_bases\tPalle_bases\tOcci_fraction\tNo_switch\tSwitch\tOverlapping_progenators\tNon-Overlapping_progenators\tswitches\tBreakpoints'
     for line in open(infile,'r'):
         line = line.strip()
         tokens = line.split()
@@ -175,13 +176,14 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
             
         if first_line == False and contig != last_contig:
             if switches == '':
+                bp_coords = ''
                 if last_g_id == 'temp':
                     switches = last_temp_id
                 else:
                     switches = last_g_id
                 
             if occi_bp > 0 or palle_bp > 0:
-                print last_contig + '\t' + str(HASH_LEN[last_contig]) + '\t' + str(occi_bp) + '\t' + str(palle_bp) + '\t' + str(round(float(occi_bp)/(occi_bp+palle_bp),3)) + '\t' + str(No_switch) + '\t' + str(Switch) + '\t' + str(Over_prog) + '\t' + str(Non_over_prog) + '\t' + str(switches)
+                print last_contig + '\t' + str(HASH_LEN[last_contig]) + '\t' + str(occi_bp) + '\t' + str(palle_bp) + '\t' + str(round(float(occi_bp)/(occi_bp+palle_bp),3)) + '\t' + str(No_switch) + '\t' + str(Switch) + '\t' + str(Over_prog) + '\t' + str(Non_over_prog) + '\t' + str(switches) + '\t' + str(bp_coords)
             occi_bp = 0
             palle_bp = 0
             No_switch = 0
@@ -191,6 +193,7 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
             first_frag = True
             first_model = True
             switches = ''
+            bp_coords = ''
             last_g_id = 'temp'
             last_en = 1000000000000
         if en - st > 1000:
@@ -217,7 +220,8 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
                                     #print 'accepted: ' + last_g_id +'_'+ g_id
                                     Switch += 1
                                     last_en = en
-                                    switches += last_g_id + '_' + g_id
+                                    switches += last_g_id + '_' + g_id 
+                                    bp_coords += contig + '_' + str(st) + '/'
                                     last_g_id = g_id
                 if last_g_id[0] == g_id[0]:
                     No_switch += 1
@@ -252,7 +256,7 @@ def count_prog(HASH_ST, HASH_MAP, HASH_LEN):
     else:
         switches = last_g_id
     if occi_bp > 0 or palle_bp > 0:
-        print last_contig + '\t' + str(HASH_LEN[last_contig]) + '\t' + str(occi_bp) + '\t' + str(palle_bp) + '\t' + str(round(float(occi_bp)/(occi_bp+palle_bp),3)) + '\t' + str(No_switch) + '\t' + str(Switch) + '\t' + str(Over_prog) + '\t' + str(Non_over_prog) + '\t' + str(switches)
+        print last_contig + '\t' + str(HASH_LEN[last_contig]) + '\t' + str(occi_bp) + '\t' + str(palle_bp) + '\t' + str(round(float(occi_bp)/(occi_bp+palle_bp),3)) + '\t' + str(No_switch) + '\t' + str(Switch) + '\t' + str(Over_prog) + '\t' + str(Non_over_prog) + '\t' + str(switches)  + '\t' + str(bp_coords)
     
 if __name__ == "__main__":
     
